@@ -34,7 +34,7 @@ namespace TracingCore
             _pyTutorDataManager.AddMethodEntry(line, methodName, parameters);
         }
 
-        public void AddMethodExit(int line, VariableData variableData, bool replacePrev = true)
+        public void AddMethodExit(int line, VariableData variableData, bool replacePrev = false)
         {
             var varData = variableData ?? VariableData.EmptyVariableData();
             _pyTutorDataManager.AddMethodExit(line, varData, replacePrev);

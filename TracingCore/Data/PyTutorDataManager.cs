@@ -347,7 +347,7 @@ namespace TracingCore.Data
                     PyTutorStepMapper.HeapToJson(heap)
                 );
 
-                if (replacePrevStep)
+                if (replacePrevStep || prevStep.StackToRender.Count() == 1)
                 {
                     _pyTutorData.Trace.Remove(prevStep);
                 }
