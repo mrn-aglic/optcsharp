@@ -14,6 +14,7 @@ namespace TracingCore
         public Assembly Assembly { get; }
         
         public CompilationUnitSyntax Root { get; }
+        public CompilationUnitSyntax NewRoot { get; }
         public CSharpCompilation Compilation { get; }
 
         public CompilationResult
@@ -33,6 +34,7 @@ namespace TracingCore
         (
             CompilationResult compilationResult,
             CompilationUnitSyntax root,
+            CompilationUnitSyntax newRoot,
             CSharpCompilation compilation
         )
         {
@@ -40,6 +42,7 @@ namespace TracingCore
             Success = compilationResult.Success;
             Assembly = compilationResult.Assembly;
             Root = root;
+            NewRoot = newRoot;
             Compilation = compilation;
         }
     }

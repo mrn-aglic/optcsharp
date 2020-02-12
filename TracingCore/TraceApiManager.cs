@@ -23,11 +23,6 @@ namespace TracingCore
             _classManager = classManager;
         }
 
-        public void TraceMethodEntry(int line, string funcName, params VariableData[] variables)
-        {
-            Console.WriteLine($"{funcName}:{variables.Last()}");
-        }
-
         public void TraceData(int line, string statement, params VariableData[] variables)
         {
             var stdOut = _consoleHandler.GetConsoleOutput();

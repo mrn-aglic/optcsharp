@@ -81,12 +81,12 @@ namespace TracingCore
             var compilation = compiler.Compilation;
 
             var executionManager = new ExecutionManager();
-            return new CompilationResult(executionManager.CompileAssembly(compilation), originalRoot, compilation);
+            return new CompilationResult(executionManager.CompileAssembly(compilation), originalRoot, root, compilation);
         }
 
         public PyTutorData Trace(CompilationUnitSyntax root, CompilationResult compilationResult)
         {
-            var semanticModel = compilationResult.Compilation.GetSemanticModel(root.SyntaxTree);
+            var semanticModel = compilationResult.Compilation.GetSemanticModel(compilationResult.NewRoot.SyntaxTree);
             var classManager = new ClassManager(new Dictionary<string, ClassData>(), semanticModel);
 
             TraceApi.Init(root, new TraceApiManager(PyTutorDataManager, ConsoleHandler, classManager));

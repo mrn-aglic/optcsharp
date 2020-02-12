@@ -55,9 +55,6 @@ namespace TracingCore.SourceCodeInstrumentation
                 InstrumentationShared.MethodTrace.FirstStep
             );
 
-            listOfDetails.Add(enterDetails);
-            listOfDetails.Add(dullDetails);
-
             var returnStatements = statements
                 .Where(x => x.IsKind(SyntaxKind.ReturnStatement))
                 .Select(x => x as ReturnStatementSyntax)
@@ -78,9 +75,14 @@ namespace TracingCore.SourceCodeInstrumentation
                     )
                 };
 
-            listOfDetails.AddRange(exitDetailsList);
+            if (hasStatements)
+            {
+                listOfDetails.Add(enterDetails);
+                listOfDetails.Add(dullDetails);
+                listOfDetails.AddRange(exitDetailsList);
 
-            if (!hasStatements)
+            }
+            else
             {
                 var exitDetails = exitDetailsList.First();
                 var newBody = body.AddStatements(
