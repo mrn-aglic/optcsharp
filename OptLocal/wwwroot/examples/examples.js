@@ -43,7 +43,7 @@ namespace TraceSourceExample
             var a = 5;
             var b = a + 2;
             b = Test() + b;
-            Console.WriteLine(""Hello World!"");
+            Console.WriteLine("Hello World!");
         }
     }
 }`
