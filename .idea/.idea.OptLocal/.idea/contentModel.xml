@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="$USER_HOME$/Library/Caches/Rider2019.3/extResources" t="IncludeRecursive" />
+    <e p="$USER_HOME$/Library/Caches/Rider2019.3/resharper-host/local/Transient/ReSharperHost/v193/SolutionCaches/_OptLocal.-363407406.00" t="ExcludeRecursive" />
+    <e p="$PROJECT_DIR$" t="IncludeFlat">
+      <e p="OptLocal" t="IncludeRecursive">
+        <e p="appsettings.Development.json" t="Include" />
+        <e p="appsettings.json" t="Include" />
+        <e p="Areas" t="Include">
+          <e p="Default" t="Include">
+            <e p="Controllers" t="Include">
+              <e p="ShellController.cs" t="Include" />
+              <e p="TraceApiController.cs" t="Include" />
+            </e>
+            <e p="Views" t="Include">
+              <e p="_ViewStart.cshtml" t="Include" />
+              <e p="Shell" t="Include">
+                <e p="Index.cshtml" t="Include" />
+              </e>
+            </e>
+          </e>
+        </e>
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Controllers" t="Include">
+          <e p="HomeController.cs" t="Include" />
+        </e>
+        <e p="Models" t="Include">
+          <e p="ErrorViewModel.cs" t="Include" />
+        </e>
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="OptLocal.AssemblyInfo.cs" t="Include" />
+              <e p="OptLocal.RazorAssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="OptLocal.csproj" t="IncludeRecursive" />
+        <e p="Program.cs" t="Include" />
+        <e p="Properties" t="Include">
+          <e p="launchSettings.json" t="Include" />
+        </e>
+        <e p="Startup.cs" t="Include" />
+        <e p="Views" t="Include">
+          <e p="_ViewImports.cshtml" t="Include" />
+          <e p="_ViewStart.cshtml" t="Include" />
+          <e p="Home" t="Include">
+            <e p="Index.cshtml" t="Include" />
+            <e p="Privacy.cshtml" t="Include" />
+          </e>
+          <e p="Shared" t="Include">
+            <e p="_Layout.cshtml" t="Include" />
+            <e p="_ValidationScriptsPartial.cshtml" t="Include" />
+            <e p="Error.cshtml" t="Include" />
+          </e>
+        </e>
+        <e p="wwwroot" t="Include">
+          <e p="css" t="Include">
+            <e p="site.css" t="Include" />
+          </e>
+          <e p="Examples" t="Include">
+            <e p="Examples.js" t="Include" />
+          </e>
+          <e p="favicon.ico" t="Include" />
+          <e p="js" t="Include">
+            <e p="site.js" t="Include" />
+          </e>
+          <e p="lib" t="Include">
+            <e p="bootstrap" t="Include">
+              <e p="dist" t="Include">
+                <e p="css" t="Include">
+                  <e p="bootstrap-grid.css" t="Include" />
+                  <e p="bootstrap-grid.css.map" t="Include" />
+                  <e p="bootstrap-grid.min.css" t="Include" />
+                  <e p="bootstrap-grid.min.css.map" t="Include" />
+                  <e p="bootstrap-reboot.css" t="Include" />
+                  <e p="bootstrap-reboot.css.map" t="Include" />
+                  <e p="bootstrap-reboot.min.css" t="Include" />
+                  <e p="bootstrap-reboot.min.css.map" t="Include" />
+                  <e p="bootstrap.css" t="Include" />
+                  <e p="bootstrap.css.map" t="Include" />
+                  <e p="bootstrap.min.css" t="Include" />
+                  <e p="bootstrap.min.css.map" t="Include" />
+                </e>
+                <e p="js" t="Include">
+                  <e p="bootstrap.bundle.js" t="Include" />
+                  <e p="bootstrap.bundle.js.map" t="Include" />
+                  <e p="bootstrap.bundle.min.js" t="Include" />
+                  <e p="bootstrap.bundle.min.js.map" t="Include" />
+                  <e p="bootstrap.js" t="Include" />
+                  <e p="bootstrap.js.map" t="Include" />
+                  <e p="bootstrap.min.js" t="Include" />
+                  <e p="bootstrap.min.js.map" t="Include" />
+                </e>
+              </e>
+              <e p="LICENSE" t="Include" />
+            </e>
+            <e p="jquery" t="Include">
+              <e p="dist" t="Include">
+                <e p="jquery.js" t="Include" />
+                <e p="jquery.min.js" t="Include" />
+                <e p="jquery.min.map" t="Include" />
+              </e>
+              <e p="LICENSE.txt" t="Include" />
+            </e>
+            <e p="jquery-validation" t="Include">
+              <e p="dist" t="Include">
+                <e p="additional-methods.js" t="Include" />
+                <e p="additional-methods.min.js" t="Include" />
+                <e p="jquery.validate.js" t="Include" />
+                <e p="jquery.validate.min.js" t="Include" />
+              </e>
+              <e p="LICENSE.md" t="Include" />
+            </e>
+            <e p="jquery-validation-unobtrusive" t="Include">
+              <e p="jquery.validate.unobtrusive.js" t="Include" />
+              <e p="jquery.validate.unobtrusive.min.js" t="Include" />
+              <e p="LICENSE.txt" t="Include" />
+            </e>
+          </e>
+          <e p="opt" t="Include">
+            <e p="css" t="Include">
+              <e p="basic.css" t="Include" />
+              <e p="codemirror.css" t="Include" />
+              <e p="composingprograms.css" t="Include" />
+              <e p="holistic.css" t="Include" />
+              <e p="index.css" t="Include" />
+              <e p="jquery.qtip.css" t="Include" />
+              <e p="jquery.ui.chatbox.css" t="Include" />
+              <e p="lightgreenarrow.png" t="Include" />
+              <e p="matrixtutor.css" t="Include" />
+              <e p="opt-frontend.css" t="Include" />
+              <e p="opt-lessons.css" t="Include" />
+              <e p="opt-live.css" t="Include" />
+              <e p="opt-testcases.css" t="Include" />
+              <e p="pytutor.css" t="Include" />
+              <e p="redarrow.png" t="Include" />
+              <e p="redgreenarrow.png" t="Include" />
+              <e p="ui-lightness" t="Include">
+                <e p="images" t="Include">
+                  <e p="ui-bg_diagonals-thick_18_b81900_40x40.png" t="Include" />
+                  <e p="ui-bg_diagonals-thick_20_666666_40x40.png" t="Include" />
+                  <e p="ui-bg_flat_10_000000_40x100.png" t="Include" />
+                  <e p="ui-bg_glass_100_f6f6f6_1x400.png" t="Include" />
+                  <e p="ui-bg_glass_100_fdf5ce_1x400.png" t="Include" />
+                  <e p="ui-bg_glass_65_ffffff_1x400.png" t="Include" />
+                  <e p="ui-bg_gloss-wave_35_f6a828_500x100.png" t="Include" />
+                  <e p="ui-bg_highlight-soft_100_eeeeee_1x100.png" t="Include" />
+                  <e p="ui-bg_highlight-soft_75_ffe45c_1x100.png" t="Include" />
+                  <e p="ui-icons_222222_256x240.png" t="Include" />
+                  <e p="ui-icons_228ef1_256x240.png" t="Include" />
+                  <e p="ui-icons_ef8c08_256x240.png" t="Include" />
+                  <e p="ui-icons_ffd27a_256x240.png" t="Include" />
+                  <e p="ui-icons_ffffff_256x240.png" t="Include" />
+                </e>
+                <e p="jquery-ui-1.8.21.custom.css" t="Include" />
+                <e p="jquery-ui-1.8.24.custom.css" t="Include" />
+              </e>
+              <e p="x.png" t="Include" />
+            </e>
+            <e p="js" t="Include">
+              <e p="ace" t="Include">
+                <e p="README.txt" t="Include" />
+                <e p="src-min-noconflict" t="Include">
+                  <e p="ace.js" t="Include" />
+                  <e p="mode-c_cpp.js" t="Include" />
+                  <e p="mode-csharp.js" t="Include" />
+                  <e p="mode-java - Copy.js" t="Include" />
+                  <e p="mode-java.js" t="Include" />
+                  <e p="mode-javascript.js" t="Include" />
+                  <e p="mode-python.js" t="Include" />
+                  <e p="mode-ruby.js" t="Include" />
+                  <e p="mode-typescript.js" t="Include" />
+                  <e p="worker-javascript.js" t="Include" />
+                </e>
+              </e>
+              <e p="codemirror" t="Include">
+                <e p="codemirror.js" t="Include" />
+                <e p="python.js" t="Include" />
+              </e>
+              <e p="composingprograms.js" t="Include" />
+              <e p="csc108h.js" t="Include" />
+              <e p="d3.v2.min.js" t="Include" />
+              <e p="diff_match_patch.js" t="Include" />
+              <e p="holistic.js" t="Include" />
+              <e p="iframe-embed.js" t="Include" />
+              <e p="index.js" t="Include" />
+              <e p="jquery-1.8.2.min.js" t="Include" />
+              <e p="jquery-ui-1.11.4" t="Include">
+                <e p="external" t="Include">
+                  <e p="jquery" t="Include">
+                    <e p="jquery.js" t="Include" />
+                  </e>
+                </e>
+                <e p="images" t="Include">
+                  <e p="ui-bg_diagonals-thick_18_b81900_40x40.png" t="Include" />
+                  <e p="ui-bg_diagonals-thick_20_666666_40x40.png" t="Include" />
+                  <e p="ui-bg_flat_10_000000_40x100.png" t="Include" />
+                  <e p="ui-bg_glass_100_f6f6f6_1x400.png" t="Include" />
+                  <e p="ui-bg_glass_100_fdf5ce_1x400.png" t="Include" />
+                  <e p="ui-bg_glass_65_ffffff_1x400.png" t="Include" />
+                  <e p="ui-bg_gloss-wave_35_f6a828_500x100.png" t="Include" />
+                  <e p="ui-bg_highlight-soft_100_eeeeee_1x100.png" t="Include" />
+                  <e p="ui-bg_highlight-soft_75_ffe45c_1x100.png" t="Include" />
+                  <e p="ui-icons_222222_256x240.png" t="Include" />
+                  <e p="ui-icons_228ef1_256x240.png" t="Include" />
+                  <e p="ui-icons_ef8c08_256x240.png" t="Include" />
+                  <e p="ui-icons_ffd27a_256x240.png" t="Include" />
+                  <e p="ui-icons_ffffff_256x240.png" t="Include" />
+                </e>
+                <e p="index.html" t="Include" />
+                <e p="jquery-ui.css" t="Include" />
+                <e p="jquery-ui.js" t="Include" />
+                <e p="jquery-ui.min.css" t="Include" />
+                <e p="jquery-ui.min.js" t="Include" />
+                <e p="jquery-ui.structure.css" t="Include" />
+                <e p="jquery-ui.structure.min.css" t="Include" />
+                <e p="jquery-ui.theme.css" t="Include" />
+                <e p="jquery-ui.theme.min.css" t="Include" />
+              </e>
+              <e p="jquery-ui-1.8.24.custom.min.js" t="Include" />
+              <e p="jquery.ba-bbq.min.js" t="Include" />
+              <e p="jquery.ba-dotimeout.min.js" t="Include" />
+              <e p="jquery.corner.js" t="Include" />
+              <e p="jquery.jsPlumb-1.3.10-all-min.js" t="Include" />
+              <e p="jquery.qtip.min.js" t="Include" />
+              <e p="jquery.simplemodal.js" t="Include" />
+              <e p="matrixtutor.js" t="Include" />
+              <e p="opt-frontend-common.js" t="Include" />
+              <e p="opt-frontend.js" t="Include" />
+              <e p="opt-live.js" t="Include" />
+              <e p="opt-office-mix.js" t="Include" />
+              <e p="pytutor.js" t="Include" />
+              <e p="socket.io-client" t="Include">
+                <e p="socket.io.js" t="Include" />
+              </e>
+              <e p="togetherjs" t="Include">
+                <e p="README" t="Include" />
+                <e p="togetherjs" t="Include">
+                  <e p="analytics.js" t="Include" />
+                  <e p="channels.js" t="Include" />
+                  <e p="chat.js" t="Include" />
+                  <e p="console.js" t="Include" />
+                  <e p="cursor.js" t="Include" />
+                  <e p="elementFinder.js" t="Include" />
+                  <e p="eventMaker.js" t="Include" />
+                  <e p="fonts" t="Include">
+                    <e p="OpenSans-Bold.ttf" t="Include" />
+                    <e p="OpenSans-Light.ttf" t="Include" />
+                    <e p="OpenSans-Regular.ttf" t="Include" />
+                  </e>
+                  <e p="forms.js" t="Include" />
+                  <e p="help.txt" t="Include" />
+                  <e p="images" t="Include">
+                    <e p="btn-menu-change-avatar.png" t="Include" />
+                    <e p="button-chat-active.png" t="Include" />
+                    <e p="button-chat.png" t="Include" />
+                    <e p="button-end-session.png" t="Include" />
+                    <e p="button-mic-active.png" t="Include" />
+                    <e p="button-mic-inactive.png" t="Include" />
+                    <e p="button-mic.png" t="Include" />
+                    <e p="button-pencil.png" t="Include" />
+                    <e p="button-share-active.png" t="Include" />
+                    <e p="button-share-hover.png" t="Include" />
+                    <e p="button-share.png" t="Include" />
+                    <e p="connect-logo@2x.png" t="Include" />
+                    <e p="cursor-white.png" t="Include" />
+                    <e p="cursor.svg" t="Include" />
+                    <e p="default-avatar-waiting.png" t="Include" />
+                    <e p="default-avatar.png" t="Include" />
+                    <e p="icn-arrow-up.png" t="Include" />
+                    <e p="icn-gear.png" t="Include" />
+                    <e p="icn-handle-circle.png" t="Include" />
+                    <e p="icn-handle-circle@2x.png" t="Include" />
+                    <e p="icn-triangle-up.png" t="Include" />
+                    <e p="icn-walkthrough-arrow-l-hover.png" t="Include" />
+                    <e p="icn-walkthrough-arrow-l.png" t="Include" />
+                    <e p="icn-walkthrough-arrow-r-hover.png" t="Include" />
+                    <e p="icn-walkthrough-arrow-r.png" t="Include" />
+                    <e p="icon-close-active.png" t="Include" />
+                    <e p="icon-close-active@2x.png" t="Include" />
+                    <e p="icon-close.png" t="Include" />
+                    <e p="icon-close@2x.png" t="Include" />
+                    <e p="icon-profile-triangle.png" t="Include" />
+                    <e p="notification-btn-close.png" t="Include" />
+                    <e p="notification-btn-close@2x.png" t="Include" />
+                    <e p="notification-togetherjs-logo.png" t="Include" />
+                    <e p="notification.ogg" t="Include" />
+                    <e p="robot-avatar.png" t="Include" />
+                    <e p="togetherjs-logo-close.png" t="Include" />
+                    <e p="togetherjs-logo-open.png" t="Include" />
+                    <e p="walkthrough-images-chat.png" t="Include" />
+                    <e p="walkthrough-images-intro.png" t="Include" />
+                    <e p="walkthrough-images-invite.png" t="Include" />
+                    <e p="walkthrough-images-logo.png" t="Include" />
+                    <e p="walkthrough-images-participant.png" t="Include" />
+                    <e p="walkthrough-images-profile.png" t="Include" />
+                    <e p="walkthrough-images-rtc.png" t="Include" />
+                  </e>
+                  <e p="interface.html" t="Include" />
+                  <e p="jqueryPlugins.js" t="Include" />
+                  <e p="libs" t="Include">
+                    <e p="almond.js" t="Include" />
+                    <e p="jquery-1.8.3.min.js" t="Include" />
+                    <e p="require-nomin.js" t="Include" />
+                    <e p="require.js" t="Include" />
+                    <e p="tinycolor.js" t="Include" />
+                    <e p="walkabout" t="Include">
+                      <e p="index.html" t="Include" />
+                      <e p="lib" t="Include">
+                        <e p="esprima.js" t="Include" />
+                        <e p="falafel.js" t="Include" />
+                      </e>
+                      <e p="node-proxy.js" t="Include" />
+                      <e p="test_overlap.html" t="Include" />
+                      <e p="test_overlap.js" t="Include" />
+                      <e p="test_walkabout.html" t="Include" />
+                      <e p="test_walkabout.js" t="Include" />
+                      <e p="test_walkabout_nojquery.html" t="Include" />
+                      <e p="test_walkabout_nojquery.js" t="Include" />
+                      <e p="traverse-rewrite.js" t="Include" />
+                      <e p="walkabout.js" t="Include" />
+                    </e>
+                    <e p="whrandom" t="Include">
+                      <e p="mersenne.js" t="Include" />
+                      <e p="random.js" t="Include" />
+                      <e p="test_random.html" t="Include" />
+                      <e p="test_random.js" t="Include" />
+                    </e>
+                  </e>
+                  <e p="linkify.js" t="Include" />
+                  <e p="locale" t="Include">
+                    <e p="en-US.json" t="Include" />
+                    <e p="ru.json" t="Include" />
+                  </e>
+                  <e p="module-descriptions.json" t="Include" />
+                  <e p="ot.js" t="Include" />
+                  <e p="peers.js" t="Include" />
+                  <e p="playback.js" t="Include" />
+                  <e p="randomutil.js" t="Include" />
+                  <e p="recorder.css" t="Include" />
+                  <e p="recorder.html" t="Include" />
+                  <e p="recorder.js" t="Include" />
+                  <e p="session.js" t="Include" />
+                  <e p="startup.js" t="Include" />
+                  <e p="storage.js" t="Include" />
+                  <e p="templates-en-US.js" t="Include" />
+                  <e p="templates-ru.js" t="Include" />
+                  <e p="templates.js" t="Include" />
+                  <e p="templating.js" t="Include" />
+                  <e p="togetherjs.css" t="Include" />
+                  <e p="togetherjsPackage.js" t="Include" />
+                  <e p="ui.js" t="Include" />
+                  <e p="util.js" t="Include" />
+                  <e p="videos.js" t="Include" />
+                  <e p="visibilityApi.js" t="Include" />
+                  <e p="walkabout.html" t="Include" />
+                  <e p="walkthrough.html" t="Include" />
+                  <e p="walkthrough.js" t="Include" />
+                  <e p="webrtc.js" t="Include" />
+                  <e p="who.js" t="Include" />
+                  <e p="windowing.js" t="Include" />
+                  <e p="youtubeVideos.js" t="Include" />
+                </e>
+                <e p="togetherjs-min.js" t="Include" />
+                <e p="togetherjs.js" t="Include" />
+              </e>
+            </e>
+            <e p="visualize.html" t="Include" />
+          </e>
+        </e>
+      </e>
+      <e p="OptLocal.sln" t="IncludeFlat" />
+      <e p="packages" t="ExcludeRecursive" />
+      <e p="TracingCore" t="IncludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Common" t="Include">
+          <e p="FileIO.cs" t="Include" />
+          <e p="RoslynHelper.cs" t="Include" />
+        </e>
+        <e p="CompilationResult.cs" t="Include" />
+        <e p="Compiler.cs" t="Include" />
+        <e p="Data" t="Include">
+          <e p="FuncStack.cs" t="Include" />
+          <e p="HeapData.cs" t="Include" />
+          <e p="OptVariableData.cs" t="Include" />
+          <e p="PyTutorData.cs" t="Include" />
+          <e p="PyTutorDataManager.cs" t="Include" />
+          <e p="PyTutorStep.cs" t="Include" />
+        </e>
+        <e p="ExecutionManager.cs" t="Include" />
+        <e p="Interceptors" t="Include">
+          <e p="ConsoleHandler.cs" t="Include" />
+          <e p="ConsoleReader.cs" t="Include" />
+          <e p="ConsoleWriter.cs" t="Include" />
+          <e p="ReadLineHandler.cs" t="Include" />
+        </e>
+        <e p="JsonMappers" t="Include">
+          <e p="EncodedLocalMapper.cs" t="Include" />
+          <e p="FuncStackMapper.cs" t="Include" />
+          <e p="PyTutorDataMapper.cs" t="Include" />
+          <e p="PyTutorStepMapper.cs" t="Include" />
+        </e>
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="TracingCore.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="OptBackend.cs" t="Include" />
+        <e p="SourceCodeInstrumentation" t="Include">
+          <e p="ClassInstrumentation.cs" t="Include" />
+          <e p="Instrumentation.cs" t="Include" />
+          <e p="InstrumentationShared.cs" t="Include" />
+          <e p="MethodInstrumentation.cs" t="Include" />
+          <e p="StatementInstrumentation.cs" t="Include" />
+        </e>
+        <e p="SubtreeType.cs" t="Include" />
+        <e p="SyntaxElementsRepository.cs" t="Include" />
+        <e p="TraceApi.cs" t="Include" />
+        <e p="TraceApiManager.cs" t="Include" />
+        <e p="TraceApiMethodNames.cs" t="Include" />
+        <e p="TraceSourceName.cs" t="Include" />
+        <e p="TraceSourceWrapper.cs" t="Include" />
+        <e p="TraceToPyDtos" t="Include">
+          <e p="ClassData.cs" t="Include" />
+          <e p="ITracePyDto.cs" t="Include" />
+          <e p="MethodData.cs" t="Include" />
+          <e p="VariableData.cs" t="Include" />
+        </e>
+        <e p="TracingCore.csproj" t="IncludeRecursive" />
+        <e p="TracingManagers" t="Include">
+          <e p="ClassManager.cs" t="Include" />
+        </e>
+        <e p="TreeRewriters" t="Include">
+          <e p="ExpressionGenerator.cs" t="Include" />
+          <e p="ExpressionGeneratorDetails.cs" t="Include" />
+          <e p="InstrumentationDetails.cs" t="Include" />
+          <e p="LineData.cs" t="Include" />
+        </e>
+      </e>
+    </e>
+  </component>
+</project>

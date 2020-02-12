@@ -1,0 +1,19 @@
+using System;
+using TracingCore;
+using TracingCore.Data;
+
+namespace TraceSourceExample
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var b = Console.ReadLine();
+            TraceApi.TraceData(9, "var b = Console.ReadLine();", new VariableData("b", b, b.GetType()));
+            var a = 5;
+            TraceApi.TraceData(10, "var a = 5;", new VariableData("a", a, a.GetType()));
+            Console.WriteLine("Hello World!");
+            TraceApi.TraceData(11, "Console.WriteLine(\"Hello World!\");");
+        }
+    }
+}
