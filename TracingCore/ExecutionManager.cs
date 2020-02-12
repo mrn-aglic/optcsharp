@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Emit;
@@ -36,7 +37,7 @@ namespace TracingCore
         {
             var mainMethod = root.DescendantNodes()
                 .OfType<MethodDeclarationSyntax>()
-                .FirstOrDefault(x => x.Identifier.Text == MainName);
+                .FirstOrDefault(x => x.Modifiers.Any(x => x.IsKind(SyntaxKind.StaticKeyword)) && x.Identifier.Text == MainName);
 
             if (mainMethod == null)
             {

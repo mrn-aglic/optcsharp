@@ -16,15 +16,19 @@ namespace TracingCore
     public class OptBackend
     {
         public string Code { get; }
+        public Compiler Compiler { get; }
         public ConsoleHandler ConsoleHandler { get; }
         public ExecutionManager ExecutionManager { get; }
         public PyTutorDataManager PyTutorDataManager { get; }
+
         public OptBackend(string code, IList<string> rawInputs)
         {
             Code = code;
+            Compiler = new Compiler();
             ConsoleHandler = new ConsoleHandler();
             ExecutionManager = new ExecutionManager();
             PyTutorDataManager = new PyTutorDataManager(code);
+            
             ConsoleHandler.AddRangeToRead(rawInputs);
         }
 
@@ -61,33 +65,43 @@ namespace TracingCore
             return (originalRoot, instrumentation.Start(root).SyntaxTree);
         }
 
-        public CompilationResult Compile(bool writeToFile = false)
+        public CompilationUnitSyntax AddInstrumentation(CompilationUnitSyntax originalRoot)
         {
-            var syntaxTree = CSharpSyntaxTree.ParseText(Code);
-            var originalRoot = syntaxTree.GetCompilationUnitRoot();
-
             var root = AddUsings(originalRoot);
 
             var instrumentation = new Instrumentation(new ExpressionGenerator());
-            root = instrumentation.Start(root);
+            return instrumentation.Start(root);
+        }
 
-            if (writeToFile)
-            {
-                instrumentation.WriteToFile(root);
-            }
+        public CompilationResult Compile(string compilationName, bool instrument)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(Code);
+            var originalRoot = syntaxTree.GetCompilationUnitRoot();
+            var root = instrument ? AddInstrumentation(originalRoot) : originalRoot;
 
-            var compilationName = "opt-compilation";
-            var compiler = new Compiler(compilationName, root.SyntaxTree);
-            var compilation = compiler.Compilation;
-
+            var compilation = Compiler.Compile(compilationName, root.SyntaxTree, Compiler.DefaultCompilationOptions);
             var executionManager = new ExecutionManager();
-            return new CompilationResult(executionManager.CompileAssembly(compilation), originalRoot, root, compilation);
+
+            return new CompilationResult
+            (
+                executionManager.CompileAssembly(compilation),
+                originalRoot,
+                instrument ? root : null,
+                compilation
+            );
+        }
+        
+        private SemanticModel GetSemanticModel(CompilationUnitSyntax root)
+        {
+            var syntaxTree = root.SyntaxTree;
+            var compilation = Compiler.Compile("user-source", syntaxTree, Compiler.DefaultCompilationOptions);
+            return compilation.GetSemanticModel(syntaxTree);
         }
 
         public PyTutorData Trace(CompilationUnitSyntax root, CompilationResult compilationResult)
         {
-            var semanticModel = compilationResult.Compilation.GetSemanticModel(compilationResult.NewRoot.SyntaxTree);
-            var classManager = new ClassManager(new Dictionary<string, ClassData>(), semanticModel);
+            var semanticModel = GetSemanticModel(root); 
+            var classManager = new ClassManager(semanticModel, new Dictionary<string, ClassData>());
 
             TraceApi.Init(root, new TraceApiManager(PyTutorDataManager, ConsoleHandler, classManager));
             PyTutorData pyTutorData;
@@ -95,7 +109,7 @@ namespace TracingCore
             {
                 ExecutionManager.StartMain(compilationResult, root);
             }
-            catch (ExitExecutionException e)
+            catch (ExitExecutionException)
             {
                 PyTutorDataManager.RegisterRawData();
             }

@@ -407,12 +407,16 @@
         <e p="CompilationResult.cs" t="Include" />
         <e p="Compiler.cs" t="Include" />
         <e p="Data" t="Include">
+          <e p="ClassHeapData.cs" t="Include" />
           <e p="FuncStack.cs" t="Include" />
           <e p="HeapData.cs" t="Include" />
+          <e p="HeapType.cs" t="Include" />
+          <e p="MethodHeapData.cs" t="Include" />
           <e p="OptVariableData.cs" t="Include" />
           <e p="PyTutorData.cs" t="Include" />
           <e p="PyTutorDataManager.cs" t="Include" />
           <e p="PyTutorStep.cs" t="Include" />
+          <e p="VarHeapData.cs" t="Include" />
         </e>
         <e p="ExecutionManager.cs" t="Include" />
         <e p="Interceptors" t="Include">

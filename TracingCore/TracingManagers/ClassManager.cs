@@ -14,14 +14,14 @@ namespace TracingCore.TracingManagers
         private readonly string _mainMethod = "Main";
         private readonly Dictionary<string, ClassData> _classes;
         private readonly SemanticModel _semanticModel;
-        
+
         private readonly IList<SyntaxKind> _supportedMemberKinds = new List<SyntaxKind>
         {
             SyntaxKind.MethodDeclaration,
             SyntaxKind.ConstructorDeclaration
         };
 
-        public ClassManager(Dictionary<string, ClassData> classes, SemanticModel semanticModel)
+        public ClassManager(SemanticModel semanticModel, Dictionary<string, ClassData> classes)
         {
             _classes = classes;
             _semanticModel = semanticModel;
@@ -62,7 +62,7 @@ namespace TracingCore.TracingManagers
             var identifier = constructorDeclarationSyntax.Identifier;
             return GetMemberData(constructorDeclarationSyntax, identifier, null);
         }
-        
+
         private MethodData GetMemberData(BaseMethodDeclarationSyntax declarationSyntax)
         {
             switch (declarationSyntax)
@@ -80,26 +80,37 @@ namespace TracingCore.TracingManagers
         {
             return _supportedMemberKinds.Contains(baseMethodDeclarationSyntax.Kind());
         }
+        
+        private string FullyQualifiedName(BaseTypeSyntax typeSyntax)
+        {
+            return _semanticModel.GetSymbolInfo(typeSyntax.Type).Symbol.ToString();
+        }
+
+        public string[] GetExtendedTypes(ClassDeclarationSyntax declarationSyntax)
+        {
+            var baseList = declarationSyntax.BaseList;
+            return baseList == null ? new string[] { } : baseList.Types.Select(FullyQualifiedName).ToArray();
+        }
 
         public void RegisterClasses(CompilationUnitSyntax root)
         {
             var namespaces = root.DescendantNodes().OfType<NamespaceDeclarationSyntax>();
-            var classesData = namespaces.SelectMany(x =>
-                x.ChildNodes().OfType<ClassDeclarationSyntax>()
-                    .Select(y =>
-                        new ClassData
-                        (
-                            y.Identifier.Text.ToString(),
-                            string.Empty, // IMPLEMENT
-                            RoslynHelper.GetClassParentPath(y),
-                            y.DescendantNodes().OfType<BaseMethodDeclarationSyntax>()
-                                .Where(IsSupported)
-                                .Select(GetMemberData)
-                                .ToList(),
-                            RoslynHelper.GetLineData(y)
-                        )
+            var classes = namespaces.SelectMany(x => x.ChildNodes().OfType<ClassDeclarationSyntax>()).ToList();
+
+            var classesData = classes
+                .Select(@class =>
+                    new ClassData
+                    (
+                        @class.Identifier.Text.ToString(),
+                        GetExtendedTypes(@class), // IMPLEMENT
+                        RoslynHelper.GetClassParentPath(@class),
+                        @class.DescendantNodes().OfType<BaseMethodDeclarationSyntax>()
+                            .Where(IsSupported)
+                            .Select(GetMemberData)
+                            .ToList(),
+                        RoslynHelper.GetLineData(@class)
                     )
-            );
+                );
 
             foreach (var classData in classesData)
             {

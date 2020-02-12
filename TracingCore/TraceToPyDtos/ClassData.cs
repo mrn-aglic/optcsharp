@@ -9,7 +9,7 @@ namespace TracingCore.TraceToPyDtos
     {
         public HeapType OptHeapType = HeapType.Class;
         public string Name { get; }
-        public string ExtendedClass { get; }
+        public string[] ExtendedTypes { get; }
         public string FullyQualifiedPath { get; }
         public IList<MethodData> Methods { get; }
         public LineData LineData { get; }
@@ -17,10 +17,10 @@ namespace TracingCore.TraceToPyDtos
 
         public bool ClassLoaded { get; set; }
 
-        public ClassData(string name, string extendedClass, string fullyQualifiedPath, IList<MethodData> methods, LineData lineData)
+        public ClassData(string name, string[] extendedTypes, string fullyQualifiedPath, IList<MethodData> methods, LineData lineData)
         {
             Name = name;
-            ExtendedClass = extendedClass;
+            ExtendedTypes = extendedTypes;
             FullyQualifiedPath = fullyQualifiedPath;
             Methods = methods;
             LineData = lineData;
