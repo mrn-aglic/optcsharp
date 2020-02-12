@@ -17,4 +17,8 @@
       <Folder Include="Instrumentation" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Include="CodeExamples\PolymorphismOverride.txt" />
+    </ItemGroup>
+
 </Project>

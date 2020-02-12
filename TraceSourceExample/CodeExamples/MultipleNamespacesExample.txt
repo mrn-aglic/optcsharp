@@ -1,0 +1,23 @@
+namespace SampleNamespace
+{
+    class SampleClass
+    {
+        public void SampleMethod()
+        {
+            System.Console.WriteLine(
+              "SampleMethod inside SampleNamespace");
+        }
+    }
+}
+
+namespace SampleNamespace2
+{
+    class SampleClass
+    {
+        static void Main(string[] args)
+        {
+            var x = new SampleNamespace.SampleClass();
+            x.SampleMethod();
+        }
+    }
+}

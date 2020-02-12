@@ -1,19 +1,37 @@
 using System;
 using TracingCore;
-using TracingCore.Data;
+using TracingCore.TraceToPyDtos;
 
 namespace TraceSourceExample
 {
+    class Student
+    {
+        public Student()
+        {
+            TraceApi.TraceMethodEntry(6, "Student", new VariableData("this", this, this.GetType()));
+            TraceApi.TraceData(8, "public Student()\n                    {\n                    }");
+            TraceApi.TraceMethodExit(8, "public Student()\n                    {\n                    }", null);
+        }
+
+        static Student()
+        {
+            TraceApi.RegisterClassLoad("TraceSourceExample.Student");
+        }
+    }
+
     class Program
     {
         static void Main(string[] args)
         {
-            var b = Console.ReadLine();
-            TraceApi.TraceData(9, "var b = Console.ReadLine();", new VariableData("b", b, b.GetType()));
-            var a = 5;
-            TraceApi.TraceData(10, "var a = 5;", new VariableData("a", a, a.GetType()));
+            TraceApi.TraceMethodEntry(13, "Main", new VariableData("args", args, args.GetType()));
+            TraceApi.TraceData(15, "static void Main(string[] args)\n                    {\n                        int c;\n                        var s = new Student();\n                        Console.WriteLine(\"Hello World!\");\n                    }");
+            int c;
+            TraceApi.TraceData(16, "int c;", new VariableData("c", "<nije inic>", typeof(int)));
+            var s = new Student();
+            TraceApi.TraceData(17, "var s = new Student();", new VariableData("s", s, s.GetType()));
             Console.WriteLine("Hello World!");
-            TraceApi.TraceData(11, "Console.WriteLine(\"Hello World!\");");
+            TraceApi.TraceData(17, "Console.WriteLine(\"Hello World!\");");
+            TraceApi.TraceMethodExit(17, "static void Main(string[] args)\n                    {\n                        int c;\n                        var s = new Student();\n                        Console.WriteLine(\"Hello World!\");\n                    }", null);
         }
     }
 }
