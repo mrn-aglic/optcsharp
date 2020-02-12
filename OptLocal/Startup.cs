@@ -20,8 +20,6 @@ namespace OptLocal
         {
             services.AddControllersWithViews();
             services.AddMvc().AddNewtonsoftJson();
-            // services.AddMvc(config => config.ModelBinderProviders.Insert(0, new MyViewModelBinderProvider()));
-            // services.AddScoped<OptBackend>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
