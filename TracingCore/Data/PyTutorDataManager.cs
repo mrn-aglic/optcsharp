@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using TracingCore.Common;
 using TracingCore.JsonMappers;
@@ -88,9 +89,9 @@ namespace TracingCore.Data
 
             foreach (var variable in variables)
             {
-                Func<HeapData, bool> p = data => variable.Value == data.Value;
+                bool Func(HeapData data) => variable.Value == data.Value;
 
-                var hd = GetValueOrDefaultFromHeap(lastStep.Heap, p);
+                var hd = GetValueOrDefaultFromHeap(lastStep?.Heap, Func);
                 if (hd == null)
                 {
                     notOnHeap.Add(variable);
@@ -134,26 +135,11 @@ namespace TracingCore.Data
                 existingStacks = existingStacks.Pop();
             }
 
-            var lastStack = existingStacks.Any() ? existingStacks.First() : null;
-
-            // var refVars = variables.Where(OptVariableBase.IsVarRef).ToList();
-            //
-            // var (varsNotOnHeap, varsOnHeap) = GroupByOnHeap(refVars);
-            // var updatedHeapValues = varsOnHeap.Select(x => x.Item2.Copy(x.Item1.Value))
-            //     .ToImmutableDictionary(x => x.HeapId, x => x);
-            //
-            // var newHeapData = varsNotOnHeap.Select(GetHeapData).ToImmutableDictionary(x => x.HeapId, x => x);
-            //
-            // var prevHeap = lastStep.Heap;
-            // var heap = prevHeap
-            //     .RemoveRange(updatedHeapValues.Select(x => x.Key))
-            //     .AddRange(updatedHeapValues)
-            //     .AddRange(newHeapData);
+            var lastStack = existingStacks.First();
 
             var heap = UpdateHeap(variables, lastStep);
-
             var encLocals = variables.Select(x => EncodedLocalFromVariableData(x, GetValueFromHeap(x.Value, heap)));
-
+            
             var newStack = lastStack.AddAndUpdate(encLocals.ToImmutableList());
 
             var stacks = existingStacks.Pop().Push(newStack);
@@ -259,27 +245,6 @@ namespace TracingCore.Data
             return heapData;
         }
 
-        private (ImmutableDictionary<int, HeapData>, ImmutableList<OptVariableData>)
-            GetHeapAndLocalValuesFromVariableData(IList<VariableData> variables)
-        {
-            var heapData = ImmutableDictionary<int, HeapData>.Empty;
-            var encodedLocals = new List<OptVariableData>();
-
-            foreach (var parameter in variables)
-            {
-                var heapObj = GetHeapData(parameter);
-                var local = EncodedLocalFromVariableData(parameter, heapObj);
-                if (heapObj != null)
-                {
-                    heapData = heapData.Add(heapObj.HeapId, heapObj);
-                }
-
-                encodedLocals.Add(local);
-            }
-
-            return (heapData, encodedLocals.ToImmutableList());
-        }
-
         private IList<VariableData> IgnoreArgsIfAllNull(string methodName, IList<VariableData> variables)
         {
             if (methodName != "Main")
@@ -326,35 +291,34 @@ namespace TracingCore.Data
         {
             var prevStep = _pyTutorData.Trace.Last() as PyTutorStep;
 
-            if (prevStep.Line == line)
+            if (prevStep.Line != line) return;
+            
+            var newStackToRender = prevStep.StackToRender.Pop(out var lastStack);
+            var hd = GetHeapData(variableData);
+            var heapId = hd?.HeapId;
+
+            var optVariable = OptVariableData.GetReturnValue(variableData, heapId);
+            var newStack = lastStack.AddAndUpdate(optVariable);
+
+            var heap = heapId.HasValue ? prevStep.Heap.Add(hd.HeapId, hd) : prevStep.Heap;
+
+            var newStep = new PyTutorStep(
+                line,
+                _returnEvent,
+                prevStep.FuncName,
+                prevStep.StdOut,
+                prevStep.Globals,
+                newStackToRender.Push(newStack),
+                heap,
+                PyTutorStepMapper.HeapToJson(heap)
+            );
+
+            if (replacePrevStep || prevStep.StackToRender.Count() == 1)
             {
-                var newStackToRender = prevStep.StackToRender.Pop(out var lastStack);
-                var hd = GetHeapData(variableData);
-                var heapId = hd?.HeapId;
-
-                var optVariable = OptVariableData.GetReturnValue(variableData, heapId);
-                var newStack = lastStack.AddAndUpdate(optVariable);
-
-                var heap = heapId.HasValue ? prevStep.Heap.Add(hd.HeapId, hd) : prevStep.Heap;
-
-                var newStep = new PyTutorStep(
-                    line,
-                    _returnEvent,
-                    prevStep.FuncName,
-                    prevStep.StdOut,
-                    prevStep.Globals,
-                    newStackToRender.Push(newStack),
-                    heap,
-                    PyTutorStepMapper.HeapToJson(heap)
-                );
-
-                if (replacePrevStep || prevStep.StackToRender.Count() == 1)
-                {
-                    _pyTutorData.Trace.Remove(prevStep);
-                }
-
-                _pyTutorData.Trace.Add(newStep);
+                _pyTutorData.Trace.Remove(prevStep);
             }
+
+            _pyTutorData.Trace.Add(newStep);
         }
 
         public void RegisterClass(ClassData classData)
