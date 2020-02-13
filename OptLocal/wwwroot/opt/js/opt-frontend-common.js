@@ -63,8 +63,6 @@ var cpp_backend_script = 'web_exec_cpp.py';
 var csharp_backend_script = 'none';
 
 var windowLocation = window.location.href.split('#')[0];
-console.log(windowLocation)
-
 
 // this is customized to my own Linode server:
 // these are the REAL endpoints, accessed via jsonp. code is in ../../v4-cokapi/
@@ -76,6 +74,10 @@ if (window.location.protocol === 'https:') {
     var RUBY_JSONP_ENDPOINT = 'https://cokapi.com:8001/exec_ruby_jsonp';
     var C_JSONP_ENDPOINT = 'https://cokapi.com:8001/exec_c_jsonp';
     var CPP_JSONP_ENDPOINT = 'https://cokapi.com:8001/exec_cpp_jsonp';
+
+    if (windowLocation[windowLocation.length - 1] === '/') {
+        windowLocation = windowLocation.substr(0, windowLocation.length - 1);
+    }
 
     var CSHARP_JSONP_ENDPOINT = `${windowLocation}/api/getcsharptrace`;
 } else {
@@ -90,8 +92,7 @@ if (window.location.protocol === 'https:') {
     if (windowLocation[windowLocation.length - 1] === '/') {
         windowLocation = windowLocation.substr(0, windowLocation.length - 1);
     }
-    
-    console.log(windowLocation)
+
     var CSHARP_JSONP_ENDPOINT = `${windowLocation}/api/getcsharptrace`;
 }
 
