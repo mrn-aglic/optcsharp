@@ -19,7 +19,7 @@ namespace TraceSourceExample
             int c;
             var a = 5;
             var b = a + 2;
-            Console.WriteLine(""Hello World!"");
+            Console.WriteLine("Hello World!");
         }
     }
 }`
@@ -112,6 +112,51 @@ namespace TraceSourceExample
     }
 }`
         }
+    },
+    polymorphism: {
+        name:'Polimorfizam',
+        code: `using System;
+
+namespace Polimorfizam
+{
+    public class Zivotinja
+    {
+        public void Glas()
+        {
+            Console.WriteLine("Zivotinja proizvodi glas.");
+        }
+    }
+    
+    public class Macka : Zivotinja
+    {
+        public void Glas()
+        {
+            Console.WriteLine("Mijau mijau");
+        }
+    }
+    
+    public class Pas : Zivotinja
+    {
+        public void Glas()
+        {
+            Console.WriteLine("Vau vau");
+        }
+    }
+    
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Zivotinja mojaZivotinja = new Zivotinja();
+            Zivotinja mojaMacka = new Macka();
+            Zivotinja mojPas = new Pas();
+            
+            mojaZivotinja.Glas();
+            mojaMacka.Glas();
+            mojPas.Glas();
+        }
+    }
+}`
     }
 };
 

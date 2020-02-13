@@ -9,6 +9,8 @@ namespace OptLocal.Areas.Default.Controllers
     [Area("Default")]
     public class TraceApiController : Controller
     {
+        private const string CompilationName = "opt-compilation";
+
         [HttpGet, Route("/api/getcsharptrace")]
         public JObject GetCSharpTrace(
             [FromQuery] string user_script,
@@ -20,7 +22,7 @@ namespace OptLocal.Areas.Default.Controllers
                 : JArray.Parse(raw_input_json).ToObject<List<string>>();
             var optBackend = new OptBackend(user_script, inputs);
 
-            var compilationResult = optBackend.Compile();
+            var compilationResult = optBackend.Compile(CompilationName, true);
             var pyTutorData = optBackend.Trace(compilationResult.Root, compilationResult);
 
             return PyTutorDataMapper.ToJson(pyTutorData);

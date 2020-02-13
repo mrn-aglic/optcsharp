@@ -86,8 +86,9 @@ namespace TracingCore.JsonMappers
         public static JToken CreateJClass(ImmutableDictionary<int, HeapData> heap, ClassHeapData value)
         {
             var heapTypeString = value.HeapType.ToString().ToUpper();
-
-            var jArray = new JArray {heapTypeString, value.FullyQualifiedName, new JArray()};
+            var extends = JArray.FromObject(value.Extends);
+            
+            var jArray = new JArray {heapTypeString, value.FullyQualifiedName, extends};
 
             var methods = heap.Values.OfType<MethodHeapData>()
                 .Where(x => x.EnclosingParentFullName == value.FullyQualifiedName);
