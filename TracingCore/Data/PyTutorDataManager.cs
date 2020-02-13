@@ -11,10 +11,10 @@ namespace TracingCore.Data
 {
     public class PyTutorDataManager
     {
-        private readonly string _functionCallEvent = "call";
-        private readonly string _stepLineEvent = "step_line";
-        private readonly string _rawInputEvent = "raw_input";
-        private readonly string _returnEvent = "return";
+        private const string FunctionCallEvent = "call";
+        private const string StepLineEvent = "step_line";
+        private const string RawInputEvent = "raw_input";
+        private const string ReturnEvent = "return";
 
         private int _currentFrameId;
         private int _currentHeapId;
@@ -146,7 +146,7 @@ namespace TracingCore.Data
 
             var pyTutorStep = new PyTutorStep(
                 line,
-                _stepLineEvent,
+                StepLineEvent,
                 _currentFunctionName,
                 stdOut,
                 lastStep.Globals,
@@ -160,7 +160,7 @@ namespace TracingCore.Data
 
         private bool IsReturnFromFunction()
         {
-            return _pyTutorData.Trace.Last() is PyTutorStep lastStep && lastStep.Event == _returnEvent;
+            return _pyTutorData.Trace.Last() is PyTutorStep lastStep && lastStep.Event == ReturnEvent;
         }
 
         private void SimpleGC()
@@ -271,7 +271,7 @@ namespace TracingCore.Data
             
             var pyTutorStep = new PyTutorStep(
                 line,
-                _functionCallEvent,
+                FunctionCallEvent,
                 methodName,
                 stdOut,
                 globals,
@@ -304,7 +304,7 @@ namespace TracingCore.Data
 
             var newStep = new PyTutorStep(
                 line,
-                _returnEvent,
+                ReturnEvent,
                 prevStep.FuncName,
                 prevStep.StdOut,
                 prevStep.Globals,
@@ -337,7 +337,7 @@ namespace TracingCore.Data
 
             var newStep = new PyTutorStep(
                 classData.LineData.StartLine,
-                _stepLineEvent,
+                StepLineEvent,
                 lastStep.FuncName,
                 lastStep.StdOut,
                 globals,
@@ -351,7 +351,7 @@ namespace TracingCore.Data
 
         public void RegisterRawData()
         {
-            _pyTutorData.Trace.Add(new PyTutorRawInputStep("", _rawInputEvent));
+            _pyTutorData.Trace.Add(new PyTutorRawInputStep("", RawInputEvent));
         }
 
         public void FlushPyTutorData()
