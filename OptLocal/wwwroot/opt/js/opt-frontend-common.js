@@ -75,6 +75,10 @@ if (window.location.protocol === 'https:') {
     var C_JSONP_ENDPOINT = 'https://cokapi.com:8001/exec_c_jsonp';
     var CPP_JSONP_ENDPOINT = 'https://cokapi.com:8001/exec_cpp_jsonp';
 
+    if (windowLocation[windowLocation.length - 1] === '/') {
+        windowLocation = windowLocation.substr(0, windowLocation.length - 1);
+    }
+
     var CSHARP_JSONP_ENDPOINT = `${windowLocation}/api/getcsharptrace`;
 } else {
     var JS_JSONP_ENDPOINT = 'http://104.237.139.253:3000/exec_js_jsonp'; // for deployment
