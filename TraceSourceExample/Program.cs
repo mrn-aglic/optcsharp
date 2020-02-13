@@ -1,17 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Collections.Generic;
 using TracingCore;
-using TracingCore.Interceptors;
-using TracingCore.JsonMappers;
-using TracingCore.SourceCodeInstrumentation;
-using TracingCore.TreeRewriters;
-using ThreadState = System.Threading.ThreadState;
 
 namespace TraceSourceExample
 {
@@ -19,7 +8,17 @@ namespace TraceSourceExample
     {
         static void Main(string[] args)
         {
+            Console.WriteLine(args.GetType());
+            var code = Codes.GetPropertiesExample();
+            // code = Codes.GetSimpleClassInstanceExample();
+            // code = Codes.GetSimpleExampleWithMethod();
+
+            var optBackend = new OptBackend(code, new List<string>());
+
+            var compilationResult = optBackend.Compile("opt-compilation", true);
+            var pyTutorData = optBackend.Trace(compilationResult.Root, compilationResult);
             
+            TraceApi.FlushPyTutorData();
         }
     }
 }

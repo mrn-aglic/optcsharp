@@ -45,9 +45,8 @@ namespace TraceSourceExample
 {
     class Program
     {
-        static int Test(){
-            var x = 5;
-            return x + 1;
+        static void Test()
+        {
         }
 
         static void Main(string[] args)
@@ -55,7 +54,7 @@ namespace TraceSourceExample
             int c;
             var a = 5;
             var b = a + 2;
-            b = Test() + b;
+            Test();
             Console.WriteLine(""Hello World!"");
         }
     }
@@ -151,6 +150,11 @@ namespace TraceSourceExample
         public static string GetMultipleNamespacesExample()
         {
             return GetFileContents("MultipleNamespacesExample.txt");
+        }
+
+        public static string GetPropertiesExample()
+        {
+            return GetFileContents("Properties.txt");
         }
     }
 }
