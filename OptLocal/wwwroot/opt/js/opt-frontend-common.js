@@ -85,6 +85,9 @@ if (window.location.protocol === 'https:') {
     var CPP_JSONP_ENDPOINT = 'http://104.237.139.253:3000/exec_cpp_jsonp'; // for deployment
 
     // TODO: CHANGE IF LIVE EVER
+    if (windowLocation[windowLocation.length - 1] === '/') {
+        windowLocation = windowLocation.substr(0, windowLocation.length - 1);
+    }
     var CSHARP_JSONP_ENDPOINT = `${windowLocation}/api/getcsharptrace`;
 }
 
@@ -2151,7 +2154,7 @@ function executeCodeAndCreateViz(codeToExec,
         //         ]
         //     }
         // )
-        
+
         // TODO : TEMP DISABLE
         $.ajax({
             url: jsonp_endpoint,
