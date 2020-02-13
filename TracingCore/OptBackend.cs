@@ -78,7 +78,10 @@ namespace TracingCore
             var syntaxTree = CSharpSyntaxTree.ParseText(Code);
             var originalRoot = syntaxTree.GetCompilationUnitRoot();
             var root = instrument ? AddInstrumentation(originalRoot) : originalRoot;
-
+           
+            var instrumentation = new Instrumentation(new ExpressionGenerator());
+            instrumentation.WriteToFile(root);
+            
             var compilation = Compiler.Compile(compilationName, root.SyntaxTree, Compiler.DefaultCompilationOptions);
             var executionManager = new ExecutionManager();
 

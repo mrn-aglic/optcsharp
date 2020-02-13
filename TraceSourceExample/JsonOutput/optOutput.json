@@ -1,10 +1,10 @@
 {
-  "code": "using System;\n            namespace TraceSourceExample\n            {\n                class Student \n                {\n                    public Student()\n                    {\n                    } \n                }\n\n                class Program\n                {\n                    static void Main(string[] args)\n                    {\n                        int c;\n                        var s = new Student();\n                        Console.WriteLine(\"Hello World!\");\n                    }\n                }\n            }",
+  "code": "using System;\n\nclass TimePeriod\n{\n   private double _seconds;\n\n   public double Hours\n   {\n       get { return _seconds / 3600; }\n       set { \n          if (value < 0 || value > 24)\n             throw new ArgumentOutOfRangeException(\n                   $\"{nameof(value)} must be between 0 and 24.\");\n\n          _seconds = value * 3600; \n       }\n   }\n}\n\nclass Program\n{\n   static void Main()\n   {\n       TimePeriod t = new TimePeriod();\n       // The property assignment causes the 'set' accessor to be called.\n       t.Hours = 24;\n\n       // Retrieving the property causes the 'get' accessor to be called.\n       Console.WriteLine($\"Time in hours: {t.Hours}\");\n   }\n}",
   "trace": [
     {
       "event": "call",
       "stdout": "",
-      "line": 13,
+      "line": 22,
       "stack_to_render": [
         {
           "func_name": "Main",
@@ -26,7 +26,7 @@
     {
       "event": "step_line",
       "stdout": "",
-      "line": 15,
+      "line": 24,
       "stack_to_render": [
         {
           "func_name": "Main",
@@ -48,42 +48,12 @@
     {
       "event": "step_line",
       "stdout": "",
-      "line": 16,
+      "line": 3,
       "stack_to_render": [
         {
           "func_name": "Main",
-          "encoded_locals": {
-            "c": "<nije inic>"
-          },
-          "ordered_varnames": [
-            "c"
-          ],
-          "parent_frame_id_list": [],
-          "is_highlighted": true,
-          "is_zombie": false,
-          "is_parent": false,
-          "unique_hash": "Main_f1",
-          "frame_id": 1
-        }
-      ],
-      "globals": {},
-      "ordered_globals": [],
-      "func_name": "Main",
-      "heap": {}
-    },
-    {
-      "event": "step_line",
-      "stdout": "",
-      "line": 4,
-      "stack_to_render": [
-        {
-          "func_name": "Main",
-          "encoded_locals": {
-            "c": "<nije inic>"
-          },
-          "ordered_varnames": [
-            "c"
-          ],
+          "encoded_locals": {},
+          "ordered_varnames": [],
           "parent_frame_id_list": [],
           "is_highlighted": true,
           "is_zombie": false,
@@ -93,200 +63,38 @@
         }
       ],
       "globals": {
-        "Student": [
+        "TimePeriod": [
           "REF",
           1
         ]
       },
       "ordered_globals": [
-        "Student"
+        "TimePeriod"
       ],
       "func_name": "Main",
       "heap": {
         "1": [
           "CLASS",
-          "TraceSourceExample.Student",
-          [],
-          [
-            "Student",
-            [
-              "REF",
-              2
-            ]
-          ]
-        ],
-        "2": [
-          "FUNCTION",
-          " Student()",
-          null
-        ]
-      }
-    },
-    {
-      "event": "call",
-      "stdout": "",
-      "line": 6,
-      "stack_to_render": [
-        {
-          "func_name": "Main",
-          "encoded_locals": {
-            "c": "<nije inic>"
-          },
-          "ordered_varnames": [
-            "c"
-          ],
-          "parent_frame_id_list": [],
-          "is_highlighted": true,
-          "is_zombie": false,
-          "is_parent": false,
-          "unique_hash": "Main_f1",
-          "frame_id": 1
-        },
-        {
-          "func_name": "Student",
-          "encoded_locals": {
-            "this": [
-              "REF",
-              3
-            ]
-          },
-          "ordered_varnames": [
-            "this"
-          ],
-          "parent_frame_id_list": [],
-          "is_highlighted": true,
-          "is_zombie": false,
-          "is_parent": false,
-          "unique_hash": "Student_f2",
-          "frame_id": 2
-        }
-      ],
-      "globals": {
-        "Student": [
-          "REF",
-          1
-        ]
-      },
-      "ordered_globals": [
-        "Student"
-      ],
-      "func_name": "Student",
-      "heap": {
-        "1": [
-          "CLASS",
-          "TraceSourceExample.Student",
-          [],
-          [
-            "Student",
-            [
-              "REF",
-              2
-            ]
-          ]
-        ],
-        "2": [
-          "FUNCTION",
-          " Student()",
-          null
-        ],
-        "3": [
-          "INSTANCE",
-          "TraceSourceExample.Student"
-        ]
-      }
-    },
-    {
-      "event": "return",
-      "stdout": "",
-      "line": 8,
-      "stack_to_render": [
-        {
-          "func_name": "Main",
-          "encoded_locals": {
-            "c": "<nije inic>"
-          },
-          "ordered_varnames": [
-            "c"
-          ],
-          "parent_frame_id_list": [],
-          "is_highlighted": true,
-          "is_zombie": false,
-          "is_parent": false,
-          "unique_hash": "Main_f1",
-          "frame_id": 1
-        },
-        {
-          "func_name": "Student",
-          "encoded_locals": {
-            "__return__": null,
-            "this": [
-              "REF",
-              3
-            ]
-          },
-          "ordered_varnames": [
-            "this",
-            "__return__"
-          ],
-          "parent_frame_id_list": [],
-          "is_highlighted": true,
-          "is_zombie": false,
-          "is_parent": false,
-          "unique_hash": "Student_f2",
-          "frame_id": 2
-        }
-      ],
-      "globals": {
-        "Student": [
-          "REF",
-          1
-        ]
-      },
-      "ordered_globals": [
-        "Student"
-      ],
-      "func_name": "Student",
-      "heap": {
-        "1": [
-          "CLASS",
-          "TraceSourceExample.Student",
-          [],
-          [
-            "Student",
-            [
-              "REF",
-              2
-            ]
-          ]
-        ],
-        "2": [
-          "FUNCTION",
-          " Student()",
-          null
-        ],
-        "3": [
-          "INSTANCE",
-          "TraceSourceExample.Student"
+          "TimePeriod",
+          []
         ]
       }
     },
     {
       "event": "step_line",
       "stdout": "",
-      "line": 17,
+      "line": 26,
       "stack_to_render": [
         {
           "func_name": "Main",
           "encoded_locals": {
-            "s": [
+            "t": [
               "REF",
-              3
-            ],
-            "c": "<nije inic>"
+              2
+            ]
           },
           "ordered_varnames": [
-            "c",
-            "s"
+            "t"
           ],
           "parent_frame_id_list": [],
           "is_highlighted": true,
@@ -297,57 +105,97 @@
         }
       ],
       "globals": {
-        "Student": [
+        "TimePeriod": [
           "REF",
           1
         ]
       },
       "ordered_globals": [
-        "Student"
+        "TimePeriod"
       ],
-      "func_name": "Student",
+      "func_name": "Main",
       "heap": {
         "1": [
           "CLASS",
-          "TraceSourceExample.Student",
-          [],
+          "TimePeriod",
+          []
+        ],
+        "2": [
+          "INSTANCE",
+          "TimePeriod",
           [
-            "Student",
-            [
+            "Hours",
+            0.0
+          ]
+        ]
+      }
+    },
+    {
+      "event": "step_line",
+      "stdout": "",
+      "line": 29,
+      "stack_to_render": [
+        {
+          "func_name": "Main",
+          "encoded_locals": {
+            "t": [
               "REF",
               2
             ]
-          ]
+          },
+          "ordered_varnames": [
+            "t"
+          ],
+          "parent_frame_id_list": [],
+          "is_highlighted": true,
+          "is_zombie": false,
+          "is_parent": false,
+          "unique_hash": "Main_f1",
+          "frame_id": 1
+        }
+      ],
+      "globals": {
+        "TimePeriod": [
+          "REF",
+          1
+        ]
+      },
+      "ordered_globals": [
+        "TimePeriod"
+      ],
+      "func_name": "Main",
+      "heap": {
+        "1": [
+          "CLASS",
+          "TimePeriod",
+          []
         ],
         "2": [
-          "FUNCTION",
-          " Student()",
-          null
-        ],
-        "3": [
           "INSTANCE",
-          "TraceSourceExample.Student"
+          "TimePeriod",
+          [
+            "Hours",
+            24.0
+          ]
         ]
       }
     },
     {
       "event": "return",
-      "stdout": "Hello World!\n",
-      "line": 17,
+      "stdout": "Time in hours: 24\n",
+      "line": 29,
       "stack_to_render": [
         {
           "func_name": "Main",
           "encoded_locals": {
             "__return__": null,
-            "s": [
+            "t": [
               "REF",
-              3
-            ],
-            "c": "<nije inic>"
+              2
+            ]
           },
           "ordered_varnames": [
-            "c",
-            "s",
+            "t",
             "__return__"
           ],
           "parent_frame_id_list": [],
@@ -359,36 +207,28 @@
         }
       ],
       "globals": {
-        "Student": [
+        "TimePeriod": [
           "REF",
           1
         ]
       },
       "ordered_globals": [
-        "Student"
+        "TimePeriod"
       ],
-      "func_name": "Student",
+      "func_name": "Main",
       "heap": {
         "1": [
           "CLASS",
-          "TraceSourceExample.Student",
-          [],
-          [
-            "Student",
-            [
-              "REF",
-              2
-            ]
-          ]
+          "TimePeriod",
+          []
         ],
         "2": [
-          "FUNCTION",
-          " Student()",
-          null
-        ],
-        "3": [
           "INSTANCE",
-          "TraceSourceExample.Student"
+          "TimePeriod",
+          [
+            "Hours",
+            24.0
+          ]
         ]
       }
     }

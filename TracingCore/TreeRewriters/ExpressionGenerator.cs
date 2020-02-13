@@ -54,6 +54,10 @@ namespace TracingCore.TreeRewriters
                                     )
                                 ));
                         case AssignmentExpressionSyntax assignmentExpressionSyntax:
+                            if (assignmentExpressionSyntax.Left is MemberAccessExpressionSyntax)
+                            {
+                                return new List<ArgumentSyntax>();
+                            }
                             var left = (IdentifierNameSyntax) assignmentExpressionSyntax.Left;
                             return new List<ArgumentSyntax>
                             {

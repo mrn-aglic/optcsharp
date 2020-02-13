@@ -10,8 +10,6 @@ namespace TraceSourceExample
         {
             Console.WriteLine(args.GetType());
             var code = Codes.GetPropertiesExample();
-            // code = Codes.GetSimpleClassInstanceExample();
-            // code = Codes.GetSimpleExampleWithMethod();
 
             var optBackend = new OptBackend(code, new List<string>());
 
