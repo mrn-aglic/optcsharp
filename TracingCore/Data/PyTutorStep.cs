@@ -15,16 +15,17 @@ namespace TracingCore.Data
         public int Line { get; }
         public string FuncName { get; }
         public string StdOut { get; }
+        public string ExceptionMsg { get; }
         public ImmutableStack<FuncStack> StackToRender { get; }
         public IImmutableDictionary<string, object> Globals;
         public IImmutableList<string> OrderedGlobals { get; }
         public ImmutableDictionary<int, HeapData> Heap { get; }
-        
+
         public ImmutableDictionary<int, HeapData> FilteredHeap =>
             Heap.Where(x => _ignore(x.Value)).ToImmutableDictionary();
 
         public string Event { get; }
-        
+
         public JObject JHeap { get; }
 
         private readonly Func<HeapData, bool> _ignore;
@@ -35,23 +36,26 @@ namespace TracingCore.Data
             string @event,
             string funcName,
             string stdOut,
+            IImmutableDictionary<string, object> globals,
             IImmutableStack<FuncStack> stacks,
             ImmutableDictionary<int, HeapData> heap,
-            JObject jHeap)
+            JObject jHeap
+        )
         {
             Line = lineNum;
             Event = @event;
             FuncName = funcName;
             StdOut = stdOut;
+
             StackToRender = ImmutableStack<FuncStack>.Empty;
             foreach (var stack in stacks.Reverse())
             {
                 StackToRender = StackToRender.Push(stack);
-            } 
+            }
 
             JHeap = jHeap;
-            Globals = ImmutableDictionary<string, object>.Empty;
-            OrderedGlobals = ImmutableList<string>.Empty;
+            Globals = globals;
+            OrderedGlobals = globals.Select(x => x.Key).ToImmutableList();
             Heap = heap;
 
             _ignore = hd => hd.Value != null;
@@ -63,20 +67,24 @@ namespace TracingCore.Data
             string @event,
             string funcName,
             string stdOut,
+            string exceptionMsg,
             IImmutableDictionary<string, object> globals,
             IImmutableStack<FuncStack> stacks,
             ImmutableDictionary<int, HeapData> heap,
-            JObject jHeap)
+            JObject jHeap
+        )
         {
             Line = lineNum;
             Event = @event;
             FuncName = funcName;
             StdOut = stdOut;
+            ExceptionMsg = exceptionMsg;
+
             StackToRender = ImmutableStack<FuncStack>.Empty;
             foreach (var stack in stacks.Reverse())
             {
                 StackToRender = StackToRender.Push(stack);
-            } 
+            }
 
             JHeap = jHeap;
             Globals = globals;

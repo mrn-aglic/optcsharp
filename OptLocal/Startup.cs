@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TracingCore;
 
 namespace OptLocal
 {
@@ -20,6 +21,9 @@ namespace OptLocal
         {
             services.AddControllersWithViews();
             services.AddMvc().AddNewtonsoftJson();
+
+            var instrumentationConfig = Configuration.GetSection("instrumentation").Get<InstrumentationConfig>();
+            services.AddSingleton(instrumentationConfig);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -66,7 +66,7 @@ namespace TracingCore
 
         private void InvokeMethod(MethodInfo method)
         {
-            var @params = method.GetParameters().Length == 0 ? new object?[0] : new object?[] {new string[1]};
+            var @params = method.GetParameters().Length == 0 ? new object[0] : new object[] {new string[1]};
             method.Invoke(null, @params);
         }
     }

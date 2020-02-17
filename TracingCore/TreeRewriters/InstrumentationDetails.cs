@@ -27,18 +27,18 @@ namespace TracingCore.TreeRewriters
     }
     public class InstrumentationDetails
     {
-        public SyntaxNode InsStatement { get; }
+        public SyntaxNode InsTarget { get; }
         public SyntaxNode StatementToInsert { get; }
         public Insert Insert { get; }
 
         public InstrumentationDetails
         (
-            SyntaxNode insStatement,
+            SyntaxNode insTarget,
             SyntaxNode statementToInsert,
             Insert insert
         )
         {
-            InsStatement = insStatement;
+            InsTarget = insTarget;
             StatementToInsert = statementToInsert;
             Insert = insert;
         }

@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using TracingCore.Common;
-using TracingCore.Data;
 using TracingCore.TraceToPyDtos;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -43,6 +40,14 @@ namespace TracingCore.TreeRewriters
                                 VariableData.GetObjectCreationSyntax(y)
                             )
                         ));
+                case IfStatementSyntax ifStatementSyntax:
+                    var condition = ifStatementSyntax.Condition;
+                    var identifiers = condition
+                        .DescendantNodes()
+                        .OfType<IdentifierNameSyntax>()
+                        .GroupBy(x => x.Identifier.Text)
+                        .Select(group => group.First());
+                    return identifiers.Select(x => Argument(VariableData.GetObjectCreationSyntax(x)));
                 case ExpressionStatementSyntax expressionStatementSyntax:
 
                     switch (expressionStatementSyntax.Expression)
@@ -58,6 +63,7 @@ namespace TracingCore.TreeRewriters
                             {
                                 return new List<ArgumentSyntax>();
                             }
+
                             var left = (IdentifierNameSyntax) assignmentExpressionSyntax.Left;
                             return new List<ArgumentSyntax>
                             {
@@ -69,6 +75,10 @@ namespace TracingCore.TreeRewriters
                             throw new NotImplementedException("Imate izraz koji još nije podržan");
                     }
 
+                case AccessorDeclarationSyntax _:
+                    return new List<ArgumentSyntax>();
+                case ThrowStatementSyntax _:
+                    return new List<ArgumentSyntax>();
                 default:
                     throw new NotSupportedException();
             }
@@ -100,8 +110,8 @@ namespace TracingCore.TreeRewriters
                 GetMemberAccessExpressionSyntax(details)
             );
 
-            var @params = GetParameters(details.BeforeNode).ToList();
-            var statementString = GetStatementString(details.BeforeNode);
+            var @params = GetParameters(details.InsTargetNode).ToList();
+            var statementString = GetStatementString(details.InsTargetNode);
 
             if (details.IncludeSelfReference)
             {
@@ -123,28 +133,12 @@ namespace TracingCore.TreeRewriters
             )).AddArgumentListArguments(@params.ToArray());
 
             return methodInvocationSyntax;
-            // return details.HasArguments
-            //     ? invocationSyntax.WithArgumentList(CreateArgumentListSyntax(details))
-            //     : invocationSyntax;
-        }
-
-        private ExpressionSyntax GetExpressionSubtree(ExpressionGeneratorDetails.Long details)
-        {
-            switch (details.SubtreeType)
-            {
-                case SubtreeType.PropertyAccess:
-                    return GetMemberAccessExpressionSyntax(details);
-                case SubtreeType.MethodInvocation:
-                    return GetMethodInvocationExpressionSyntax(details);
-                default:
-                    throw new ArgumentException("Unsupported SubtreeType");
-            }
         }
 
         public ExpressionStatementSyntax GetExpressionStatement(ExpressionGeneratorDetails.Long details)
         {
             return ExpressionStatement(
-                GetExpressionSubtree(details)
+                GetMethodInvocationExpressionSyntax(details)
             );
         }
 
@@ -164,7 +158,7 @@ namespace TracingCore.TreeRewriters
                             ))
                             .Add(Argument(
                                 LiteralExpression(SyntaxKind.StringLiteralExpression,
-                                    Literal(details.BeforeNode.ToString())
+                                    Literal(details.InsTargetNode.ToString())
                                 )
                             ))
                     )
@@ -206,7 +200,7 @@ namespace TracingCore.TreeRewriters
                             ))
                             .Add(Argument(
                                 LiteralExpression(SyntaxKind.StringLiteralExpression,
-                                    Literal(details.BeforeNode.ToString())
+                                    Literal(details.InsTargetNode.ToString())
                                 )
                             ))
                             .Add(Argument(
@@ -220,11 +214,11 @@ namespace TracingCore.TreeRewriters
 
         public LocalDeclarationStatementSyntax FromReturnToLocalDeclaration(
             string variableName,
-            MethodDeclarationSyntax methodDeclaration,
+            TypeSyntax returnType,
             ReturnStatementSyntax returnStatementSyntax)
         {
             var localDeclaration = LocalDeclarationStatement(
-                VariableDeclaration(methodDeclaration.ReturnType,
+                VariableDeclaration(returnType,
                     new SeparatedSyntaxList<VariableDeclaratorSyntax>()
                         .Add(
                             VariableDeclarator(

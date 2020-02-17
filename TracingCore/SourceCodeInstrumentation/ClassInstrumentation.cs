@@ -60,7 +60,6 @@ namespace TracingCore.SourceCodeInstrumentation
 
             var lineData = RoslynHelper.GetLineData(classDeclarationSyntax);
             var egDetails = new ExpressionGeneratorDetails.Short(
-                SubtreeType.MethodInvocation,
                 TraceApiNames.ClassName,
                 TraceApiNames.RegisterClassLoad,
                 lineData

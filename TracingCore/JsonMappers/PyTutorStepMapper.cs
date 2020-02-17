@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json.Linq;
 using TracingCore.Common;
 using TracingCore.Data;
@@ -11,6 +12,25 @@ namespace TracingCore.JsonMappers
     {
         private static bool _useFullName = true;
         private static bool _ignoreNull = true;
+
+        private static BindingFlags _fieldBindingFlags =
+            BindingFlags.NonPublic |
+            BindingFlags.Public |
+            BindingFlags.Instance |
+            BindingFlags.DeclaredOnly;
+
+        private static BindingFlags _propertyBindingFlags =
+            BindingFlags.DeclaredOnly |
+            BindingFlags.NonPublic | // Should we include non-public properties?
+            BindingFlags.Public |
+            BindingFlags.Instance;
+
+        private static string _backupPropPrefix;
+
+        public static void RegisterConfig(InstrumentationConfig instrumentationConfig)
+        {
+            _backupPropPrefix = instrumentationConfig.Property.BackupNamePrefix;
+        }
 
         private static JToken ToJElement(string prop, int val)
         {
@@ -25,6 +45,9 @@ namespace TracingCore.JsonMappers
         private static JToken PopulateJArray(JArray jArray, ImmutableDictionary<int, HeapData> heap,
             IEnumerable<(string, object)> value)
         {
+            var instanceString = HeapType.Instance.ToString().ToUpper();
+            var classString = HeapType.Class.ToString().ToUpper();
+            var listString = HeapType.List.ToString().ToUpper();
             foreach (var (name, obj) in value)
             {
                 if (!_ignoreNull || obj != null)
@@ -38,10 +61,11 @@ namespace TracingCore.JsonMappers
 
                     switch (jArray.First().ToString())
                     {
-                        case var type when type == "INSTANCE" || type == "CLASS":
+                        case var type when type == instanceString ||
+                                           type == classString:
                             jArray.Add(new JArray {name, valueToken});
                             break;
-                        case "LIST":
+                        case var type when type == listString:
                             jArray.Add(valueToken);
                             break;
                     }
@@ -70,9 +94,15 @@ namespace TracingCore.JsonMappers
             var heapTypeString = value.HeapType.ToString().ToUpper();
 
             var jArray = new JArray {heapTypeString, instanceName};
-            var properties = varVal.GetType().GetProperties().Select(x => (x.Name, x.GetValue(varVal)));
+            var type = varVal.GetType();
+            var prefixLength = _backupPropPrefix.Length;
+            var properties = type.GetProperties(_propertyBindingFlags)
+                .Where(x => x.Name.StartsWith(_backupPropPrefix))
+                .Select(x => (x.Name.Substring(prefixLength), x.GetValue(varVal)))
+                .ToList();
+            var fields = type.GetFields(_fieldBindingFlags).Select(x => (x.Name, x.GetValue(varVal))).ToList();
 
-            return PopulateJArray(jArray, heap, properties);
+            return PopulateJArray(jArray, heap, fields.Concat(properties));
         }
 
         public static JToken CreateJFunction(MethodHeapData value)
@@ -87,12 +117,12 @@ namespace TracingCore.JsonMappers
         {
             var heapTypeString = value.HeapType.ToString().ToUpper();
             var extends = JArray.FromObject(value.Extends);
-            
+
             var jArray = new JArray {heapTypeString, value.FullyQualifiedName, extends};
 
             var methods = heap.Values.OfType<MethodHeapData>()
                 .Where(x => x.EnclosingParentFullName == value.FullyQualifiedName);
-            
+
             foreach (var method in methods)
             {
                 jArray.Add(new JArray {method.FuncName, new JArray {"REF", method.HeapId}});

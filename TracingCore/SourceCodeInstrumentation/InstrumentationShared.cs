@@ -21,14 +21,6 @@ namespace TracingCore.SourceCodeInstrumentation
 
         private readonly string _returnVarTemplate = "__return_{0}";
 
-        public enum MethodTrace
-        {
-            Entry,
-            FirstStep,
-            Data,
-            Exit
-        }
-
         public InstrumentationShared(ExpressionGenerator expressionGenerator)
         {
             _expressionGenerator = expressionGenerator;
@@ -51,7 +43,7 @@ namespace TracingCore.SourceCodeInstrumentation
 
         private InstrumentationDetails InstrumentReturnStatement
         (
-            MethodDeclarationSyntax declarationSyntax,
+            TypeSyntax returnType,
             ReturnStatementSyntax returnStatement
         )
         {
@@ -59,11 +51,10 @@ namespace TracingCore.SourceCodeInstrumentation
             var variableName = string.Format(_returnVarTemplate, lineData.StartLine);
 
             var newLocalDeclarationStatement =
-                _expressionGenerator.FromReturnToLocalDeclaration(variableName, declarationSyntax, returnStatement);
+                _expressionGenerator.FromReturnToLocalDeclaration(variableName, returnType, returnStatement);
             var rewrittenReturnStatement = _expressionGenerator.ReturnVariableStatement(variableName);
 
             var generatorDetails = new ExpressionGeneratorDetails.Long(
-                SubtreeType.MethodInvocation,
                 TraceApiClass,
                 TraceApiReturnExitMethod,
                 lineData,
@@ -92,18 +83,28 @@ namespace TracingCore.SourceCodeInstrumentation
             IEnumerable<ReturnStatementSyntax> returnStatements
         )
         {
-            return returnStatements.Select(x => InstrumentReturnStatement(declarationSyntax, x));
+            var returnType = declarationSyntax.ReturnType;
+            return returnStatements.Select(x => InstrumentReturnStatement(returnType, x));
+        }
+        
+        public IEnumerable<InstrumentationDetails> InstrumentReturnStatements
+        (
+            TypeSyntax returnType,
+            IEnumerable<ReturnStatementSyntax> returnStatements
+        )
+        {
+            return returnStatements.Select(x => InstrumentReturnStatement(returnType, x));
         }
 
-        public InstrumentationDetails GetMethodInsStatement
+        internal InstrumentationDetails GetBodyInsStatement
         (
-            BaseMethodDeclarationSyntax declarationSyntax,
+            BlockSyntax body,
             bool hasStatements,
             bool includeThisReference,
             MethodTrace methodTrace
         )
         {
-            var body = declarationSyntax.Body;
+            var declarationSyntax = body.Parent;
             var statements = body.Statements;
 
             var target = hasStatements ? GetTarget(statements, methodTrace) : body;
@@ -118,7 +119,6 @@ namespace TracingCore.SourceCodeInstrumentation
                     : TraceApiMethodFirstStep;
 
             var egDetails = new ExpressionGeneratorDetails.Long(
-                SubtreeType.MethodInvocation,
                 TraceApiClass,
                 traceMethodName,
                 targetLine,
@@ -138,6 +138,17 @@ namespace TracingCore.SourceCodeInstrumentation
             return new InstrumentationDetails(target, statementToInsert.NormalizeWhitespace(), insertWhere);
         }
 
+        public InstrumentationDetails GetMethodInsStatementDetails
+        (
+            BaseMethodDeclarationSyntax declarationSyntax,
+            bool hasStatements,
+            bool includeThisReference,
+            MethodTrace methodTrace
+        )
+        {
+            return GetBodyInsStatement(declarationSyntax.Body, hasStatements, includeThisReference, methodTrace);
+        }
+
         public InstrumentationData GetMethodInsData
         (
             BaseMethodDeclarationSyntax declarationSyntax,
@@ -149,12 +160,12 @@ namespace TracingCore.SourceCodeInstrumentation
             var body = declarationSyntax.Body;
             var hasStatements = body.Statements.Any();
 
-            var enterDetails = GetMethodInsStatement(declarationSyntax, hasStatements, includeThisReference,
+            var enterDetails = GetMethodInsStatementDetails(declarationSyntax, hasStatements, includeThisReference,
                 MethodTrace.Entry);
-            var dullDetails = GetMethodInsStatement(declarationSyntax, hasStatements, includeThisReference,
+            var dullDetails = GetMethodInsStatementDetails(declarationSyntax, hasStatements, includeThisReference,
                 MethodTrace.FirstStep);
             var exitDetails =
-                GetMethodInsStatement(declarationSyntax, hasStatements, includeThisReference, MethodTrace.Exit);
+                GetMethodInsStatementDetails(declarationSyntax, hasStatements, includeThisReference, MethodTrace.Exit);
 
             var listOfDetails = new List<InstrumentationDetails>();
 

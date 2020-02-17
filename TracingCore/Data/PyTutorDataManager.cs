@@ -15,6 +15,8 @@ namespace TracingCore.Data
         private const string StepLineEvent = "step_line";
         private const string RawInputEvent = "raw_input";
         private const string ReturnEvent = "return";
+        private const string ExceptionEvent = "exception";
+        private const string UncaughtException = "uncaught_exception";
 
         private int _currentFrameId;
         private int _currentHeapId;
@@ -139,7 +141,7 @@ namespace TracingCore.Data
 
             var heap = UpdateHeap(variables, lastStep);
             var encLocals = variables.Select(x => EncodedLocalFromVariableData(x, GetValueFromHeap(x.Value, heap)));
-            
+
             var newStack = lastStack.AddAndUpdate(encLocals.ToImmutableList());
 
             var stacks = existingStacks.Pop().Push(newStack);
@@ -268,7 +270,7 @@ namespace TracingCore.Data
 
             var stdOut = lastStep != null ? lastStep.StdOut : string.Empty;
             var globals = lastStep != null ? lastStep.Globals : ImmutableDictionary<string, object>.Empty;
-            
+
             var pyTutorStep = new PyTutorStep(
                 line,
                 FunctionCallEvent,
@@ -292,7 +294,7 @@ namespace TracingCore.Data
             var prevStep = _pyTutorData.Trace.Last() as PyTutorStep;
 
             if (prevStep.Line != line) return;
-            
+
             var newStackToRender = prevStep.StackToRender.Pop(out var lastStack);
             var hd = GetHeapData(variableData);
             var heapId = hd?.HeapId;
@@ -347,6 +349,34 @@ namespace TracingCore.Data
             );
 
             _pyTutorData.Trace.Add(newStep);
+        }
+
+        private void RegisterExceptionShared(int line, string message, string @event)
+        {
+            var lastStep = _pyTutorData.Trace.Last() as PyTutorStep;
+
+            var newStep = new PyTutorStep(
+                line,
+                @event,
+                lastStep.FuncName,
+                lastStep.StdOut,
+                message,
+                lastStep.Globals,
+                lastStep.StackToRender,
+                lastStep.Heap,
+                lastStep.JHeap
+            );
+            _pyTutorData.Trace.Add(newStep);
+        }
+
+        public void RegisterException(int line, string message)
+        {
+            RegisterExceptionShared(line, message, ExceptionEvent);
+        }
+
+        public void RegisterUncaughtException(int line, string message)
+        {
+            RegisterExceptionShared(line, message, UncaughtException);
         }
 
         public void RegisterRawData()

@@ -10,6 +10,14 @@ namespace OptLocal.Areas.Default.Controllers
     public class TraceApiController : Controller
     {
         private const string CompilationName = "opt-compilation";
+        private readonly InstrumentationConfig _instrumentationConfig;
+
+        public TraceApiController(InstrumentationConfig instrumentationConfig)
+        {
+            _instrumentationConfig = instrumentationConfig;
+            // Refactor in the future
+            PyTutorStepMapper.RegisterConfig(_instrumentationConfig);
+        }
 
         [HttpGet, Route("/api/getcsharptrace")]
         public JObject GetCSharpTrace(
@@ -20,7 +28,7 @@ namespace OptLocal.Areas.Default.Controllers
             var inputs = raw_input_json == null
                 ? new List<string>()
                 : JArray.Parse(raw_input_json).ToObject<List<string>>();
-            var optBackend = new OptBackend(user_script, inputs);
+            var optBackend = new OptBackend(user_script, inputs, _instrumentationConfig);
 
             var compilationResult = optBackend.Compile(CompilationName, true);
             var pyTutorData = optBackend.Trace(compilationResult.Root, compilationResult);

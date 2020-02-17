@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -50,6 +51,22 @@ namespace TracingCore.TracingManagers
             );
         }
 
+        private IList<MethodData> GetMemberDataForProperty(PropertyDeclarationSyntax property)
+        {
+            var propertyName = property.Identifier.Text;
+            var accessors = property.AccessorList.Accessors;
+            var propertyType = property.Type.ToString();
+
+            return accessors
+                .Select(x =>
+                    new MethodData(
+                        propertyName,
+                        RoslynHelper.GetLineData(x).StartLine,
+                        $"{propertyType} {propertyName} {x.Keyword.ToString()}",
+                        false
+                    )).ToList();
+        }
+
         private MethodData GetMemberData(MethodDeclarationSyntax methodDeclarationSyntax)
         {
             var identifier = methodDeclarationSyntax.Identifier;
@@ -92,6 +109,20 @@ namespace TracingCore.TracingManagers
             return baseList == null ? new string[] { } : baseList.Types.Select(FullyQualifiedName).ToArray();
         }
 
+        public IList<MethodData> GetMethodsAndProperties(ClassDeclarationSyntax @class)
+        {
+            _semanticModel.LookupNamespacesAndTypes(0);
+
+            var members = @class.Members;
+            var baseMethodTypes = members.OfType<BaseMethodDeclarationSyntax>();
+            var properties = members.OfType<PropertyDeclarationSyntax>();
+
+            var accessors = properties.SelectMany(GetMemberDataForProperty);
+            var methods = baseMethodTypes.Select(GetMemberData);
+
+            return accessors.Concat(methods).ToList();
+        }
+
         public void RegisterClasses(CompilationUnitSyntax root)
         {
             var namespaces = root.DescendantNodes().OfType<NamespaceDeclarationSyntax>().ToList();
@@ -104,12 +135,9 @@ namespace TracingCore.TracingManagers
                     new ClassData
                     (
                         @class.Identifier.Text.ToString(),
-                        GetExtendedTypes(@class), // IMPLEMENT
+                        GetExtendedTypes(@class), 
                         RoslynHelper.GetClassParentPath(@class),
-                        @class.DescendantNodes().OfType<BaseMethodDeclarationSyntax>()
-                            .Where(IsSupported)
-                            .Select(GetMemberData)
-                            .ToList(),
+                        GetMethodsAndProperties(@class),
                         RoslynHelper.GetLineData(@class)
                     )
                 );

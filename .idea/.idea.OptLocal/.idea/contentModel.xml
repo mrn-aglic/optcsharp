@@ -25,6 +25,9 @@
         <e p="Controllers" t="Include">
           <e p="HomeController.cs" t="Include" />
         </e>
+        <e p="Instrumentation" t="Include">
+          <e p="code.txt" t="Include" />
+        </e>
         <e p="Models" t="Include">
           <e p="ErrorViewModel.cs" t="Include" />
         </e>
@@ -374,6 +377,7 @@
       <e p="OptLocal.sln" t="IncludeFlat" />
       <e p="packages" t="ExcludeRecursive" />
       <e p="TraceSourceExample" t="IncludeRecursive">
+        <e p="appsettings.json" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
         <e p="CodeExamples" t="Include">
           <e p="HelloWorld.txt" t="Include" />
@@ -400,6 +404,7 @@
         <e p="TraceSourceExample.csproj" t="IncludeRecursive" />
       </e>
       <e p="TracingCore" t="IncludeRecursive">
+        <e p="appsettings.json" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
         <e p="Common" t="Include">
           <e p="FileIO.cs" t="Include" />
@@ -445,9 +450,10 @@
           <e p="Instrumentation.cs" t="Include" />
           <e p="InstrumentationShared.cs" t="Include" />
           <e p="MethodInstrumentation.cs" t="Include" />
+          <e p="MethodTrace.cs" t="Include" />
+          <e p="PropertyInstrumentation.cs" t="Include" />
           <e p="StatementInstrumentation.cs" t="Include" />
         </e>
-        <e p="SubtreeType.cs" t="Include" />
         <e p="SyntaxElementsRepository.cs" t="Include" />
         <e p="TraceApi.cs" t="Include" />
         <e p="TraceApiManager.cs" t="Include" />
@@ -460,6 +466,7 @@
           <e p="MethodData.cs" t="Include" />
           <e p="VariableData.cs" t="Include" />
         </e>
+        <e p="TracingConfig.cs" t="Include" />
         <e p="TracingCore.csproj" t="IncludeRecursive" />
         <e p="TracingManagers" t="Include">
           <e p="ClassManager.cs" t="Include" />

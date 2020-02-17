@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Extensions.Configuration;
 using TracingCore.Data;
 using TracingCore.Interceptors;
 using TracingCore.SourceCodeInstrumentation;
@@ -20,15 +21,17 @@ namespace TracingCore
         public ConsoleHandler ConsoleHandler { get; }
         public ExecutionManager ExecutionManager { get; }
         public PyTutorDataManager PyTutorDataManager { get; }
+        public InstrumentationConfig InstrumentationConfig { get; }
 
-        public OptBackend(string code, IList<string> rawInputs)
+        public OptBackend(string code, IList<string> rawInputs, InstrumentationConfig instrumentationConfig)
         {
             Code = code;
+            InstrumentationConfig = instrumentationConfig;
             Compiler = new Compiler();
             ConsoleHandler = new ConsoleHandler();
             ExecutionManager = new ExecutionManager();
             PyTutorDataManager = new PyTutorDataManager(code);
-            
+
             ConsoleHandler.AddRangeToRead(rawInputs);
         }
 
@@ -78,10 +81,9 @@ namespace TracingCore
             var syntaxTree = CSharpSyntaxTree.ParseText(Code);
             var originalRoot = syntaxTree.GetCompilationUnitRoot();
             var root = instrument ? AddInstrumentation(originalRoot) : originalRoot;
-           
-            var instrumentation = new Instrumentation(new ExpressionGenerator());
-            instrumentation.WriteToFile(root);
-            
+
+            Instrumentation.WriteToFile(root);
+
             var compilation = Compiler.Compile(compilationName, root.SyntaxTree, Compiler.DefaultCompilationOptions);
             var executionManager = new ExecutionManager();
 
@@ -93,7 +95,7 @@ namespace TracingCore
                 compilation
             );
         }
-        
+
         private SemanticModel GetSemanticModel(CompilationUnitSyntax root)
         {
             var syntaxTree = root.SyntaxTree;
@@ -103,7 +105,7 @@ namespace TracingCore
 
         public PyTutorData Trace(CompilationUnitSyntax root, CompilationResult compilationResult)
         {
-            var semanticModel = GetSemanticModel(root); 
+            var semanticModel = GetSemanticModel(root);
             var classManager = new ClassManager(semanticModel, new Dictionary<string, ClassData>());
 
             TraceApi.Init(root, new TraceApiManager(PyTutorDataManager, ConsoleHandler, classManager));

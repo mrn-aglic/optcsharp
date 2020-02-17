@@ -1,6 +1,5 @@
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using TracingCore.Common;
 using TracingCore.TreeRewriters;
@@ -12,6 +11,7 @@ namespace TracingCore.SourceCodeInstrumentation
         private readonly StatementInstrumentation _statementInstrumentation;
         private readonly MethodInstrumentation _methodInstrumentation;
         private readonly ClassInstrumentation _classInstrumentation;
+        private readonly PropertyInstrumentation _propertyInstrumentation;
 
         public Instrumentation(ExpressionGenerator expressionGenerator)
         {
@@ -19,6 +19,7 @@ namespace TracingCore.SourceCodeInstrumentation
             _statementInstrumentation = new StatementInstrumentation(eg);
             _methodInstrumentation = new MethodInstrumentation(new InstrumentationShared(eg));
             _classInstrumentation = new ClassInstrumentation(new InstrumentationShared(eg), eg);
+            _propertyInstrumentation = new PropertyInstrumentation(new InstrumentationShared(eg));
         }
 
         public CompilationUnitSyntax Start(CompilationUnitSyntax root)
@@ -28,9 +29,11 @@ namespace TracingCore.SourceCodeInstrumentation
             var insData = _statementInstrumentation.PrepareTraceData(root);
             var classInsData = _classInstrumentation.PrepareTraceData(root);
             var methodInsData = _methodInstrumentation.PrepareTraceData(root);
+            var propertyInsData = _propertyInstrumentation.PrepareTraceData(root);
             var staticConsData = _classInstrumentation.PrepareStaticConstructor(root);
 
-            var newRoot = InjectTraceApi(methodInsData);
+            var newRoot = InjectTraceApi(propertyInsData);
+            newRoot = InjectTraceApi(new InstrumentationData(newRoot, methodInsData.Statements));
             newRoot = InjectTraceApi(new InstrumentationData(newRoot, classInsData.Statements));
             newRoot = InjectTraceApi(new InstrumentationData(newRoot, insData.Statements));
             newRoot = InjectTraceApi(new InstrumentationData(newRoot, staticConsData.Statements));
@@ -40,7 +43,7 @@ namespace TracingCore.SourceCodeInstrumentation
         public CompilationUnitSyntax InjectTraceApi(InstrumentationData data)
         {
             var root = data.Root;
-            var statements = data.Statements.Select(x => x.InsStatement).ToList();
+            var statements = data.Statements.Select(x => x.InsTarget).ToList();
             var insDetailsList = data.Statements;
 
             root = root.TrackNodes(root.DescendantNodes());
@@ -77,29 +80,18 @@ namespace TracingCore.SourceCodeInstrumentation
                         }
 
                         break;
-                    case Insert.InsertAttribute:
-                        var method = currentStatement as MethodDeclarationSyntax;
-                        root = root.ReplaceNode(
-                            method,
-                            new[]
-                            {
-                                method.WithAttributeLists(
-                                    method.AttributeLists.Add((AttributeListSyntax) statementToInsert))
-                            }
-                        );
-                        break;
                     case Insert.Member:
                         var currentClass = currentStatement as ClassDeclarationSyntax;
-                        var constructor = statementToInsert as ConstructorDeclarationSyntax;
+                        var newMember = statementToInsert as MemberDeclarationSyntax;
                         var hasMembers = currentClass.Members.Any();
                         if (hasMembers)
                         {
-                            root = root.InsertNodesAfter(currentClass.Members.Last(), new[] {constructor});
+                            root = root.InsertNodesAfter(currentClass.Members.Last(), new[] {newMember});
                         }
                         else
                         {
                             root = root.ReplaceNode(currentClass, currentClass
-                                .WithMembers(new SyntaxList<MemberDeclarationSyntax>().Add(constructor)));
+                                .WithMembers(new SyntaxList<MemberDeclarationSyntax>().Add(newMember)));
                         }
 
                         break;
@@ -109,7 +101,7 @@ namespace TracingCore.SourceCodeInstrumentation
             return root.NormalizeWhitespace();
         }
 
-        public void WriteToFile(CompilationUnitSyntax root)
+        public static void WriteToFile(CompilationUnitSyntax root)
         {
             FileIO.WriteToFile(root.ToString(), "Instrumentation", "code.txt");
         }

@@ -42,22 +42,21 @@ namespace TracingCore.SourceCodeInstrumentation
             var statements = body.Statements;
             var hasStatements = body.Statements.Any();
 
-            var enterDetails = _instrumentationShared.GetMethodInsStatement(
+            var enterDetails = _instrumentationShared.GetMethodInsStatementDetails(
                 methodDeclarationSyntax,
                 hasStatements,
                 includeThisReference,
-                InstrumentationShared.MethodTrace.Entry
+                MethodTrace.Entry
             );
-            var dullDetails = _instrumentationShared.GetMethodInsStatement(
+            var dullDetails = _instrumentationShared.GetMethodInsStatementDetails(
                 methodDeclarationSyntax,
                 hasStatements,
                 includeThisReference,
-                InstrumentationShared.MethodTrace.FirstStep
+                MethodTrace.FirstStep
             );
 
             var returnStatements = statements
-                .Where(x => x.IsKind(SyntaxKind.ReturnStatement))
-                .Select(x => x as ReturnStatementSyntax)
+                .OfType<ReturnStatementSyntax>()
                 .ToList();
 
             var exitDetailsList = returnStatements.Any()
@@ -67,11 +66,11 @@ namespace TracingCore.SourceCodeInstrumentation
                 ).ToList()
                 : new List<InstrumentationDetails>
                 {
-                    _instrumentationShared.GetMethodInsStatement(
+                    _instrumentationShared.GetMethodInsStatementDetails(
                         methodDeclarationSyntax,
                         hasStatements,
                         includeThisReference,
-                        InstrumentationShared.MethodTrace.Exit
+                        MethodTrace.Exit
                     )
                 };
 
@@ -80,7 +79,6 @@ namespace TracingCore.SourceCodeInstrumentation
                 listOfDetails.Add(enterDetails);
                 listOfDetails.Add(dullDetails);
                 listOfDetails.AddRange(exitDetailsList);
-
             }
             else
             {

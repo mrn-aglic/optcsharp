@@ -6,6 +6,8 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.4.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.1" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.1" />
       <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     </ItemGroup>
 
@@ -19,6 +21,18 @@
 
     <ItemGroup>
       <None Remove="Fody\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Microsoft.Extensions.Configuration, Version=3.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
+        <HintPath>..\..\..\..\..\usr\local\share\dotnet\packs\Microsoft.AspNetCore.App.Ref\3.1.0\ref\netcoreapp3.1\Microsoft.Extensions.Configuration.dll</HintPath>
+      </Reference>
+      <Reference Include="Microsoft.Extensions.Configuration.Abstractions, Version=3.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
+        <HintPath>..\..\..\..\..\usr\local\share\dotnet\packs\Microsoft.AspNetCore.App.Ref\3.1.0\ref\netcoreapp3.1\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
+      </Reference>
+      <Reference Include="Microsoft.Extensions.Configuration.Json, Version=3.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
+        <HintPath>..\..\..\..\..\usr\local\share\dotnet\packs\Microsoft.AspNetCore.App.Ref\3.1.0\ref\netcoreapp3.1\Microsoft.Extensions.Configuration.Json.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

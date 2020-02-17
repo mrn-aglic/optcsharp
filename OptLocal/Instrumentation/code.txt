@@ -1,0 +1,37 @@
+using System;
+using TracingCore;
+using TracingCore.TraceToPyDtos;
+
+namespace TraceSourceExample
+{
+    class Program
+    {
+        static int Test()
+        {
+            TraceApi.TraceMethodEntry(7, "Test");
+            TraceApi.TraceData(8, "static int Test(){\n            var x = 5;\n            return x + 1;\n        }");
+            var x = 5;
+            TraceApi.TraceData(8, "var x = 5;", new VariableData("x", x, x.GetType()));
+            int __return_9 = x + 1;
+            TraceApi.TraceMethodReturnExit(9, "int __return_9=x + 1;", new VariableData("__return_9", __return_9, __return_9.GetType()));
+            return __return_9;
+        }
+
+        static void Main(string[] args)
+        {
+            TraceApi.TraceMethodEntry(12, "Main", new VariableData("args", args, args.GetType()));
+            TraceApi.TraceData(14, "static void Main(string[] args)\n        {\n            int c;\n            var a = 5;\n            var b = a + 2;\n            b = Test() + b;\n            Console.WriteLine(\"Hello World!\");\n        }");
+            int c;
+            TraceApi.TraceData(15, "int c;", new VariableData("c", "<nije inic>", typeof(int)));
+            var a = 5;
+            TraceApi.TraceData(16, "var a = 5;", new VariableData("a", a, a.GetType()));
+            var b = a + 2;
+            TraceApi.TraceData(17, "var b = a + 2;", new VariableData("b", b, b.GetType()));
+            b = Test() + b;
+            TraceApi.TraceData(18, "b = Test() + b;", new VariableData("b", b, b.GetType()));
+            Console.WriteLine("Hello World!");
+            TraceApi.TraceData(18, "Console.WriteLine(\"Hello World!\");");
+            TraceApi.TraceMethodExit(18, "static void Main(string[] args)\n        {\n            int c;\n            var a = 5;\n            var b = a + 2;\n            b = Test() + b;\n            Console.WriteLine(\"Hello World!\");\n        }", null);
+        }
+    }
+}
