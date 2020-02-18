@@ -103,8 +103,8 @@ namespace TracingCore.TreeRewriters
         {
             switch (syntaxNode)
             {
-                case StatementSyntax statementSyntax:
-                    return statementSyntax.ToString();
+                case StatementSyntax _:
+                    return string.Empty;
                 case MethodDeclarationSyntax methodDeclarationSyntax:
                     return $"{methodDeclarationSyntax.Identifier.Text}";
                 case ConstructorDeclarationSyntax constructorDeclarationSyntax:

@@ -48,12 +48,12 @@ namespace TracingCore.SourceCodeInstrumentation
                 includeThisReference,
                 MethodTrace.Entry
             );
-            var dullDetails = _instrumentationShared.GetBlockInsStatementDetails(
-                methodDeclarationSyntax.Body,
-                hasStatements,
-                includeThisReference,
-                MethodTrace.FirstStep
-            );
+            // var dullDetails = _instrumentationShared.GetBlockInsStatementDetails(
+            //     methodDeclarationSyntax.Body,
+            //     hasStatements,
+            //     includeThisReference,
+            //     MethodTrace.FirstStep
+            // );
 
             var returnStatements = statements
                 .OfType<ReturnStatementSyntax>()
@@ -77,7 +77,7 @@ namespace TracingCore.SourceCodeInstrumentation
             if (hasStatements)
             {
                 listOfDetails.Add(enterDetails);
-                listOfDetails.Add(dullDetails);
+                // listOfDetails.Add(dullDetails);
                 listOfDetails.AddRange(exitDetailsList);
             }
             else
@@ -85,7 +85,7 @@ namespace TracingCore.SourceCodeInstrumentation
                 var exitDetails = exitDetailsList.First();
                 var newBody = body.AddStatements(
                     (ExpressionStatementSyntax) enterDetails.StatementToInsert,
-                    (ExpressionStatementSyntax) dullDetails.StatementToInsert,
+                    // (ExpressionStatementSyntax) dullDetails.StatementToInsert,
                     (ExpressionStatementSyntax) exitDetails.StatementToInsert
                 );
 

@@ -47,11 +47,6 @@ namespace TracingCore.SourceCodeInstrumentation
             };
         }
 
-        private InstrumentationDetails InstrumentIfStatementNew(IfStatementSyntax ifStatementSyntax, LineData lineNum)
-        {
-            return null;
-        }
-
         private InstrumentationDetails InstrumentThrowStatement(ThrowStatementSyntax throwStatementSyntax,
             LineData lineNum)
         {

@@ -13,7 +13,7 @@ namespace TracingCore.SourceCodeInstrumentation
     public class InstrumentationShared
     {
         private readonly ExpressionGenerator _expressionGenerator;
-        
+
         private readonly string _returnVarTemplate = "__return_{0}";
 
         public InstrumentationShared(ExpressionGenerator expressionGenerator)
@@ -23,17 +23,13 @@ namespace TracingCore.SourceCodeInstrumentation
 
         private SyntaxNode GetTarget(IEnumerable<StatementSyntax> statements, MethodTrace methodTrace)
         {
-            switch (methodTrace)
+            return methodTrace switch
             {
-                case MethodTrace.Entry:
-                    return statements.First();
-                case MethodTrace.Exit:
-                    return statements.Last();
-                case MethodTrace.FirstStep:
-                    return statements.First();
-                default:
-                    throw new ArgumentException("Wrong MethodTrace value");
-            }
+                MethodTrace.Entry => statements.First(),
+                MethodTrace.Exit => statements.Last(),
+                MethodTrace.FirstStep => statements.First(),
+                _ => throw new ArgumentException("Wrong MethodTrace value")
+            };
         }
 
         private InstrumentationDetails InstrumentReturnStatement
@@ -81,7 +77,7 @@ namespace TracingCore.SourceCodeInstrumentation
             var returnType = declarationSyntax.ReturnType;
             return returnStatements.Select(x => InstrumentReturnStatement(returnType, x));
         }
-        
+
         public IEnumerable<InstrumentationDetails> InstrumentReturnStatements
         (
             TypeSyntax returnType,
@@ -107,13 +103,15 @@ namespace TracingCore.SourceCodeInstrumentation
                 ? RoslynHelper.GetLineData(declarationSyntax)
                 : RoslynHelper.GetLineData(target, !hasStatements);
 
-            var traceMethodName = methodTrace == MethodTrace.Entry
-                ? TraceApiNames.TraceMethodEntry
-                : methodTrace == MethodTrace.Exit
-                    ? TraceApiNames.TraceMethodExit
-                    : TraceApiNames.TraceApiMethodFirstStep;
+            var traceMethodName = methodTrace switch
+            {
+                MethodTrace.Entry => TraceApiNames.TraceMethodEntry,
+                MethodTrace.Exit => TraceApiNames.TraceMethodExit,
+                _ => TraceApiNames.TraceApiMethodFirstStep
+            };
 
-            var egDetails = new ExpressionGeneratorDetails.Long(
+            var egDetails = new ExpressionGeneratorDetails.Long
+            (
                 TraceApiNames.ClassName,
                 traceMethodName,
                 targetLine,
@@ -121,11 +119,12 @@ namespace TracingCore.SourceCodeInstrumentation
                 includeThisReference
             );
 
-            var statementToInsert = methodTrace == MethodTrace.Entry
-                ? _expressionGenerator.GetExpressionStatement(egDetails)
-                : methodTrace == MethodTrace.FirstStep
-                    ? _expressionGenerator.GetDullExpressionStatement(egDetails)
-                    : _expressionGenerator.GetExitExpressionStatement(egDetails);
+            var statementToInsert = methodTrace switch
+            {
+                MethodTrace.Entry => _expressionGenerator.GetExpressionStatement(egDetails),
+                MethodTrace.FirstStep => _expressionGenerator.GetDullExpressionStatement(egDetails),
+                _ => _expressionGenerator.GetExitExpressionStatement(egDetails)
+            };
 
             var insertWhere = methodTrace == MethodTrace.Entry || methodTrace == MethodTrace.FirstStep
                 ? Insert.Before
@@ -160,7 +159,8 @@ namespace TracingCore.SourceCodeInstrumentation
             var dullDetails = GetBlockInsStatementDetails(declarationSyntax.Body, hasStatements, includeThisReference,
                 MethodTrace.FirstStep);
             var exitDetails =
-                GetBlockInsStatementDetails(declarationSyntax.Body, hasStatements, includeThisReference, MethodTrace.Exit);
+                GetBlockInsStatementDetails(declarationSyntax.Body, hasStatements, includeThisReference,
+                    MethodTrace.Exit);
 
             var listOfDetails = new List<InstrumentationDetails>();
 
