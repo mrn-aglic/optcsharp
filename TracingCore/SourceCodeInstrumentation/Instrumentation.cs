@@ -13,13 +13,13 @@ namespace TracingCore.SourceCodeInstrumentation
         private readonly ClassInstrumentation _classInstrumentation;
         private readonly PropertyInstrumentation _propertyInstrumentation;
 
-        public Instrumentation(ExpressionGenerator expressionGenerator)
+        public Instrumentation(ExpressionGenerator expressionGenerator, InstrumentationConfig instrumentationConfig)
         {
             var eg = expressionGenerator;
             _statementInstrumentation = new StatementInstrumentation(eg);
             _methodInstrumentation = new MethodInstrumentation(new InstrumentationShared(eg));
             _classInstrumentation = new ClassInstrumentation(new InstrumentationShared(eg), eg);
-            _propertyInstrumentation = new PropertyInstrumentation(new InstrumentationShared(eg));
+            _propertyInstrumentation = new PropertyInstrumentation(new InstrumentationShared(eg), instrumentationConfig.Property);
         }
 
         public CompilationUnitSyntax Start(CompilationUnitSyntax root)
@@ -37,6 +37,7 @@ namespace TracingCore.SourceCodeInstrumentation
             newRoot = InjectTraceApi(new InstrumentationData(newRoot, classInsData.Statements));
             newRoot = InjectTraceApi(new InstrumentationData(newRoot, insData.Statements));
             newRoot = InjectTraceApi(new InstrumentationData(newRoot, staticConsData.Statements));
+
             return newRoot;
         }
 
@@ -70,35 +71,33 @@ namespace TracingCore.SourceCodeInstrumentation
                             });
                         break;
                     case Insert.Replace:
-                        if (currentStatement is ReturnStatementSyntax)
-                        {
-                            root = root.ReplaceNode(currentStatement, statementToInsert.ChildNodes());
-                        }
-                        else
-                        {
-                            root = root.ReplaceNode(currentStatement, statementToInsert);
-                        }
+                        root = currentStatement is ReturnStatementSyntax
+                            ? root.ReplaceNode(currentStatement, statementToInsert.ChildNodes())
+                            : root.ReplaceNode(currentStatement, statementToInsert);
 
                         break;
                     case Insert.Member:
-                        var currentClass = currentStatement as ClassDeclarationSyntax;
-                        var newMember = statementToInsert as MemberDeclarationSyntax;
-                        var hasMembers = currentClass.Members.Any();
-                        if (hasMembers)
-                        {
-                            root = root.InsertNodesAfter(currentClass.Members.Last(), new[] {newMember});
-                        }
-                        else
-                        {
-                            root = root.ReplaceNode(currentClass, currentClass
-                                .WithMembers(new SyntaxList<MemberDeclarationSyntax>().Add(newMember)));
-                        }
-
+                        root = HandleInsertMember(currentStatement, statementToInsert, root).NormalizeWhitespace();
                         break;
                 }
             }
 
             return root.NormalizeWhitespace();
+        }
+
+        private CompilationUnitSyntax HandleInsertMember(SyntaxNode currentStatement, SyntaxNode statementToInsert,
+            CompilationUnitSyntax root)
+        {
+            var currentClass = currentStatement as ClassDeclarationSyntax;
+            var newMember = statementToInsert as MemberDeclarationSyntax;
+            var hasMembers = currentClass.Members.Any();
+            if (hasMembers)
+            {
+                return root.InsertNodesAfter(currentClass.Members.Last(), new[] {newMember});
+            }
+
+            return root.ReplaceNode(currentClass, currentClass
+                .WithMembers(new SyntaxList<MemberDeclarationSyntax>().Add(newMember)));
         }
 
         public static void WriteToFile(CompilationUnitSyntax root)

@@ -1,0 +1,18 @@
+using System;
+
+namespace TraceSourceExample
+{
+    class Program
+    {
+        static void Test(){
+            var x = 5;
+            x = x + 1;
+        }
+
+        static void Main(string[] args)
+        {
+            Test();
+            Console.WriteLine("Hello World!");
+        }
+    }
+}

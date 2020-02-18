@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -75,12 +76,21 @@ namespace TracingCore.TreeRewriters
                             throw new NotImplementedException("Imate izraz koji još nije podržan");
                     }
 
-                case AccessorDeclarationSyntax _:
-                    return new List<ArgumentSyntax>();
+                case AccessorDeclarationSyntax accessorDeclarationSyntax:
+                    
+                    var args = new List<ArgumentSyntax>();
+                    
+                    if (accessorDeclarationSyntax.Keyword.IsKind(SyntaxKind.GetKeyword)) return args;
+
+                    var valueData = VariableData.GetObjectCreationSyntax(IdentifierName("value"));
+                    var arg = Argument(valueData);
+                    args.Add(arg);
+
+                    return args;
                 case ThrowStatementSyntax _:
                     return new List<ArgumentSyntax>();
                 default:
-                    throw new NotSupportedException();
+                    throw new NotImplementedException("Imate izraz koji još nije podržan");
             }
         }
 
@@ -99,6 +109,11 @@ namespace TracingCore.TreeRewriters
                     return $"{methodDeclarationSyntax.Identifier.Text}";
                 case ConstructorDeclarationSyntax constructorDeclarationSyntax:
                     return $"{constructorDeclarationSyntax.Identifier.Text}";
+                case AccessorDeclarationSyntax accessorDeclarationSyntax:
+                    // Accessor declaration syntax has AccessorList as immediate parent, skip it.
+                    var property = accessorDeclarationSyntax.Parent.Parent as PropertyDeclarationSyntax;
+                    Debug.Assert(property != null, "Accessor syntax should have property syntax as parent");
+                    return $"{accessorDeclarationSyntax.Keyword.Text} {property.Identifier.Text}";
                 default:
                     return "<expression generator unknown>";
             }
@@ -164,24 +179,6 @@ namespace TracingCore.TreeRewriters
                     )
                 )
             );
-        }
-
-        public AttributeListSyntax CreateAttribute(
-            int line,
-            string name)
-        {
-            var attributeArgument = AttributeArgument(
-                LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(line))
-            );
-
-            var attribute = Attribute(
-                IdentifierName(name),
-                AttributeArgumentList(
-                    new SeparatedSyntaxList<AttributeArgumentSyntax>().Add(attributeArgument)
-                )
-            );
-
-            return AttributeList(new SeparatedSyntaxList<AttributeSyntax>().Add(attribute));
         }
 
         public ExpressionStatementSyntax GetExitExpressionStatement(ExpressionGeneratorDetails.Long details)

@@ -39,7 +39,8 @@ namespace TracingCore.TraceToPyDtos
                 ? Argument(IdentifierName(identifier))
                 : Argument(
                     LiteralExpression(SyntaxKind.StringLiteralExpression,
-                        Literal("<nije inic>"))
+                        Literal("undefined")
+                    )
                 );
             var thirdArgument = hasInit
                 ? Argument(

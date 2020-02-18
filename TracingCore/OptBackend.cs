@@ -64,7 +64,7 @@ namespace TracingCore
             var originalRoot = syntaxTree.GetCompilationUnitRoot();
             var root = AddUsings(originalRoot);
 
-            var instrumentation = new Instrumentation(new ExpressionGenerator());
+            var instrumentation = new Instrumentation(new ExpressionGenerator(), InstrumentationConfig);
             return (originalRoot, instrumentation.Start(root).SyntaxTree);
         }
 
@@ -72,7 +72,7 @@ namespace TracingCore
         {
             var root = AddUsings(originalRoot);
 
-            var instrumentation = new Instrumentation(new ExpressionGenerator());
+            var instrumentation = new Instrumentation(new ExpressionGenerator(), InstrumentationConfig);
             return instrumentation.Start(root);
         }
 

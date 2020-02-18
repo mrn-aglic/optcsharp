@@ -67,13 +67,14 @@ namespace TracingCore.SourceCodeInstrumentation
 
         private List<InstrumentationDetails> InstrumentBlock(BlockSyntax blockSyntax)
         {
-            var nonReturnStatements = blockSyntax.Statements.Where(x => !(x is ReturnStatementSyntax || x is IfStatementSyntax)).ToList();
+            var statements = blockSyntax.Statements;
+            var nonReturnStatements = blockSyntax.Statements.Where(x => !(x is ReturnStatementSyntax)).ToList();
             var lineNumbers = nonReturnStatements
                 .Select(x => RoslynHelper.GetLineData(x))
                 .Skip(1)
                 .ToList();
-            var lineNums = (nonReturnStatements.Any()
-                ? lineNumbers.Append(RoslynHelper.GetLineData(nonReturnStatements.Last()))
+            var lineNums = (statements.Any()
+                ? lineNumbers.Append(RoslynHelper.GetLineData(statements.Last()))
                 : lineNumbers).ToList();
 
             var statementsWithNums = nonReturnStatements.Zip(lineNums);

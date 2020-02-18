@@ -385,6 +385,8 @@
           <e p="Polymorphism.txt" t="Include" />
           <e p="PolymorphismOverride.txt" t="Include" />
           <e p="Properties.txt" t="Include" />
+          <e p="SimpleWithMethod.txt" t="Include" />
+          <e p="VoidMethodExample.txt" t="Include" />
         </e>
         <e p="Codes.cs" t="Include" />
         <e p="Instrumentation" t="Include">

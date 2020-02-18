@@ -13,12 +13,7 @@ namespace TracingCore.SourceCodeInstrumentation
     public class InstrumentationShared
     {
         private readonly ExpressionGenerator _expressionGenerator;
-        private const string TraceApiClass = "TraceApi";
-        private const string TraceApiEnterMethod = "TraceMethodEntry";
-        private const string TraceApiMethodFirstStep = "TraceData";
-        private const string TraceApiExitMethod = "TraceMethodExit";
-        private const string TraceApiReturnExitMethod = "TraceMethodReturnExit";
-
+        
         private readonly string _returnVarTemplate = "__return_{0}";
 
         public InstrumentationShared(ExpressionGenerator expressionGenerator)
@@ -55,8 +50,8 @@ namespace TracingCore.SourceCodeInstrumentation
             var rewrittenReturnStatement = _expressionGenerator.ReturnVariableStatement(variableName);
 
             var generatorDetails = new ExpressionGeneratorDetails.Long(
-                TraceApiClass,
-                TraceApiReturnExitMethod,
+                TraceApiNames.ClassName,
+                TraceApiNames.TraceMethodReturnExit,
                 lineData,
                 newLocalDeclarationStatement,
                 false
@@ -113,13 +108,13 @@ namespace TracingCore.SourceCodeInstrumentation
                 : RoslynHelper.GetLineData(target, !hasStatements);
 
             var traceMethodName = methodTrace == MethodTrace.Entry
-                ? TraceApiEnterMethod
+                ? TraceApiNames.TraceMethodEntry
                 : methodTrace == MethodTrace.Exit
-                    ? TraceApiExitMethod
-                    : TraceApiMethodFirstStep;
+                    ? TraceApiNames.TraceMethodExit
+                    : TraceApiNames.TraceApiMethodFirstStep;
 
             var egDetails = new ExpressionGeneratorDetails.Long(
-                TraceApiClass,
+                TraceApiNames.ClassName,
                 traceMethodName,
                 targetLine,
                 declarationSyntax,

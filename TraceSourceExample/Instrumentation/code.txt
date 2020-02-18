@@ -9,7 +9,7 @@ class TimePeriod
     {
         get
         {
-            TraceApi.TraceMethodEntry(9, "<expression generator unknown>", new VariableData("this", this, this.GetType()));
+            TraceApi.TraceMethodEntry(9, "get Hours", new VariableData("this", this, this.GetType()));
             TraceApi.TraceData(9, "get { return _seconds / 3600; }");
             double __return_9 = _seconds / 3600;
             TraceApi.TraceMethodReturnExit(9, "double __return_9=_seconds / 3600;", new VariableData("__return_9", __return_9, __return_9.GetType()));
@@ -18,7 +18,7 @@ class TimePeriod
 
         set
         {
-            TraceApi.TraceMethodEntry(10, "<expression generator unknown>", new VariableData("this", this, this.GetType()));
+            TraceApi.TraceMethodEntry(10, "set Hours", new VariableData("this", this, this.GetType()));
             TraceApi.TraceData(11, "set { \n          if (value < 0 || value > 24)\n             throw new ArgumentOutOfRangeException(\n                   $\"{nameof(value)} must be between 0 and 24.\");\n\n          _seconds = value * 3600; \n       }");
             if (value < 0 || value > 24)
                 throw new ArgumentOutOfRangeException($"{nameof(value)} must be between 0 and 24.");

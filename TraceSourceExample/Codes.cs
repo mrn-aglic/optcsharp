@@ -156,5 +156,15 @@ namespace TraceSourceExample
         {
             return GetFileContents("Properties.txt");
         }
+
+        public static string GetSimpleWithMethod()
+        {
+            return GetFileContents("SimpleWithMethod.txt");
+        }
+
+        public static string VoidMethodExample()
+        {
+            return GetFileContents("VoidMethodExample.txt");
+        }
     }
 }

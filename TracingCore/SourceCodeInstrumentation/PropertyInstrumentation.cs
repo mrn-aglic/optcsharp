@@ -10,10 +10,12 @@ namespace TracingCore.SourceCodeInstrumentation
     public class PropertyInstrumentation
     {
         private readonly InstrumentationShared _instrumentationShared;
+        private readonly PropertyInstrumentationConfig _propertyInstrumentationConfig;
 
-        public PropertyInstrumentation(InstrumentationShared instrumentationShared)
+        public PropertyInstrumentation(InstrumentationShared instrumentationShared, PropertyInstrumentationConfig propertyInstrumentationConfig)
         {
             _instrumentationShared = instrumentationShared;
+            _propertyInstrumentationConfig = propertyInstrumentationConfig;
         }
 
         public InstrumentationData PrepareTraceData(CompilationUnitSyntax root)
@@ -34,17 +36,13 @@ namespace TracingCore.SourceCodeInstrumentation
             return new InstrumentationData(root, insData.SelectMany(x => x.Statements).Concat(proxyPropertiesData).ToList());
         }
 
-        private string GetPropertyName(string name)
-        {
-            return $"__Pre_Ins_Prop_{name}";
-        }
-
         public InstrumentationDetails PrepareProxyProperty
         (
             PropertyDeclarationSyntax propertyDeclarationSyntax
         )
         {
-            var newPropertyName = GetPropertyName(propertyDeclarationSyntax.Identifier.Text);
+            var propNamePrefix = _propertyInstrumentationConfig.BackupNamePrefix;
+            var newPropertyName = $"{propNamePrefix}{propertyDeclarationSyntax.Identifier.Text}";
             var propProxy = propertyDeclarationSyntax.WithIdentifier(
                 SyntaxFactory.Identifier(newPropertyName)
             );
