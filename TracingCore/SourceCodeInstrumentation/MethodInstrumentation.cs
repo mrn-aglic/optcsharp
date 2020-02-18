@@ -42,14 +42,14 @@ namespace TracingCore.SourceCodeInstrumentation
             var statements = body.Statements;
             var hasStatements = body.Statements.Any();
 
-            var enterDetails = _instrumentationShared.GetMethodInsStatementDetails(
-                methodDeclarationSyntax,
+            var enterDetails = _instrumentationShared.GetBlockInsStatementDetails(
+                methodDeclarationSyntax.Body,
                 hasStatements,
                 includeThisReference,
                 MethodTrace.Entry
             );
-            var dullDetails = _instrumentationShared.GetMethodInsStatementDetails(
-                methodDeclarationSyntax,
+            var dullDetails = _instrumentationShared.GetBlockInsStatementDetails(
+                methodDeclarationSyntax.Body,
                 hasStatements,
                 includeThisReference,
                 MethodTrace.FirstStep
@@ -66,8 +66,8 @@ namespace TracingCore.SourceCodeInstrumentation
                 ).ToList()
                 : new List<InstrumentationDetails>
                 {
-                    _instrumentationShared.GetMethodInsStatementDetails(
-                        methodDeclarationSyntax,
+                    _instrumentationShared.GetBlockInsStatementDetails(
+                        methodDeclarationSyntax.Body,
                         hasStatements,
                         includeThisReference,
                         MethodTrace.Exit

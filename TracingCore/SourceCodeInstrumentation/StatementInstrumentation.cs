@@ -10,10 +10,13 @@ namespace TracingCore.SourceCodeInstrumentation
 {
     public class StatementInstrumentation
     {
+        private readonly InstrumentationShared _instrumentationShared;
         private readonly ExpressionGenerator _expressionGenerator;
 
-        public StatementInstrumentation(ExpressionGenerator expressionGenerator)
+        public StatementInstrumentation(InstrumentationShared instrumentationShared,
+            ExpressionGenerator expressionGenerator)
         {
+            _instrumentationShared = instrumentationShared;
             _expressionGenerator = expressionGenerator;
         }
 
@@ -25,9 +28,8 @@ namespace TracingCore.SourceCodeInstrumentation
 
             var statementsData = new List<InstrumentationDetails>();
 
-            foreach (var blockSyntax in blocks)
+            foreach (var data in blocks.Select(blockSyntax => BlockDetails(blockSyntax)))
             {
-                var data = InstrumentBlock(blockSyntax);
                 statementsData.AddRange(data);
             }
 
@@ -36,15 +38,18 @@ namespace TracingCore.SourceCodeInstrumentation
 
         private InstrumentationDetails PrepareStatementDetails(StatementSyntax statementSyntax, LineData lineNum)
         {
-            switch (statementSyntax)
+            return statementSyntax switch
             {
-                case IfStatementSyntax ifStatementSyntax:
-                    return InstrumentIfStatement(ifStatementSyntax, lineNum);
-                case ThrowStatementSyntax throwStatementSyntax:
-                    return InstrumentThrowStatement(throwStatementSyntax, lineNum);
-                default:
-                    return InstrumentSimpleStatement(statementSyntax, lineNum);
-            }
+                ThrowStatementSyntax throwStatementSyntax => InstrumentThrowStatement(throwStatementSyntax, lineNum),
+                // IfStatementSyntax ifStatementSyntax => InstrumentIfStatement(ifStatementSyntax, lineNum),
+                // IfStatementSyntax ifStatementSyntax => InstrumentIfStatementNew(ifStatementSyntax, lineNum),
+                _ => InstrumentSimpleStatement(statementSyntax, lineNum)
+            };
+        }
+
+        private InstrumentationDetails InstrumentIfStatementNew(IfStatementSyntax ifStatementSyntax, LineData lineNum)
+        {
+            return null;
         }
 
         private InstrumentationDetails InstrumentThrowStatement(ThrowStatementSyntax throwStatementSyntax,
@@ -65,7 +70,45 @@ namespace TracingCore.SourceCodeInstrumentation
             return new InstrumentationDetails(throwStatementSyntax, statementToInsert, Insert.Before);
         }
 
-        private List<InstrumentationDetails> InstrumentBlock(BlockSyntax blockSyntax)
+        private InstrumentationDetails CreateBlockEnterStepDetails
+        (
+            BlockSyntax blockSyntax,
+            bool includeThisReference = false
+        )
+        {
+            var statements = blockSyntax.Statements.ToList();
+            var hasStatements = statements.Any();
+            return
+                _instrumentationShared.GetBodyInsStatement(blockSyntax, hasStatements, includeThisReference,
+                    MethodTrace.FirstStep); //TODO separate method entry from block entry
+        }
+
+        private IEnumerable<(StatementSyntax, LineData)> ZipWitLineData(StatementSyntax[] statements)
+        {
+            var lineNumbers = statements.Skip(1).Select(x => RoslynHelper.GetLineData(x));
+            var anyStatements = statements.Any();
+            var lineNums = anyStatements
+                ? lineNumbers.Append(RoslynHelper.GetLineData(statements.Last())).ToList()
+                : lineNumbers;
+
+            return statements.Zip(lineNums);
+        }
+
+        private List<InstrumentationDetails> BlockDetails(BlockSyntax blockSyntax, bool includeThisReference = false)
+        {
+            var list = new List<InstrumentationDetails>();
+            var enterStepDetails = CreateBlockEnterStepDetails(blockSyntax, includeThisReference);
+            var nonReturnStatements = blockSyntax.Statements.Where(x => !x.IsKind(SyntaxKind.ReturnStatement));
+            var statementsWithLineData = ZipWitLineData(nonReturnStatements.ToArray());
+            var statementsDetails = statementsWithLineData.Select(x => PrepareStatementDetails(x.Item1, x.Item2));
+
+            list.Add(enterStepDetails);
+            list.AddRange(statementsDetails);
+
+            return list;
+        }
+
+        private IEnumerable<InstrumentationDetails> InstrumentBlock(BlockSyntax blockSyntax)
         {
             var statements = blockSyntax.Statements;
             var nonReturnStatements = blockSyntax.Statements.Where(x => !(x is ReturnStatementSyntax)).ToList();

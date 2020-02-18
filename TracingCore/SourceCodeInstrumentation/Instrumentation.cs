@@ -16,7 +16,7 @@ namespace TracingCore.SourceCodeInstrumentation
         public Instrumentation(ExpressionGenerator expressionGenerator, InstrumentationConfig instrumentationConfig)
         {
             var eg = expressionGenerator;
-            _statementInstrumentation = new StatementInstrumentation(eg);
+            _statementInstrumentation = new StatementInstrumentation(new InstrumentationShared(eg), eg);
             _methodInstrumentation = new MethodInstrumentation(new InstrumentationShared(eg));
             _classInstrumentation = new ClassInstrumentation(new InstrumentationShared(eg), eg);
             _propertyInstrumentation = new PropertyInstrumentation(new InstrumentationShared(eg), instrumentationConfig.Property);

@@ -133,15 +133,15 @@ namespace TracingCore.SourceCodeInstrumentation
             return new InstrumentationDetails(target, statementToInsert.NormalizeWhitespace(), insertWhere);
         }
 
-        public InstrumentationDetails GetMethodInsStatementDetails
+        public InstrumentationDetails GetBlockInsStatementDetails
         (
-            BaseMethodDeclarationSyntax declarationSyntax,
+            BlockSyntax block,
             bool hasStatements,
             bool includeThisReference,
             MethodTrace methodTrace
         )
         {
-            return GetBodyInsStatement(declarationSyntax.Body, hasStatements, includeThisReference, methodTrace);
+            return GetBodyInsStatement(block, hasStatements, includeThisReference, methodTrace);
         }
 
         public InstrumentationData GetMethodInsData
@@ -155,12 +155,12 @@ namespace TracingCore.SourceCodeInstrumentation
             var body = declarationSyntax.Body;
             var hasStatements = body.Statements.Any();
 
-            var enterDetails = GetMethodInsStatementDetails(declarationSyntax, hasStatements, includeThisReference,
+            var enterDetails = GetBlockInsStatementDetails(declarationSyntax.Body, hasStatements, includeThisReference,
                 MethodTrace.Entry);
-            var dullDetails = GetMethodInsStatementDetails(declarationSyntax, hasStatements, includeThisReference,
+            var dullDetails = GetBlockInsStatementDetails(declarationSyntax.Body, hasStatements, includeThisReference,
                 MethodTrace.FirstStep);
             var exitDetails =
-                GetMethodInsStatementDetails(declarationSyntax, hasStatements, includeThisReference, MethodTrace.Exit);
+                GetBlockInsStatementDetails(declarationSyntax.Body, hasStatements, includeThisReference, MethodTrace.Exit);
 
             var listOfDetails = new List<InstrumentationDetails>();
 
