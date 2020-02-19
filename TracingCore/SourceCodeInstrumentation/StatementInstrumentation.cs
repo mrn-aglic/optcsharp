@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -41,8 +42,7 @@ namespace TracingCore.SourceCodeInstrumentation
             return statementSyntax switch
             {
                 ThrowStatementSyntax throwStatementSyntax => InstrumentThrowStatement(throwStatementSyntax, lineNum),
-                // IfStatementSyntax ifStatementSyntax => InstrumentIfStatement(ifStatementSyntax, lineNum),
-                // IfStatementSyntax ifStatementSyntax => InstrumentIfStatementNew(ifStatementSyntax, lineNum),
+                IfStatementSyntax ifStatementSyntax => InstrumentIfStatement(ifStatementSyntax).FirstOrDefault(),
                 _ => InstrumentSimpleStatement(statementSyntax, lineNum)
             };
         }
@@ -73,17 +73,36 @@ namespace TracingCore.SourceCodeInstrumentation
         {
             var statements = blockSyntax.Statements.ToList();
             var hasStatements = statements.Any();
+
             return
                 _instrumentationShared.GetBodyInsStatement(blockSyntax, hasStatements, includeThisReference,
                     MethodTrace.FirstStep); //TODO separate method entry from block entry
         }
 
-        private IEnumerable<(StatementSyntax, LineData)> ZipWitLineData(StatementSyntax[] statements)
+        private InstrumentationDetails CreateBlockEnterStepDetails
+        (
+            BlockSyntax blockSyntax,
+            LineData lineData,
+            bool includeThisReference = false
+        )
         {
+            var statements = blockSyntax.Statements.ToList();
+            var hasStatements = statements.Any();
+
+            return
+                _instrumentationShared.GetBodyInsStatement(blockSyntax, hasStatements, includeThisReference,
+                    MethodTrace.FirstStep, lineData); //TODO separate method entry from block entry
+        }
+
+        private IEnumerable<(StatementSyntax, LineData)> ZipWitLineData(StatementSyntax[] statements,
+            StatementSyntax lastStatement)
+        {
+            if (lastStatement == null) return new List<(StatementSyntax, LineData)>();
+
             var lineNumbers = statements.Skip(1).Select(x => RoslynHelper.GetLineData(x));
             var anyStatements = statements.Any();
             var lineNums = anyStatements
-                ? lineNumbers.Append(RoslynHelper.GetLineData(statements.Last())).ToList()
+                ? lineNumbers.Append(RoslynHelper.GetLineData(lastStatement)).ToList()
                 : lineNumbers;
 
             return statements.Zip(lineNums);
@@ -92,15 +111,59 @@ namespace TracingCore.SourceCodeInstrumentation
         private List<InstrumentationDetails> BlockDetails(BlockSyntax blockSyntax, bool includeThisReference = false)
         {
             var list = new List<InstrumentationDetails>();
-            var enterStepDetails = CreateBlockEnterStepDetails(blockSyntax, includeThisReference);
+            var statements = blockSyntax.Statements;
             var nonReturnStatements = blockSyntax.Statements.Where(x => !x.IsKind(SyntaxKind.ReturnStatement));
-            var statementsWithLineData = ZipWitLineData(nonReturnStatements.ToArray());
+            var statementsWithLineData = ZipWitLineData(nonReturnStatements.ToArray(), statements.LastOrDefault());
             var statementsDetails = statementsWithLineData.Select(x => PrepareStatementDetails(x.Item1, x.Item2));
 
-            list.Add(enterStepDetails);
+            if (!(blockSyntax.Parent is BaseMethodDeclarationSyntax || blockSyntax.Parent is AccessorDeclarationSyntax))
+            {
+                var enterStepDetails = CreateBlockEnterStepDetails(blockSyntax, includeThisReference);
+                list.Add(enterStepDetails);
+            }
+
             list.AddRange(statementsDetails);
 
             return list;
+        }
+
+        private InstrumentationDetails SingleStatementBlockDetails
+        (
+            StatementSyntax statement,
+            bool includeThisReference = false
+        )
+        {
+            var enterLine = RoslynHelper.GetLineData(statement);
+            var exitLine = enterLine;
+
+            var egEnterDetails = new ExpressionGeneratorDetails.Long
+            (
+                TraceApiNames.ClassName,
+                TraceApiNames.TraceData,
+                enterLine,
+                statement.Parent,
+                includeThisReference
+            );
+
+            var egExitDetails = new ExpressionGeneratorDetails.Long
+            (
+                TraceApiNames.ClassName,
+                TraceApiNames.TraceData,
+                exitLine,
+                statement,
+                includeThisReference
+            );
+            
+            var enterStatement = _expressionGenerator.GetExpressionStatement(egEnterDetails);
+            var statementDetails = PrepareStatementDetails(statement, exitLine);
+            var beforeExitStatement = statementDetails.StatementToInsert as StatementSyntax;
+            var block = statementDetails.Insert switch
+            {
+                Insert.After => _expressionGenerator.WrapInBlock(enterStatement, statement, beforeExitStatement),
+                Insert.Before => _expressionGenerator.WrapInBlock(enterStatement, beforeExitStatement, statement),
+            };
+
+            return new InstrumentationDetails(statement, block, Insert.Replace);
         }
 
         private IEnumerable<InstrumentationDetails> InstrumentBlock(BlockSyntax blockSyntax)
@@ -126,40 +189,23 @@ namespace TracingCore.SourceCodeInstrumentation
             return statementsWithNums.Select(x => PrepareStatementDetails(x.Item1, x.Item2)).ToList();
         }
 
-        private InstrumentationDetails InstrumentIfStatement
+        private List<InstrumentationDetails> InstrumentIfStatement
         (
-            IfStatementSyntax ifStatementSyntax,
-            LineData lineNum
+            IfStatementSyntax ifStatementSyntax
         )
         {
-            var hasBody = ifStatementSyntax.Statement is BlockSyntax;
+            var hasBody = ifStatementSyntax.Statement.IsKind(SyntaxKind.Block);
             var body = ifStatementSyntax.Statement as BlockSyntax;
 
+            if (hasBody) return BlockDetails(body);
+
             var statement = ifStatementSyntax.Statement;
-            var egDetails = new ExpressionGeneratorDetails.Long
-            (
-                TraceApiNames.ClassName,
-                TraceApiNames.TraceData,
-                lineNum,
-                ifStatementSyntax,
-                false
-            );
-            var statementToInsertForIf = _expressionGenerator.GetExpressionStatement(egDetails);
+            var details = SingleStatementBlockDetails(statement);
 
-            if (hasBody)
-                return new InstrumentationDetails(body.Statements.First(), statementToInsertForIf, Insert.Before);
-
-            var instrumentationDetails = InstrumentNonReturnStatements(new List<(StatementSyntax, LineData)>
-                {(statement, RoslynHelper.GetLineData(statement))}).First();
-            var block = instrumentationDetails.Insert == Insert.Before
-                ? _expressionGenerator.WrapInBlock(statementToInsertForIf,
-                    instrumentationDetails.StatementToInsert as StatementSyntax,
-                    statement)
-                : _expressionGenerator.WrapInBlock(
-                    statementToInsertForIf, statement, instrumentationDetails.StatementToInsert as StatementSyntax);
-
-            return
-                new InstrumentationDetails(statement, block, Insert.Replace);
+            return new List<InstrumentationDetails>
+            {
+                details
+            };
         }
 
         private InstrumentationDetails InstrumentSimpleStatement(StatementSyntax statement, LineData lineNum)

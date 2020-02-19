@@ -381,6 +381,7 @@
         <e p="bin" t="ExcludeRecursive" />
         <e p="CodeExamples" t="Include">
           <e p="HelloWorld.txt" t="Include" />
+          <e p="MethodsExample.txt" t="Include" />
           <e p="MultipleNamespacesExample.txt" t="Include" />
           <e p="Polymorphism.txt" t="Include" />
           <e p="PolymorphismOverride.txt" t="Include" />

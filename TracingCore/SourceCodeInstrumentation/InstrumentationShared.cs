@@ -21,13 +21,13 @@ namespace TracingCore.SourceCodeInstrumentation
             _expressionGenerator = expressionGenerator;
         }
 
-        private SyntaxNode GetTarget(IEnumerable<StatementSyntax> statements, MethodTrace methodTrace)
+        private SyntaxNode GetTarget(IReadOnlyCollection<StatementSyntax> statements, MethodTrace methodTrace)
         {
             return methodTrace switch
             {
                 MethodTrace.Entry => statements.First(),
                 MethodTrace.Exit => statements.Last(),
-                MethodTrace.FirstStep => statements.First(),
+                MethodTrace.FirstStep => statements.FirstOrDefault(),
                 _ => throw new ArgumentException("Wrong MethodTrace value")
             };
         }
@@ -86,7 +86,7 @@ namespace TracingCore.SourceCodeInstrumentation
         {
             return returnStatements.Select(x => InstrumentReturnStatement(returnType, x));
         }
-
+        
         internal InstrumentationDetails GetBodyInsStatement
         (
             BlockSyntax body,
@@ -123,7 +123,50 @@ namespace TracingCore.SourceCodeInstrumentation
             {
                 MethodTrace.Entry => _expressionGenerator.GetExpressionStatement(egDetails),
                 MethodTrace.FirstStep => _expressionGenerator.GetDullExpressionStatement(egDetails),
-                _ => _expressionGenerator.GetExitExpressionStatement(egDetails)
+                _ => _expressionGenerator.GetExitExpressionStatement(egDetails, hasStatements)
+            };
+
+            var insertWhere = methodTrace == MethodTrace.Entry || methodTrace == MethodTrace.FirstStep
+                ? Insert.Before
+                : Insert.After;
+            return new InstrumentationDetails(target, statementToInsert.NormalizeWhitespace(), insertWhere);
+        }
+        
+        internal InstrumentationDetails GetBodyInsStatement
+        (
+            BlockSyntax body,
+            bool hasStatements,
+            bool includeThisReference,
+            MethodTrace methodTrace,
+            LineData lineData
+        )
+        {
+            var declarationSyntax = body.Parent;
+            var statements = body.Statements;
+
+            var target = hasStatements ? GetTarget(statements, methodTrace) : body;
+
+            var traceMethodName = methodTrace switch
+            {
+                MethodTrace.Entry => TraceApiNames.TraceMethodEntry,
+                MethodTrace.Exit => TraceApiNames.TraceMethodExit,
+                _ => TraceApiNames.TraceApiMethodFirstStep
+            };
+
+            var egDetails = new ExpressionGeneratorDetails.Long
+            (
+                TraceApiNames.ClassName,
+                traceMethodName,
+                lineData,
+                declarationSyntax,
+                includeThisReference
+            );
+
+            var statementToInsert = methodTrace switch
+            {
+                MethodTrace.Entry => _expressionGenerator.GetExpressionStatement(egDetails),
+                MethodTrace.FirstStep => _expressionGenerator.GetDullExpressionStatement(egDetails),
+                _ => _expressionGenerator.GetExitExpressionStatement(egDetails, hasStatements)
             };
 
             var insertWhere = methodTrace == MethodTrace.Entry || methodTrace == MethodTrace.FirstStep
@@ -156,8 +199,8 @@ namespace TracingCore.SourceCodeInstrumentation
 
             var enterDetails = GetBlockInsStatementDetails(declarationSyntax.Body, hasStatements, includeThisReference,
                 MethodTrace.Entry);
-            var dullDetails = GetBlockInsStatementDetails(declarationSyntax.Body, hasStatements, includeThisReference,
-                MethodTrace.FirstStep);
+            // var dullDetails = GetBlockInsStatementDetails(declarationSyntax.Body, hasStatements, includeThisReference,
+            //     MethodTrace.FirstStep);
             var exitDetails =
                 GetBlockInsStatementDetails(declarationSyntax.Body, hasStatements, includeThisReference,
                     MethodTrace.Exit);
@@ -167,7 +210,7 @@ namespace TracingCore.SourceCodeInstrumentation
             if (hasStatements)
             {
                 listOfDetails.Add(enterDetails);
-                listOfDetails.Add(dullDetails);
+                // listOfDetails.Add(dullDetails);
                 listOfDetails.Add(exitDetails);
 
                 return new InstrumentationData(root, listOfDetails);
@@ -175,7 +218,7 @@ namespace TracingCore.SourceCodeInstrumentation
 
             var newBody = body.AddStatements(
                 (ExpressionStatementSyntax) enterDetails.StatementToInsert,
-                (ExpressionStatementSyntax) dullDetails.StatementToInsert,
+                // (ExpressionStatementSyntax) dullDetails.StatementToInsert,
                 (ExpressionStatementSyntax) exitDetails.StatementToInsert);
 
             listOfDetails.Add(new InstrumentationDetails(declarationSyntax.Body,

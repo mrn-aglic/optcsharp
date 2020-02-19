@@ -208,12 +208,14 @@
         {
           "func_name": "set Hours",
           "encoded_locals": {
+            "value": 24.0,
             "this": [
               "REF",
               4
             ]
           },
           "ordered_varnames": [
+            "value",
             "this"
           ],
           "parent_frame_id_list": [],
@@ -304,12 +306,14 @@
         {
           "func_name": "set Hours",
           "encoded_locals": {
+            "value": 24.0,
             "this": [
               "REF",
               4
             ]
           },
           "ordered_varnames": [
+            "value",
             "this"
           ],
           "parent_frame_id_list": [],
@@ -402,12 +406,14 @@
           "encoded_locals": {
             "__return__": null,
             "_seconds": 86400.0,
+            "value": 24.0,
             "this": [
               "REF",
               4
             ]
           },
           "ordered_varnames": [
+            "value",
             "this",
             "_seconds",
             "__return__"

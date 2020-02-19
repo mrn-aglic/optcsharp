@@ -23,7 +23,7 @@ namespace TracingCore
             _classManager = classManager;
         }
 
-        public void TraceData(int line, string statement, params VariableData[] variables)
+        public void TraceData(int line, params VariableData[] variables)
         {
             var stdOut = _consoleHandler.GetConsoleOutput();
             _pyTutorDataManager.AddNextTraceEntry(line, stdOut, variables.ToList());

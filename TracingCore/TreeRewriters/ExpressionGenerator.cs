@@ -77,9 +77,9 @@ namespace TracingCore.TreeRewriters
                     }
 
                 case AccessorDeclarationSyntax accessorDeclarationSyntax:
-                    
+
                     var args = new List<ArgumentSyntax>();
-                    
+
                     if (accessorDeclarationSyntax.Keyword.IsKind(SyntaxKind.GetKeyword)) return args;
 
                     var valueData = VariableData.GetObjectCreationSyntax(IdentifierName("value"));
@@ -126,26 +126,31 @@ namespace TracingCore.TreeRewriters
             );
 
             var @params = GetParameters(details.InsTargetNode).ToList();
-            var statementString = GetStatementString(details.InsTargetNode);
 
             if (details.IncludeSelfReference)
             {
                 @params.Add(CreateThisArgument());
             }
 
-            var methodInvocationSyntax = invocationSyntax.WithArgumentList(ArgumentList(
-                new SeparatedSyntaxList<ArgumentSyntax>()
-                    .Add(Argument(
-                        LiteralExpression(
-                            SyntaxKind.NumericLiteralExpression,
-                            Literal(details.LineData.StartLine)
-                        )
-                    ))
-                    .Add(Argument(
-                        LiteralExpression(SyntaxKind.StringLiteralExpression,
-                            Literal(statementString))
-                    ))
-            )).AddArgumentListArguments(@params.ToArray());
+            var statementString = GetStatementString(details.InsTargetNode);
+            var arguments = new SeparatedSyntaxList<ArgumentSyntax>().Add(
+                Argument(
+                    LiteralExpression(
+                        SyntaxKind.NumericLiteralExpression,
+                        Literal(details.LineData.StartLine)
+                    )
+                )
+            );
+
+            arguments = statementString == string.Empty
+                ? arguments
+                : arguments.Add(
+                    Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(statementString)))
+                );
+
+            var methodInvocationSyntax = invocationSyntax
+                .WithArgumentList(ArgumentList(arguments))
+                .AddArgumentListArguments(@params.ToArray());
 
             return methodInvocationSyntax;
         }
@@ -171,17 +176,13 @@ namespace TracingCore.TreeRewriters
                                     Literal(details.LineData.StartLine)
                                 )
                             ))
-                            .Add(Argument(
-                                LiteralExpression(SyntaxKind.StringLiteralExpression,
-                                    Literal(details.InsTargetNode.ToString())
-                                )
-                            ))
                     )
                 )
             );
         }
 
-        public ExpressionStatementSyntax GetExitExpressionStatement(ExpressionGeneratorDetails.Long details)
+        public ExpressionStatementSyntax GetExitExpressionStatement(ExpressionGeneratorDetails.Long details,
+            bool hasStatements)
         {
             return ExpressionStatement(
                 InvocationExpression(
@@ -196,12 +197,9 @@ namespace TracingCore.TreeRewriters
                                 )
                             ))
                             .Add(Argument(
-                                LiteralExpression(SyntaxKind.StringLiteralExpression,
-                                    Literal(details.InsTargetNode.ToString())
-                                )
-                            ))
-                            .Add(Argument(
-                                    LiteralExpression(SyntaxKind.NullLiteralExpression)
+                                    hasStatements
+                                        ? LiteralExpression(SyntaxKind.TrueLiteralExpression)
+                                        : LiteralExpression(SyntaxKind.FalseLiteralExpression)
                                 )
                             )
                     )

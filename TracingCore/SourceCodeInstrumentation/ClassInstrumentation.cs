@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -23,18 +22,13 @@ namespace TracingCore.SourceCodeInstrumentation
 
         public InstrumentationData PrepareTraceData(CompilationUnitSyntax root)
         {
-            var insData = new List<InstrumentationData>();
             var declarations = root.DescendantNodes().OfType<ConstructorDeclarationSyntax>().ToList();
-            foreach (var declarationSyntax in declarations)
-            {
-                var data = PrepareTraceData(declarationSyntax, root);
-                insData.Add(data);
-            }
+            var insData = declarations.Select(declarationSyntax => PrepareTraceData(declarationSyntax, root)).ToList();
 
             return new InstrumentationData(root, insData.SelectMany(x => x.Statements).ToList());
         }
 
-        public InstrumentationData PrepareTraceData(ConstructorDeclarationSyntax constructorDeclarationSyntax,
+        private InstrumentationData PrepareTraceData(ConstructorDeclarationSyntax constructorDeclarationSyntax,
             CompilationUnitSyntax root)
         {
             return _instrumentationShared.GetMethodInsData(constructorDeclarationSyntax, root);

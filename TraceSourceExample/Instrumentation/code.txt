@@ -10,21 +10,26 @@ class TimePeriod
         get
         {
             TraceApi.TraceMethodEntry(9, "get Hours", new VariableData("this", this, this.GetType()));
-            TraceApi.TraceData(9, "get { return _seconds / 3600; }");
+            TraceApi.TraceData(9);
             double __return_9 = _seconds / 3600;
-            TraceApi.TraceMethodReturnExit(9, "double __return_9=_seconds / 3600;", new VariableData("__return_9", __return_9, __return_9.GetType()));
+            TraceApi.TraceMethodReturnExit(9, new VariableData("__return_9", __return_9, __return_9.GetType()));
             return __return_9;
         }
 
         set
         {
-            TraceApi.TraceMethodEntry(10, "set Hours", new VariableData("this", this, this.GetType()));
-            TraceApi.TraceData(11, "set { \n          if (value < 0 || value > 24)\n             throw new ArgumentOutOfRangeException(\n                   $\"{nameof(value)} must be between 0 and 24.\");\n\n          _seconds = value * 3600; \n       }");
+            TraceApi.TraceMethodEntry(10, "set Hours", new VariableData("value", value, value.GetType()), new VariableData("this", this, this.GetType()));
+            TraceApi.TraceData(11);
             if (value < 0 || value > 24)
+            {
+                TraceApi.TraceData(12, new VariableData("value", value, value.GetType()));
+                TraceApi.TraceData(12);
                 throw new ArgumentOutOfRangeException($"{nameof(value)} must be between 0 and 24.");
+            }
+
             _seconds = value * 3600;
-            TraceApi.TraceData(15, "_seconds = value * 3600;", new VariableData("_seconds", _seconds, _seconds.GetType()));
-            TraceApi.TraceMethodExit(15, "set { \n          if (value < 0 || value > 24)\n             throw new ArgumentOutOfRangeException(\n                   $\"{nameof(value)} must be between 0 and 24.\");\n\n          _seconds = value * 3600; \n       }", null);
+            TraceApi.TraceData(15, new VariableData("_seconds", _seconds, _seconds.GetType()));
+            TraceApi.TraceMethodExit(15, true);
         }
     }
 
@@ -54,15 +59,15 @@ class Program
     static void Main()
     {
         TraceApi.TraceMethodEntry(22, "Main");
-        TraceApi.TraceData(24, "static void Main()\n   {\n       TimePeriod t = new TimePeriod();\n       // The property assignment causes the 'set' accessor to be called.\n       t.Hours = 24;\n\n       // Retrieving the property causes the 'get' accessor to be called.\n       Console.WriteLine($\"Time in hours: {t.Hours}\");\n   }");
+        TraceApi.TraceData(24);
         TimePeriod t = new TimePeriod();
-        TraceApi.TraceData(26, "TimePeriod t = new TimePeriod();", new VariableData("t", t, t.GetType()));
+        TraceApi.TraceData(26, new VariableData("t", t, t.GetType()));
         // The property assignment causes the 'set' accessor to be called.
         t.Hours = 24;
-        TraceApi.TraceData(29, "t.Hours = 24;");
+        TraceApi.TraceData(29);
         // Retrieving the property causes the 'get' accessor to be called.
         Console.WriteLine($"Time in hours: {t.Hours}");
-        TraceApi.TraceData(29, "Console.WriteLine($\"Time in hours: {t.Hours}\");");
-        TraceApi.TraceMethodExit(29, "static void Main()\n   {\n       TimePeriod t = new TimePeriod();\n       // The property assignment causes the 'set' accessor to be called.\n       t.Hours = 24;\n\n       // Retrieving the property causes the 'get' accessor to be called.\n       Console.WriteLine($\"Time in hours: {t.Hours}\");\n   }", null);
+        TraceApi.TraceData(29);
+        TraceApi.TraceMethodExit(29, true);
     }
 }

@@ -22,8 +22,8 @@ namespace TracingCore.TreeRewriters
         After,
         Before,
         Replace,
-        InsertAttribute,
-        Member
+        Member,
+        IntoBlock
     }
     public class InstrumentationDetails
     {

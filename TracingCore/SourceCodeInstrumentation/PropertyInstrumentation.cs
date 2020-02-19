@@ -36,7 +36,7 @@ namespace TracingCore.SourceCodeInstrumentation
             return new InstrumentationData(root, insData.SelectMany(x => x.Statements).Concat(proxyPropertiesData).ToList());
         }
 
-        public InstrumentationDetails PrepareProxyProperty
+        private InstrumentationDetails PrepareProxyProperty
         (
             PropertyDeclarationSyntax propertyDeclarationSyntax
         )
@@ -52,7 +52,7 @@ namespace TracingCore.SourceCodeInstrumentation
             );
         }
 
-        public InstrumentationData PrepareTraceData
+        private InstrumentationData PrepareTraceData
         (
             PropertyDeclarationSyntax propertyDeclarationSyntax,
             CompilationUnitSyntax root
@@ -70,7 +70,7 @@ namespace TracingCore.SourceCodeInstrumentation
             return new InstrumentationData(root, accessorDetails.SelectMany(x => x.Statements).ToList());
         }
 
-        public InstrumentationData InstrumentAccessor(
+        private InstrumentationData InstrumentAccessor(
             AccessorDeclarationSyntax accessorDeclaration,
             TypeSyntax propertyType,
             bool includeThisReference,
@@ -86,12 +86,12 @@ namespace TracingCore.SourceCodeInstrumentation
                 includeThisReference,
                 MethodTrace.Entry);
 
-            // var dullDetails = GetAccessorInsStatementDetails(
-            //     accessorDeclaration,
-            //     hasStatements,
-            //     includeThisReference,
-            //     MethodTrace.FirstStep
-            // );
+            var dullDetails = GetAccessorInsStatementDetails(
+                accessorDeclaration,
+                hasStatements,
+                includeThisReference,
+                MethodTrace.FirstStep
+            );
 
             var returnStatements = statements.OfType<ReturnStatementSyntax>().ToList();
 
@@ -111,7 +111,7 @@ namespace TracingCore.SourceCodeInstrumentation
             if (hasStatements)
             {
                 listOfDetails.Add(enterDetails);
-                // listOfDetails.Add(dullDetails);
+                listOfDetails.Add(dullDetails);
                 listOfDetails.AddRange(exitDetailsList);
             }
             else
@@ -119,7 +119,7 @@ namespace TracingCore.SourceCodeInstrumentation
                 var exitDetails = exitDetailsList.First();
                 var newBody = body.AddStatements(
                     (ExpressionStatementSyntax) enterDetails.StatementToInsert,
-                    // (ExpressionStatementSyntax) dullDetails.StatementToInsert,
+                    (ExpressionStatementSyntax) dullDetails.StatementToInsert,
                     (ExpressionStatementSyntax) exitDetails.StatementToInsert
                 );
 
@@ -135,7 +135,7 @@ namespace TracingCore.SourceCodeInstrumentation
             return new InstrumentationData(root, listOfDetails);
         }
 
-        internal InstrumentationDetails GetAccessorInsStatementDetails
+        private InstrumentationDetails GetAccessorInsStatementDetails
         (
             AccessorDeclarationSyntax declaration,
             bool hasStatements,

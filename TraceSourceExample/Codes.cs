@@ -37,6 +37,11 @@ namespace TraceSourceExample
 }";
         }
         
+        public static string GetMethodsExample()
+        {
+            return GetFileContents("MethodsExample.txt");
+        }
+        
         public static string GetSimpleExampleWithMethod()
         {
             return @"using System;

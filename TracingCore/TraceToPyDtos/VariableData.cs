@@ -114,17 +114,6 @@ namespace TracingCore.TraceToPyDtos
             return a;
         }
 
-        public static InvocationExpressionSyntax GetThisWithMemberwiseClone()
-        {
-            return InvocationExpression(
-                MemberAccessExpression(
-                    SyntaxKind.SimpleMemberAccessExpression,
-                    ThisExpression(),
-                    IdentifierName("MemberwiseClone")
-                )
-            );
-        }
-
         public static ObjectCreationExpressionSyntax GetThisReferenceVariableDataSyntax()
         {
             var a = ObjectCreationExpression(
@@ -142,7 +131,6 @@ namespace TracingCore.TraceToPyDtos
                         )
                         .Add(
                             Argument(
-                                // GetThisWithMemberwiseClone()
                                 ThisExpression()
                             )
                         )

@@ -1,6 +1,45 @@
 'use strict';
 
 const Examples = {
+    methodsExample: {
+      name: 'Methods example',
+      code: `using System;
+
+namespace TraceSourceExample
+{
+    class Program
+    {
+        static void Test()
+        {
+        }
+
+        static void Test2()
+        {
+            var x = 5;
+        }
+
+        static int Test3(int x)
+        {
+            return x + 3;
+        }
+
+        static int Test4(int x)
+        {
+            x = x + 2;
+            return x + 1;
+        }
+
+        static void Main(string[] args)
+        {
+            Test();
+            Test2();
+            Test3(3);
+            Test4(4);
+            Console.WriteLine("Hello World!");
+        }
+    }
+}`  
+    },
     simpleExample: {
         name: 'Simple example',
         code: `using System;

@@ -109,6 +109,7 @@ namespace TracingCore
             var classManager = new ClassManager(semanticModel, new Dictionary<string, ClassData>());
 
             TraceApi.Init(root, new TraceApiManager(PyTutorDataManager, ConsoleHandler, classManager));
+
             PyTutorData pyTutorData;
             try
             {

@@ -7,7 +7,7 @@ namespace TracingCore
     public class TraceApi
     {
         private static TraceApiManager _traceApiManager;
-        
+
         public static void Init(CompilationUnitSyntax root, TraceApiManager traceApiManager)
         {
             _traceApiManager = traceApiManager;
@@ -18,23 +18,23 @@ namespace TracingCore
         {
             _traceApiManager.AddMethodEntry(line, funcName, variables);
         }
-        
-        public static void TraceData(int line, string statement, params VariableData[] variables)
+
+        public static void TraceData(int line)
         {
-            _traceApiManager.TraceData(line, statement, variables);
-        }
-        
-        public static void TraceData(int line, string statement)
-        {
-            TraceData(line, statement, new VariableData[0]);
+            TraceData(line, new VariableData[0]);
         }
 
-        public static void TraceMethodExit(int line, string statement, VariableData variableData)
+        public static void TraceData(int line, params VariableData[] variables)
         {
-            _traceApiManager.AddMethodExit(line, variableData);
+            _traceApiManager.TraceData(line, variables);
         }
 
-        public static void TraceMethodReturnExit(int line, string statement, VariableData variableData)
+        public static void TraceMethodExit(int line, bool replacePrev)
+        {
+            _traceApiManager.AddMethodExit(line, null, replacePrev);
+        }
+
+        public static void TraceMethodReturnExit(int line, VariableData variableData)
         {
             _traceApiManager.AddMethodExit(line, variableData, false);
         }
@@ -48,7 +48,7 @@ namespace TracingCore
         {
             _traceApiManager.RegisterClassLoad(fullyQualifiedName);
         }
-        
+
         public static void FlushPyTutorData()
         {
             _traceApiManager.FlushPyTutorData();

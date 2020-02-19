@@ -54,32 +54,17 @@ namespace TracingCore.SourceCodeInstrumentation
                 var currentStatement = root.GetCurrentNode(statement);
                 var statementToInsert = insDetails.StatementToInsert;
 
-                switch (insDetails.Insert)
+                root = insDetails.Insert switch
                 {
-                    case Insert.After:
-                        root = root.InsertNodesAfter(currentStatement,
-                            new[]
-                            {
-                                statementToInsert
-                            });
-                        break;
-                    case Insert.Before:
-                        root = root.InsertNodesBefore(currentStatement,
-                            new[]
-                            {
-                                statementToInsert
-                            });
-                        break;
-                    case Insert.Replace:
-                        root = currentStatement is ReturnStatementSyntax
-                            ? root.ReplaceNode(currentStatement, statementToInsert.ChildNodes())
-                            : root.ReplaceNode(currentStatement, statementToInsert);
-
-                        break;
-                    case Insert.Member:
-                        root = HandleInsertMember(currentStatement, statementToInsert, root).NormalizeWhitespace();
-                        break;
-                }
+                    Insert.After => root.InsertNodesAfter(currentStatement, new[] {statementToInsert}),
+                    Insert.Before => root.InsertNodesBefore(currentStatement, new[] {statementToInsert}),
+                    Insert.Replace => (currentStatement is ReturnStatementSyntax
+                        ? root.ReplaceNode(currentStatement, statementToInsert.ChildNodes())
+                        : root.ReplaceNode(currentStatement, statementToInsert)),
+                    Insert.Member => HandleInsertMember(currentStatement, statementToInsert, root)
+                        .NormalizeWhitespace(),
+                    _ => root
+                };
             }
 
             return root.NormalizeWhitespace();
