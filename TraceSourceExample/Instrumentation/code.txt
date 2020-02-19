@@ -27,6 +27,7 @@ class TimePeriod
                 throw new ArgumentOutOfRangeException($"{nameof(value)} must be between 0 and 24.");
             }
 
+            TraceApi.TraceData(15, new VariableData("value", value, value.GetType()));
             _seconds = value * 3600;
             TraceApi.TraceData(15, new VariableData("_seconds", _seconds, _seconds.GetType()));
             TraceApi.TraceMethodExit(15, true);

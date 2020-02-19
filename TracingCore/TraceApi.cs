@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using TracingCore.Data;
 using TracingCore.TraceToPyDtos;
 
 namespace TracingCore

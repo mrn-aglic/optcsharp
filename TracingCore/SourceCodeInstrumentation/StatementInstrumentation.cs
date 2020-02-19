@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -42,8 +41,19 @@ namespace TracingCore.SourceCodeInstrumentation
             return statementSyntax switch
             {
                 ThrowStatementSyntax throwStatementSyntax => InstrumentThrowStatement(throwStatementSyntax, lineNum),
-                IfStatementSyntax ifStatementSyntax => InstrumentIfStatement(ifStatementSyntax).FirstOrDefault(),
+                // IfStatementSyntax ifStatementSyntax => 
+                // new List<InstrumentationDetails> {InstrumentIfStatement(ifStatementSyntax), InstrumentSimpleStatement(statementSyntax, lineNum)},
                 _ => InstrumentSimpleStatement(statementSyntax, lineNum)
+            };
+        }
+
+        private List<InstrumentationDetails> PrepareNestedStatementsDetails(StatementSyntax statementSyntax,
+            LineData lineNum)
+        {
+            return statementSyntax switch
+            {
+                IfStatementSyntax ifStatementSyntax => InstrumentIfStatement(ifStatementSyntax),
+                _ => new List<InstrumentationDetails>()
             };
         }
 
@@ -114,7 +124,10 @@ namespace TracingCore.SourceCodeInstrumentation
             var statements = blockSyntax.Statements;
             var nonReturnStatements = blockSyntax.Statements.Where(x => !x.IsKind(SyntaxKind.ReturnStatement));
             var statementsWithLineData = ZipWitLineData(nonReturnStatements.ToArray(), statements.LastOrDefault());
-            var statementsDetails = statementsWithLineData.Select(x => PrepareStatementDetails(x.Item1, x.Item2));
+            var statementsDetails = statementsWithLineData.SelectMany(x =>
+                new List<InstrumentationDetails> {PrepareStatementDetails(x.Item1, x.Item2)}
+                    .Concat(PrepareNestedStatementsDetails(x.Item1, x.Item2))
+            );
 
             if (!(blockSyntax.Parent is BaseMethodDeclarationSyntax || blockSyntax.Parent is AccessorDeclarationSyntax))
             {
@@ -153,7 +166,7 @@ namespace TracingCore.SourceCodeInstrumentation
                 statement,
                 includeThisReference
             );
-            
+
             var enterStatement = _expressionGenerator.GetExpressionStatement(egEnterDetails);
             var statementDetails = PrepareStatementDetails(statement, exitLine);
             var beforeExitStatement = statementDetails.StatementToInsert as StatementSyntax;
