@@ -2,73 +2,59 @@ using System;
 using TracingCore;
 using TracingCore.TraceToPyDtos;
 
-class TimePeriod
+namespace TraceSourceExample
 {
-    private double _seconds;
-    public double Hours
+    class Program
     {
-        get
+        static void Test()
         {
-            TraceApi.TraceMethodEntry(9, "get Hours", new VariableData("this", this, this.GetType()));
+            TraceApi.TraceMethodEntry(7, "Test");
             TraceApi.TraceData(9);
-            double __return_9 = _seconds / 3600;
-            TraceApi.TraceMethodReturnExit(9, new VariableData("__return_9", __return_9, __return_9.GetType()));
-            return __return_9;
+            TraceApi.TraceMethodExit(9, false);
         }
 
-        set
+        static void Test2()
         {
-            TraceApi.TraceMethodEntry(10, "set Hours", new VariableData("value", value, value.GetType()), new VariableData("this", this, this.GetType()));
-            TraceApi.TraceData(11);
-            if (value < 0 || value > 24)
-            {
-                TraceApi.TraceData(12, new VariableData("value", value, value.GetType()));
-                TraceApi.TraceData(12);
-                throw new ArgumentOutOfRangeException($"{nameof(value)} must be between 0 and 24.");
-            }
-
-            TraceApi.TraceData(15, new VariableData("value", value, value.GetType()));
-            _seconds = value * 3600;
-            TraceApi.TraceData(15, new VariableData("_seconds", _seconds, _seconds.GetType()));
-            TraceApi.TraceMethodExit(15, true);
+            TraceApi.TraceMethodEntry(11, "Test2");
+            TraceApi.TraceData(13);
+            var x = 5;
+            TraceApi.TraceData(13, new VariableData("x", x, x.GetType()));
+            TraceApi.TraceMethodExit(13, true);
         }
-    }
 
-    public double __Pre_Ins_Prop_Hours
-    {
-        get
+        static int Test3(int x)
         {
-            return _seconds / 3600;
+            TraceApi.TraceMethodEntry(16, "Test3", new VariableData("x", x, x.GetType()));
+            TraceApi.TraceData(18);
+            int __return_18 = x + 3;
+            TraceApi.TraceMethodReturnExit(18, new VariableData("__return_18", __return_18, __return_18.GetType()));
+            return __return_18;
         }
 
-        set
+        static int Test4(int x)
         {
-            if (value < 0 || value > 24)
-                throw new ArgumentOutOfRangeException($"{nameof(value)} must be between 0 and 24.");
-            _seconds = value * 3600;
+            TraceApi.TraceMethodEntry(21, "Test4", new VariableData("x", x, x.GetType()));
+            TraceApi.TraceData(23);
+            x = x + 2;
+            TraceApi.TraceData(24, new VariableData("x", x, x.GetType()));
+            int __return_24 = x + 1;
+            TraceApi.TraceMethodReturnExit(24, new VariableData("__return_24", __return_24, __return_24.GetType()));
+            return __return_24;
         }
-    }
 
-    static TimePeriod()
-    {
-        TraceApi.RegisterClassLoad("TimePeriod");
-    }
-}
-
-class Program
-{
-    static void Main()
-    {
-        TraceApi.TraceMethodEntry(22, "Main");
-        TraceApi.TraceData(24);
-        TimePeriod t = new TimePeriod();
-        TraceApi.TraceData(26, new VariableData("t", t, t.GetType()));
-        // The property assignment causes the 'set' accessor to be called.
-        t.Hours = 24;
-        TraceApi.TraceData(29);
-        // Retrieving the property causes the 'get' accessor to be called.
-        Console.WriteLine($"Time in hours: {t.Hours}");
-        TraceApi.TraceData(29);
-        TraceApi.TraceMethodExit(29, true);
+        static void Main(string[] args)
+        {
+            TraceApi.TraceMethodEntry(27, "Main", new VariableData("args", args, args.GetType()));
+            TraceApi.TraceData(29);
+            int c;
+            TraceApi.TraceData(30, new VariableData("c", "undefined", typeof(int)));
+            var a = 5;
+            TraceApi.TraceData(31, new VariableData("a", a, a.GetType()));
+            var b = a + 2;
+            TraceApi.TraceData(32, new VariableData("b", b, b.GetType()));
+            Console.WriteLine("Hello World!");
+            TraceApi.TraceData(32);
+            TraceApi.TraceMethodExit(32, true);
+        }
     }
 }

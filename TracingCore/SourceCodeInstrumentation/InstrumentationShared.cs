@@ -199,8 +199,8 @@ namespace TracingCore.SourceCodeInstrumentation
 
             var enterDetails = GetBlockInsStatementDetails(declarationSyntax.Body, hasStatements, includeThisReference,
                 MethodTrace.Entry);
-            // var dullDetails = GetBlockInsStatementDetails(declarationSyntax.Body, hasStatements, includeThisReference,
-            //     MethodTrace.FirstStep);
+            var dullDetails = GetBlockInsStatementDetails(declarationSyntax.Body, hasStatements, includeThisReference,
+                MethodTrace.FirstStep);
             var exitDetails =
                 GetBlockInsStatementDetails(declarationSyntax.Body, hasStatements, includeThisReference,
                     MethodTrace.Exit);
@@ -210,7 +210,7 @@ namespace TracingCore.SourceCodeInstrumentation
             if (hasStatements)
             {
                 listOfDetails.Add(enterDetails);
-                // listOfDetails.Add(dullDetails);
+                listOfDetails.Add(dullDetails);
                 listOfDetails.Add(exitDetails);
 
                 return new InstrumentationData(root, listOfDetails);
@@ -218,7 +218,7 @@ namespace TracingCore.SourceCodeInstrumentation
 
             var newBody = body.AddStatements(
                 (ExpressionStatementSyntax) enterDetails.StatementToInsert,
-                // (ExpressionStatementSyntax) dullDetails.StatementToInsert,
+                (ExpressionStatementSyntax) dullDetails.StatementToInsert,
                 (ExpressionStatementSyntax) exitDetails.StatementToInsert);
 
             listOfDetails.Add(new InstrumentationDetails(declarationSyntax.Body,
