@@ -89,21 +89,6 @@ namespace TracingCore.SourceCodeInstrumentation
                     MethodTrace.FirstStep); //TODO separate method entry from block entry
         }
 
-        private InstrumentationDetails CreateBlockEnterStepDetails
-        (
-            BlockSyntax blockSyntax,
-            LineData lineData,
-            bool includeThisReference = false
-        )
-        {
-            var statements = blockSyntax.Statements.ToList();
-            var hasStatements = statements.Any();
-
-            return
-                _instrumentationShared.GetBodyInsStatement(blockSyntax, hasStatements, includeThisReference,
-                    MethodTrace.FirstStep, lineData); //TODO separate method entry from block entry
-        }
-
         private IEnumerable<(StatementSyntax, LineData)> ZipWitLineData(StatementSyntax[] statements,
             StatementSyntax lastStatement)
         {
