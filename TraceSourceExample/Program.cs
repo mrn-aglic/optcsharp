@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TracingCore;
 using TracingCore.JsonMappers;
+using TracingCore.RoslynRewriters;
+using TracingCore.TreeRewriters;
 
 namespace TraceSourceExample
 {
@@ -24,11 +28,10 @@ namespace TraceSourceExample
         static void Main(string[] args)
         {
             Console.WriteLine(args.GetType());
-            var code = Codes.GetMethodsExample();
-            
+            var code = Codes.GetClassEmptyConstructorInstanceExample();
+
             var config = LoadConfiguration();
             var appConfig = config.GetSection("instrumentation").Get<InstrumentationConfig>();
-            
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton(appConfig);
             // serviceCollection.AddTransient<OptBackend>();
@@ -37,7 +40,17 @@ namespace TraceSourceExample
             var service = provider.GetService<InstrumentationConfig>();
             
             PyTutorStepMapper.RegisterConfig(service);
-            var optBackend = new OptBackend(code, new List<string>(), service);
+
+            var tree = CSharpSyntaxTree.ParseText(code);
+            
+            var rewriter = new SourceCodeRewriter(new ExpressionGenerator(), service);
+
+            var newTree = rewriter.Start(tree.GetCompilationUnitRoot());
+            
+            // return;
+            
+            // var sourceRewriter = new SourceCodeRewriter(new ExpressionGenerator(), service);
+            var optBackend = new OptBackend(code, new List<string>(), rewriter, service);
 
             var compilationResult = optBackend.Compile("opt-compilation", true);
             var pyTutorData = optBackend.Trace(compilationResult.Root, compilationResult);

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using TracingCore;
 using TracingCore.JsonMappers;
+using TracingCore.RoslynRewriters;
+using TracingCore.TreeRewriters;
 
 namespace OptLocal.Areas.Default.Controllers
 {
@@ -28,7 +30,8 @@ namespace OptLocal.Areas.Default.Controllers
             var inputs = raw_input_json == null
                 ? new List<string>()
                 : JArray.Parse(raw_input_json).ToObject<List<string>>();
-            var optBackend = new OptBackend(user_script, inputs, _instrumentationConfig);
+            var sourceRewriter = new SourceCodeRewriter(new ExpressionGenerator(), _instrumentationConfig);
+            var optBackend = new OptBackend(user_script, inputs, sourceRewriter, _instrumentationConfig);
 
             var compilationResult = optBackend.Compile(CompilationName, true);
             var pyTutorData = optBackend.Trace(compilationResult.Root, compilationResult);

@@ -89,26 +89,7 @@ namespace TraceSourceExample
         
         public static string GetClassEmptyConstructorInstanceExample()
         {
-            return @"using System;
-            namespace TraceSourceExample
-            {
-                class Student 
-                {
-                    public Student()
-                    {
-                    } 
-                }
-
-                class Program
-                {
-                    static void Main(string[] args)
-                    {
-                        int c;
-                        var s = new Student();
-                        Console.WriteLine(""Hello World!"");
-                    }
-                }
-            }";
+            return GetFileContents("ClassEmptyConstructor.txt");
         }
 
         public static string GetClassInstanceExample()

@@ -380,6 +380,7 @@
         <e p="appsettings.json" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
         <e p="CodeExamples" t="Include">
+          <e p="ClassEmptyConstructor.txt" t="Include" />
           <e p="HelloWorld.txt" t="Include" />
           <e p="MethodsExample.txt" t="Include" />
           <e p="MultipleNamespacesExample.txt" t="Include" />
@@ -428,6 +429,7 @@
           <e p="VarHeapData.cs" t="Include" />
         </e>
         <e p="ExecutionManager.cs" t="Include" />
+        <e p="IInstrumentationEngine.cs" t="Include" />
         <e p="Interceptors" t="Include">
           <e p="ConsoleHandler.cs" t="Include" />
           <e p="ConsoleReader.cs" t="Include" />
@@ -448,6 +450,9 @@
           </e>
         </e>
         <e p="OptBackend.cs" t="Include" />
+        <e p="RoslynRewriters" t="Include">
+          <e p="SourceCodeRewriter.cs" t="Include" />
+        </e>
         <e p="SourceCodeInstrumentation" t="Include">
           <e p="ClassInstrumentation.cs" t="Include" />
           <e p="Instrumentation.cs" t="Include" />

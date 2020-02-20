@@ -72,21 +72,27 @@
           pyInputAceEditor.clearSelection();
           pyInputAceEditor.focus();
           
-          function populateCsharpExamples() {
+          function populateCsharpExamples(category) {
             const select = document.getElementById('csharp-examples');
             const examples = Examples;
             
             for(let k in examples){
-                let option = document.createElement('option');
                 let example = examples[k];
-                option.innerHTML = example.name;
-                option.value = example.code;
-                select.appendChild(option);
+
+                if(example.categories.some(x => x === category)){
+                    let option = document.createElement('option');
+                    
+                    option.innerHTML = example.name;
+                    option.value = example.code;
+                    select.appendChild(option);    
+                }
             }            
             
             select.options[0].selected = 'selected';
           }
-          populateCsharpExamples();
+          
+          var useCategory = Categories.Debug;
+          populateCsharpExamples(useCategory);
           loadExample();
         });
     </script>

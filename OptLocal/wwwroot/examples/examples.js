@@ -1,9 +1,16 @@
 'use strict';
 
+const Categories = {
+    Debug: 'Debug',
+    Microsoft: 'Microsoft',
+    Professor: 'Professor'
+};
+
 const Examples = {
     methodsExample: {
-      name: 'Methods example',
-      code: `using System;
+        name: 'Methods example',
+        categories: [Categories.Debug],
+        code: `using System;
 
 namespace TraceSourceExample
 {
@@ -38,10 +45,11 @@ namespace TraceSourceExample
             Console.WriteLine("Hello World!");
         }
     }
-}`  
+}`
     },
     simpleExample: {
         name: 'Simple example',
+        categories: [Categories.Debug],
         code: `using System;
 
 namespace TraceSourceExample
@@ -65,6 +73,7 @@ namespace TraceSourceExample
     },
     simpleExampleWithMethod: {
         name: 'Simple example with method',
+        categories: [Categories.Debug],
         code: `using System;
 
 namespace TraceSourceExample
@@ -88,7 +97,8 @@ namespace TraceSourceExample
 }`
     },
     simpleClassInstanceExample: {
-        name:'Simple class instance example',
+        name: 'Simple class instance example',
+        categories: [Categories.Debug],
         code: `using System;
 namespace Primjer
 {
@@ -108,6 +118,7 @@ namespace Primjer
     },
     simpleClassWithEmptyConstructor: {
         name: 'Simple class with empty constructor',
+        categories: [Categories.Debug],
         code: `using System;
 namespace TraceSourceExample
 {
@@ -127,8 +138,9 @@ namespace TraceSourceExample
         }
     }
 }`,
-        classInstanceExample:{
+        classInstanceExample: {
             name: 'Class instance example',
+            categories: [Categories.Debug],
             code: `using System;
 namespace TraceSourceExample
 {
@@ -153,7 +165,8 @@ namespace TraceSourceExample
         }
     },
     polymorphism: {
-        name:'Polimorfizam',
+        name: 'Polimorfizam',
+        categories: [Categories.Debug],
         code: `using System;
 
 namespace Polimorfizam
@@ -199,6 +212,7 @@ namespace Polimorfizam
     },
     property: {
         name: 'Primjer svojstva',
+        categories: [Categories.Debug, Categories.Microsoft],
         code: `using System;
 
 class TimePeriod
@@ -234,3 +248,4 @@ class Program
 };
 
 window.Examples = Examples;
+window.ExampleCategories = Categories;

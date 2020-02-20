@@ -2,12 +2,14 @@ namespace TracingCore
 {
     public static class TraceApiNames
     {
-        public static readonly string ClassName = "TraceApi";
-        public static readonly string TraceMethodEntry = "TraceMethodEntry";
-        public static readonly string TraceData = "TraceData";
-        public static readonly string TraceApiMethodFirstStep = "TraceData";
-        public static readonly string TraceMethodExit = "TraceMethodExit";
-        public static readonly string TraceMethodReturnExit = "TraceMethodReturnExit";
-        public static readonly string RegisterClassLoad = "RegisterClassLoad";
+        public const string ClassName = "TraceApi";
+        public const string TraceMethodEntry = "TraceMethodEntry";
+        public const string TraceBlockEntry = "TraceBlockEntry";
+        public const string TraceData = "TraceData";
+        public const string TraceApiMethodFirstStep = "TraceData";
+        public const string TraceMethodExit = "TraceMethodExit";
+        public const string TraceBlockExit = "TraceBlockExit";
+        public const string TraceMethodReturnExit = "TraceMethodReturnExit";
+        public const string RegisterClassLoad = "RegisterClassLoad";
     }
 }

@@ -17,6 +17,16 @@ namespace TracingCore
         {
             _traceApiManager.AddMethodEntry(line, funcName, variables);
         }
+        
+        public static void TraceBlockEntry(int line, params VariableData[] variables)
+        {
+            _traceApiManager.TraceData(line, variables);
+        }
+        
+        public static void TraceBlockExit(int line)
+        {
+            _traceApiManager.TraceData(line);
+        }
 
         public static void TraceData(int line)
         {

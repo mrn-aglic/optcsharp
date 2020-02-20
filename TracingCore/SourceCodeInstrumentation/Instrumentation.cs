@@ -6,7 +6,7 @@ using TracingCore.TreeRewriters;
 
 namespace TracingCore.SourceCodeInstrumentation
 {
-    public class Instrumentation
+    public class Instrumentation : IInstrumentationEngine
     {
         private readonly StatementInstrumentation _statementInstrumentation;
         private readonly MethodInstrumentation _methodInstrumentation;

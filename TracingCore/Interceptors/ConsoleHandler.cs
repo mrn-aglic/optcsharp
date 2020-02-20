@@ -39,11 +39,6 @@ namespace TracingCore.Interceptors
             return _consoleWriter.GetOutput();
         }
 
-        public string GetEnteredString()
-        {
-            return _consoleReader.ReadLine();
-        }
-        
         public void AddToRead(string element)
         {
             _consoleReader.Add(element);

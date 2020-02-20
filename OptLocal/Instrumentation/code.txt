@@ -1,15 +1,14 @@
 using System;
-using TracingCore;
-using TracingCore.TraceToPyDtos;
 
-namespace TraceSourceExample
+using TracingCore;usingTracingCore.TraceToPyDtos;namespace TraceSourceExample
 {
     class Student
     {
         public Student()
         {
-            TraceApi.TraceMethodEntry(6, "Student", new VariableData("this", this, this.GetType()));
-            TraceApi.TraceMethodExit(8, false);
+            TraceApi.TraceBlockEntry(6, "Student", new VariableData("this", this, this.GetType()));
+            TraceApi.TraceData(8);
+            TraceApi.TraceBlockExit(8);
         }
 
         static Student()

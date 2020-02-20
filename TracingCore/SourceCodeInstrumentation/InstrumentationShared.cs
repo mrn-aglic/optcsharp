@@ -123,7 +123,7 @@ namespace TracingCore.SourceCodeInstrumentation
             {
                 MethodTrace.Entry => _expressionGenerator.GetExpressionStatement(egDetails),
                 MethodTrace.FirstStep => _expressionGenerator.GetDullExpressionStatement(egDetails),
-                _ => _expressionGenerator.GetExitExpressionStatement(egDetails, hasStatements)
+                _ => _expressionGenerator.GetExitExpressionStatement(egDetails, hasStatements, true)
             };
 
             var insertWhere = methodTrace == MethodTrace.Entry || methodTrace == MethodTrace.FirstStep
@@ -166,7 +166,7 @@ namespace TracingCore.SourceCodeInstrumentation
             {
                 MethodTrace.Entry => _expressionGenerator.GetExpressionStatement(egDetails),
                 MethodTrace.FirstStep => _expressionGenerator.GetDullExpressionStatement(egDetails),
-                _ => _expressionGenerator.GetExitExpressionStatement(egDetails, hasStatements)
+                _ => _expressionGenerator.GetExitExpressionStatement(egDetails, hasStatements, true)
             };
 
             var insertWhere = methodTrace == MethodTrace.Entry || methodTrace == MethodTrace.FirstStep

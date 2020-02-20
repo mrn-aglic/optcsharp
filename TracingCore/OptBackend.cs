@@ -4,7 +4,6 @@ using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.Extensions.Configuration;
 using TracingCore.Data;
 using TracingCore.Interceptors;
 using TracingCore.SourceCodeInstrumentation;
@@ -22,9 +21,17 @@ namespace TracingCore
         public ExecutionManager ExecutionManager { get; }
         public PyTutorDataManager PyTutorDataManager { get; }
         public InstrumentationConfig InstrumentationConfig { get; }
+        private readonly IInstrumentationEngine _instrumentationEngine;
 
-        public OptBackend(string code, IList<string> rawInputs, InstrumentationConfig instrumentationConfig)
+        public OptBackend
+        (
+            string code,
+            IList<string> rawInputs,
+            IInstrumentationEngine instrumentationEngine,
+            InstrumentationConfig instrumentationConfig
+        )
         {
+            _instrumentationEngine = instrumentationEngine;
             Code = code;
             InstrumentationConfig = instrumentationConfig;
             Compiler = new Compiler();
@@ -76,11 +83,19 @@ namespace TracingCore
             return instrumentation.Start(root);
         }
 
+        public CompilationUnitSyntax InstrumentSourceCode(CompilationUnitSyntax originalRoot)
+        {
+            var cUnitRoot = _instrumentationEngine.Start(originalRoot);
+            cUnitRoot = AddUsings(cUnitRoot);
+
+            return cUnitRoot;
+        }
+
         public CompilationResult Compile(string compilationName, bool instrument)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(Code);
             var originalRoot = syntaxTree.GetCompilationUnitRoot();
-            var root = instrument ? AddInstrumentation(originalRoot) : originalRoot;
+            var root = instrument ? InstrumentSourceCode(originalRoot) : originalRoot;
 
             Instrumentation.WriteToFile(root);
 
@@ -125,6 +140,7 @@ namespace TracingCore
             }
             finally
             {
+                ConsoleHandler.RestoreDefaults();
                 pyTutorData = PyTutorDataManager.GetData();
             }
 

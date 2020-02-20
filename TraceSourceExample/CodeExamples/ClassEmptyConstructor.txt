@@ -1,0 +1,20 @@
+using System;
+namespace TraceSourceExample
+{
+    class Student 
+    {
+        public Student()
+        {
+        } 
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            int c;
+            var s = new Student();
+            Console.WriteLine("Hello World!");
+        }
+    }
+}

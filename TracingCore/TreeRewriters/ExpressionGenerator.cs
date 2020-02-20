@@ -181,28 +181,35 @@ namespace TracingCore.TreeRewriters
             );
         }
 
-        public ExpressionStatementSyntax GetExitExpressionStatement(ExpressionGeneratorDetails.Long details,
-            bool hasStatements)
+        public ExpressionStatementSyntax GetExitExpressionStatement
+        (
+            ExpressionGeneratorDetails.Long details,
+            bool hasStatements,
+            bool isMethodExit
+        )
         {
+            var args = new SeparatedSyntaxList<ArgumentSyntax>().Add(Argument(
+                LiteralExpression(
+                    SyntaxKind.NumericLiteralExpression,
+                    Literal(details.LineData.StartLine)
+                )
+            ));
+
+            if (isMethodExit)
+            {
+                args = args.Add(Argument(
+                        hasStatements
+                            ? LiteralExpression(SyntaxKind.TrueLiteralExpression)
+                            : LiteralExpression(SyntaxKind.FalseLiteralExpression)
+                    )
+                );
+            }
+
             return ExpressionStatement(
                 InvocationExpression(
                     GetMemberAccessExpressionSyntax(details)
                 ).WithArgumentList(
-                    ArgumentList(
-                        new SeparatedSyntaxList<ArgumentSyntax>()
-                            .Add(Argument(
-                                LiteralExpression(
-                                    SyntaxKind.NumericLiteralExpression,
-                                    Literal(details.LineData.StartLine)
-                                )
-                            ))
-                            .Add(Argument(
-                                    hasStatements
-                                        ? LiteralExpression(SyntaxKind.TrueLiteralExpression)
-                                        : LiteralExpression(SyntaxKind.FalseLiteralExpression)
-                                )
-                            )
-                    )
+                    ArgumentList(args)
                 )
             );
         }
