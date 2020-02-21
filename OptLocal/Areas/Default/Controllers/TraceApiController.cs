@@ -18,7 +18,6 @@ namespace OptLocal.Areas.Default.Controllers
         {
             _instrumentationConfig = instrumentationConfig;
             // Refactor in the future
-            PyTutorStepMapper.RegisterConfig(_instrumentationConfig);
         }
 
         [HttpGet, Route("/api/getcsharptrace")]
@@ -28,6 +27,8 @@ namespace OptLocal.Areas.Default.Controllers
             [FromQuery] string raw_input_json
             )
         {
+            PyTutorStepMapper.RegisterConfig(_instrumentationConfig);
+
             var inputs = raw_input_json == null
                 ? new List<string>()
                 : JArray.Parse(raw_input_json).ToObject<List<string>>();
