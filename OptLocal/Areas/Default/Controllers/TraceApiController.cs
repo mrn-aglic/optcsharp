@@ -23,7 +23,7 @@ namespace OptLocal.Areas.Default.Controllers
         }
 
         [HttpGet, Route("/api/getcsharptrace")]
-        public JObject GetCSharpTrace(
+        public string GetCSharpTrace(
             // [FromQuery] string user_script,
             // [FromQuery] string options_json,
             // [FromQuery] string raw_input_json
@@ -40,7 +40,7 @@ namespace OptLocal.Areas.Default.Controllers
             //
             // return PyTutorDataMapper.ToJson(pyTutorData);
 
-            return JObject.FromObject("Sranje");
+            return "SRANJE";
         }
         
         [HttpGet, Route("/api/statuscheck")]
