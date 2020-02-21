@@ -28,16 +28,18 @@ namespace OptLocal.Areas.Default.Controllers
             [FromQuery] string options_json,
             [FromQuery] string raw_input_json)
         {
-            var inputs = raw_input_json == null
-                ? new List<string>()
-                : JArray.Parse(raw_input_json).ToObject<List<string>>();
-            var sourceRewriter = new SourceCodeRewriter(new ExpressionGenerator(), _instrumentationConfig);
-            var optBackend = new OptBackend(user_script, inputs, sourceRewriter, _instrumentationConfig);
+            // var inputs = raw_input_json == null
+            //     ? new List<string>()
+            //     : JArray.Parse(raw_input_json).ToObject<List<string>>();
+            // var sourceRewriter = new SourceCodeRewriter(new ExpressionGenerator(), _instrumentationConfig);
+            // var optBackend = new OptBackend(user_script, inputs, sourceRewriter, _instrumentationConfig);
+            //
+            // var compilationResult = optBackend.Compile(CompilationName, true);
+            // var pyTutorData = optBackend.Trace(compilationResult.Root, compilationResult);
+            //
+            // return PyTutorDataMapper.ToJson(pyTutorData);
 
-            var compilationResult = optBackend.Compile(CompilationName, true);
-            var pyTutorData = optBackend.Trace(compilationResult.Root, compilationResult);
-
-            return PyTutorDataMapper.ToJson(pyTutorData);
+            return JObject.FromObject("Sranje");
         }
         
         [HttpGet, Route("/api/statuscheck")]
