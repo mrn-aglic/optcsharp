@@ -24,9 +24,10 @@ namespace OptLocal.Areas.Default.Controllers
 
         [HttpGet, Route("/api/getcsharptrace")]
         public JObject GetCSharpTrace(
-            [FromQuery] string user_script,
-            [FromQuery] string options_json,
-            [FromQuery] string raw_input_json)
+            // [FromQuery] string user_script,
+            // [FromQuery] string options_json,
+            // [FromQuery] string raw_input_json
+            )
         {
             // var inputs = raw_input_json == null
             //     ? new List<string>()
@@ -42,10 +43,10 @@ namespace OptLocal.Areas.Default.Controllers
             return JObject.FromObject("Sranje");
         }
         
-        [HttpGet, Route("/api/statuscheck")]
-        public string GetCSharpTrace()
-        {
-            return _instrumentationConfig.Property.BackupNamePrefix;
-        }
+        // [HttpGet, Route("/api/statuscheck")]
+        // public string GetCSharpTrace()
+        // {
+        //     return _instrumentationConfig.Property.BackupNamePrefix;
+        // }
     }
 }
