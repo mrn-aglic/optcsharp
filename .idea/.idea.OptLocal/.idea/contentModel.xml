@@ -430,7 +430,6 @@
           <e p="VarHeapData.cs" t="Include" />
         </e>
         <e p="ExecutionManager.cs" t="Include" />
-        <e p="IInstrumentationEngine.cs" t="Include" />
         <e p="Interceptors" t="Include">
           <e p="ConsoleHandler.cs" t="Include" />
           <e p="ConsoleReader.cs" t="Include" />
@@ -452,6 +451,7 @@
         </e>
         <e p="OptBackend.cs" t="Include" />
         <e p="RoslynRewriters" t="Include">
+          <e p="IInstrumentationEngine.cs" t="Include" />
           <e p="InstrumentationManager.cs" t="Include" />
           <e p="SourceCodeRewriter.cs" t="Include" />
         </e>
@@ -464,12 +464,9 @@
           <e p="PropertyInstrumentation.cs" t="Include" />
           <e p="StatementInstrumentation.cs" t="Include" />
         </e>
-        <e p="SyntaxElementsRepository.cs" t="Include" />
         <e p="TraceApi.cs" t="Include" />
         <e p="TraceApiManager.cs" t="Include" />
         <e p="TraceApiMethodNames.cs" t="Include" />
-        <e p="TraceSourceName.cs" t="Include" />
-        <e p="TraceSourceWrapper.cs" t="Include" />
         <e p="TraceToPyDtos" t="Include">
           <e p="ClassData.cs" t="Include" />
           <e p="ITracePyDto.cs" t="Include" />

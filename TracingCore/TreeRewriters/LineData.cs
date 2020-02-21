@@ -11,11 +11,4 @@ namespace TracingCore.TreeRewriters
             StartLine = startLine;
         }
     }
-
-    public class BlockLineData : LineData, ILineData
-    {
-        public BlockLineData(int startLine, int endLine) : base(startLine)
-        {
-        }
-    }
 }

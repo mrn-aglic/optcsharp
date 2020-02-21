@@ -1,5 +1,3 @@
-using Newtonsoft.Json;
-
 namespace TracingCore
 {
     public class InstrumentationConfig

@@ -21,7 +21,7 @@ namespace TracingCore
                     MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
                     MetadataReference.CreateFromFile(Path.Combine(path, "System.Runtime.dll")),
-                    MetadataReference.CreateFromFile(typeof(TraceSourceName).Assembly.Location)
+                    MetadataReference.CreateFromFile(typeof(TraceApi).Assembly.Location)
                 )
                 .WithOptions(compilationOptions);
         }

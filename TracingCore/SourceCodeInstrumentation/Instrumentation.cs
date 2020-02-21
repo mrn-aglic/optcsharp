@@ -2,6 +2,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using TracingCore.Common;
+using TracingCore.RoslynRewriters;
 using TracingCore.TreeRewriters;
 
 namespace TracingCore.SourceCodeInstrumentation

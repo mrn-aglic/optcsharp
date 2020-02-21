@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace TracingCore
+namespace TracingCore.RoslynRewriters
 {
     public interface IInstrumentationEngine
     {
