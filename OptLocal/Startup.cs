@@ -22,9 +22,6 @@ namespace OptLocal
             services.AddControllersWithViews().AddNewtonsoftJson();
             services.AddMvc().AddNewtonsoftJson();
             
-            services.AddControllers().AddNewtonsoftJson();
-            services.AddRazorPages().AddNewtonsoftJson();
-
             var instrumentationConfig = Configuration.GetSection("instrumentation").Get<InstrumentationConfig>();
             services.AddSingleton(instrumentationConfig);
         }
