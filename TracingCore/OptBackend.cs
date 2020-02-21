@@ -97,7 +97,7 @@ namespace TracingCore
             var originalRoot = syntaxTree.GetCompilationUnitRoot();
             var root = instrument ? InstrumentSourceCode(originalRoot) : originalRoot;
 
-            Instrumentation.WriteToFile(root);
+            // Instrumentation.WriteToFile(root);
 
             var compilation = Compiler.Compile(compilationName, root.SyntaxTree, Compiler.DefaultCompilationOptions);
             var executionManager = new ExecutionManager();
