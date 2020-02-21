@@ -30,7 +30,7 @@ namespace TraceSourceExample
             var code = Codes.GetClassEmptyConstructorInstanceExample();
 
             var config = LoadConfiguration();
-            var appConfig = config.GetSection("instrumentation").Get<InstrumentationConfig>();
+            var appConfig = config.GetSection("Instrumentation").Get<InstrumentationConfig>();
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton(appConfig);
             // serviceCollection.AddTransient<OptBackend>();

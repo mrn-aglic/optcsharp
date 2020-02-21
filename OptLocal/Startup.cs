@@ -22,7 +22,7 @@ namespace OptLocal
             services.AddControllersWithViews();
             services.AddMvc().AddNewtonsoftJson();
             
-            var instrumentationConfig = Configuration.GetSection("instrumentation").Get<InstrumentationConfig>();
+            var instrumentationConfig = Configuration.GetSection("Instrumentation").Get<InstrumentationConfig>();
             services.AddSingleton(instrumentationConfig);
         }
 
