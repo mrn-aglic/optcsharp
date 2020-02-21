@@ -27,7 +27,7 @@ namespace OptLocal.Areas.Default.Controllers
             [FromQuery] string raw_input_json
             )
         {
-            PyTutorStepMapper.RegisterConfig(_instrumentationConfig);
+            // PyTutorStepMapper.RegisterConfig(_instrumentationConfig);
 
             var inputs = raw_input_json == null
                 ? new List<string>()

@@ -25,11 +25,11 @@ namespace TracingCore.JsonMappers
             BindingFlags.Public |
             BindingFlags.Instance;
 
-        private static string _backupPropPrefix;
+        private static string _backupPropPrefix = "__Pre_Ins_Prop_";
 
         public static void RegisterConfig(InstrumentationConfig instrumentationConfig)
         {
-            _backupPropPrefix = instrumentationConfig.Property.BackupNamePrefix;
+            // _backupPropPrefix = instrumentationConfig.Property.BackupNamePrefix;
         }
 
         private static JToken ToJElement(string prop, int val)
