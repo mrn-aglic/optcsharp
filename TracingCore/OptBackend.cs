@@ -6,10 +6,9 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using TracingCore.Data;
 using TracingCore.Interceptors;
-using TracingCore.SourceCodeInstrumentation;
+using TracingCore.RoslynRewriters;
 using TracingCore.TraceToPyDtos;
 using TracingCore.TracingManagers;
-using TracingCore.TreeRewriters;
 
 namespace TracingCore
 {
@@ -20,20 +19,17 @@ namespace TracingCore
         public ConsoleHandler ConsoleHandler { get; }
         public ExecutionManager ExecutionManager { get; }
         public PyTutorDataManager PyTutorDataManager { get; }
-        public InstrumentationConfig InstrumentationConfig { get; }
-        private readonly IInstrumentationEngine _instrumentationEngine;
+        private readonly InstrumentationManager _instrumentationManager;
 
         public OptBackend
         (
             string code,
             IList<string> rawInputs,
-            IInstrumentationEngine instrumentationEngine,
-            InstrumentationConfig instrumentationConfig
+            InstrumentationManager instrumentationManager
         )
         {
-            _instrumentationEngine = instrumentationEngine;
+            _instrumentationManager = instrumentationManager;
             Code = code;
-            InstrumentationConfig = instrumentationConfig;
             Compiler = new Compiler();
             ConsoleHandler = new ConsoleHandler();
             ExecutionManager = new ExecutionManager();
@@ -42,53 +38,9 @@ namespace TracingCore
             ConsoleHandler.AddRangeToRead(rawInputs);
         }
 
-        private CompilationUnitSyntax AddUsings(CompilationUnitSyntax root)
-        {
-            var tracingCoreIdentifier =
-                SyntaxFactory.IdentifierName("TracingCore").WithLeadingTrivia(SyntaxFactory.Space);
-
-            var variableDataDirective =
-                SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName("TracingCore"),
-                    SyntaxFactory.IdentifierName("TraceToPyDtos"));
-
-            return root.WithUsings(root.Usings
-                .Add(
-                    SyntaxFactory.UsingDirective(
-                        tracingCoreIdentifier
-                    )
-                )
-                .Add(
-                    SyntaxFactory.UsingDirective(
-                        variableDataDirective
-                    )
-                )
-            );
-        }
-
-        public (CompilationUnitSyntax, SyntaxTree) AddInstrumentation(string code)
-        {
-            var syntaxTree = CSharpSyntaxTree.ParseText(Code);
-            var originalRoot = syntaxTree.GetCompilationUnitRoot();
-            var root = AddUsings(originalRoot);
-
-            var instrumentation = new Instrumentation(new ExpressionGenerator(), InstrumentationConfig);
-            return (originalRoot, instrumentation.Start(root).SyntaxTree);
-        }
-
-        public CompilationUnitSyntax AddInstrumentation(CompilationUnitSyntax originalRoot)
-        {
-            var root = AddUsings(originalRoot);
-
-            var instrumentation = new Instrumentation(new ExpressionGenerator(), InstrumentationConfig);
-            return instrumentation.Start(root);
-        }
-
         public CompilationUnitSyntax InstrumentSourceCode(CompilationUnitSyntax originalRoot)
         {
-            var cUnitRoot = _instrumentationEngine.Start(originalRoot);
-            cUnitRoot = AddUsings(cUnitRoot);
-
-            return cUnitRoot;
+            return _instrumentationManager.Start(originalRoot);
         }
 
         public CompilationResult Compile(string compilationName, bool instrument)

@@ -12,9 +12,12 @@ namespace TracingCore.RoslynRewriters
     public class SourceCodeRewriter : CSharpSyntaxRewriter, IInstrumentationEngine
     {
         private readonly SyntaxAnnotation _locationAnnotation;
-        private const string ReturnVarTemplate = "__return_{0}";
         private readonly ExpressionGenerator _expressionGenerator;
         private readonly PropertyInstrumentationConfig _propertyConfig;
+        private readonly string _returnVarTemplate;
+
+        private const string AnnotationKind = "location";
+
 
         private readonly HashSet<SyntaxKind> _methodLikeDeclarations = new HashSet<SyntaxKind>
         {
@@ -28,8 +31,9 @@ namespace TracingCore.RoslynRewriters
         {
             _expressionGenerator = expressionGenerator;
             _propertyConfig = instrumentationConfig.Property;
+            _returnVarTemplate = instrumentationConfig.ReturnVarTemplate;
 
-            _locationAnnotation = new SyntaxAnnotation("location");
+            _locationAnnotation = new SyntaxAnnotation(AnnotationKind);
         }
 
         private ConstructorDeclarationSyntax PrepareStaticConstructor(ClassDeclarationSyntax classDeclarationSyntax)
@@ -235,7 +239,7 @@ namespace TracingCore.RoslynRewriters
             ReturnStatementSyntax returnStatement
         )
         {
-            var variableName = string.Format(ReturnVarTemplate, lineData.StartLine);
+            var variableName = string.Format(_returnVarTemplate, lineData.StartLine);
 
             var newLocalDeclarationStatement =
                 _expressionGenerator.FromReturnToLocalDeclaration(variableName, returnType, returnStatement);

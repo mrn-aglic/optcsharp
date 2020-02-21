@@ -452,6 +452,7 @@
         </e>
         <e p="OptBackend.cs" t="Include" />
         <e p="RoslynRewriters" t="Include">
+          <e p="InstrumentationManager.cs" t="Include" />
           <e p="SourceCodeRewriter.cs" t="Include" />
         </e>
         <e p="SourceCodeInstrumentation" t="Include">

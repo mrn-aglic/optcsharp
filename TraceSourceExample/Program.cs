@@ -42,14 +42,15 @@ namespace TraceSourceExample
 
             var tree = CSharpSyntaxTree.ParseText(code);
             
-            var rewriter = new SourceCodeRewriter(new ExpressionGenerator(), service);
+            var srcRew = new SourceCodeRewriter(new ExpressionGenerator(), service);
+            var rewriter = new InstrumentationManager(srcRew);
 
             var newTree = rewriter.Start(tree.GetCompilationUnitRoot());
             
             // return;
             
             // var sourceRewriter = new SourceCodeRewriter(new ExpressionGenerator(), service);
-            var optBackend = new OptBackend(code, new List<string>(), rewriter, service);
+            var optBackend = new OptBackend(code, new List<string>(),  rewriter);
 
             var compilationResult = optBackend.Compile("opt-compilation", true);
             var pyTutorData = optBackend.Trace(compilationResult.Root, compilationResult);

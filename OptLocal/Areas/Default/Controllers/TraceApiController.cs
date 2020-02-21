@@ -18,6 +18,7 @@ namespace OptLocal.Areas.Default.Controllers
         {
             _instrumentationConfig = instrumentationConfig;
             // Refactor in the future
+            PyTutorStepMapper.RegisterConfig(_instrumentationConfig);
         }
 
         [HttpGet, Route("/api/getcsharptrace")]
@@ -25,24 +26,20 @@ namespace OptLocal.Areas.Default.Controllers
             [FromQuery] string user_script,
             [FromQuery] string options_json,
             [FromQuery] string raw_input_json
-            )
+        )
         {
-            // PyTutorStepMapper.RegisterConfig(_instrumentationConfig);
-
             var inputs = raw_input_json == null
                 ? new List<string>()
                 : JArray.Parse(raw_input_json).ToObject<List<string>>();
             var sourceRewriter = new SourceCodeRewriter(new ExpressionGenerator(), _instrumentationConfig);
-            var optBackend = new OptBackend(user_script, inputs, sourceRewriter, _instrumentationConfig);
-            
+            var optBackend = new OptBackend(user_script, inputs, new InstrumentationManager(sourceRewriter));
+
             var compilationResult = optBackend.Compile(CompilationName, true);
             var pyTutorData = optBackend.Trace(compilationResult.Root, compilationResult);
-            
-            return PyTutorDataMapper.ToJson(pyTutorData);
 
-            // return "SRANJE";
+            return PyTutorDataMapper.ToJson(pyTutorData);
         }
-        
+
         [HttpGet, Route("/api/statuscheck")]
         public JObject GetCSharpTrace(int a)
         {
