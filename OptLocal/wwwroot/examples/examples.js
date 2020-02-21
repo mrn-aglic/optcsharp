@@ -316,4 +316,4 @@ class Program
 };
 
 window.Examples = Examples;
-window.ExampleCategories = Categories;
+window.Categories = Categories;
