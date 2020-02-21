@@ -41,9 +41,9 @@ namespace OptLocal.Areas.Default.Controllers
         }
         
         [HttpGet, Route("/api/statuscheck")]
-        public HttpStatusCode GetCSharpTrace()
+        public string GetCSharpTrace()
         {
-            return HttpStatusCode.OK;
+            return _instrumentationConfig.Property.BackupNamePrefix;
         }
     }
 }
