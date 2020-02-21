@@ -43,9 +43,9 @@ namespace OptLocal.Areas.Default.Controllers
         }
         
         [HttpGet, Route("/api/statuscheck")]
-        public string GetCSharpTrace(int a)
+        public JObject GetCSharpTrace(int a)
         {
-            return _instrumentationConfig.Property.BackupNamePrefix;
+            return JObject.FromObject(_instrumentationConfig.Property.BackupNamePrefix);
         }
     }
 }
