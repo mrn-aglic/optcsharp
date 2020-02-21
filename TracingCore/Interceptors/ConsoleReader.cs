@@ -4,10 +4,6 @@ using System.IO;
 
 namespace TracingCore.Interceptors
 {
-    public static class EventManager
-    {
-    }
-    
     public class ExitExecutionException : Exception
     {
         public override string Message => "Exit execution to prompt user for ReadLine input";
@@ -26,11 +22,6 @@ namespace TracingCore.Interceptors
             _bufferedInputs = new Queue<string>();
         }
 
-        public ConsoleReader(Queue<string> bufferedInputs)
-        {
-            _bufferedInputs = bufferedInputs;
-        }
-
         public int Add(string msg)
         {
             _bufferedInputs.Enqueue(msg);
@@ -39,13 +30,9 @@ namespace TracingCore.Interceptors
 
         public override string ReadLine()
         {
-            if (IsEmpty)
-            {
-                Console.SetOut(_defaultOutStream);
-                throw new ExitExecutionException();
-            }
-
-            return _bufferedInputs.Dequeue();
+            if (!IsEmpty) return _bufferedInputs.Dequeue();
+            Console.SetOut(_defaultOutStream);
+            throw new ExitExecutionException();
         }
     }
 }

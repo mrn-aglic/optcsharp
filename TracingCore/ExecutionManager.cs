@@ -37,7 +37,8 @@ namespace TracingCore
         {
             var mainMethod = root.DescendantNodes()
                 .OfType<MethodDeclarationSyntax>()
-                .FirstOrDefault(x => x.Modifiers.Any(x => x.IsKind(SyntaxKind.StaticKeyword)) && x.Identifier.Text == MainName);
+                .FirstOrDefault(x =>
+                    x.Modifiers.Any(x => x.IsKind(SyntaxKind.StaticKeyword)) && x.Identifier.Text == MainName);
 
             if (mainMethod == null)
             {
@@ -67,7 +68,17 @@ namespace TracingCore
         private void InvokeMethod(MethodInfo method)
         {
             var @params = method.GetParameters().Length == 0 ? new object[0] : new object[] {new string[1]};
-            method.Invoke(null, @params);
+            if (method.GetParameters().Length > 0)
+            {
+                var del = (Action<string[]>) Delegate.CreateDelegate(typeof(Action<string[]>), null, method);
+                del(new string[1]);
+            }
+            else
+            {
+                var del = (Action) Delegate.CreateDelegate(typeof(Action), null, method);
+                del();
+            }
+            // method.Invoke(null, @params);
         }
     }
 }

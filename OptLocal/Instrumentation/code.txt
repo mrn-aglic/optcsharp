@@ -1,35 +1,30 @@
 using System;
 
-using TracingCore;usingTracingCore.TraceToPyDtos;namespace TraceSourceExample
+using TracingCore;usingTracingCore.TraceToPyDtos;public class Person
 {
-    class Student
+    public int age;
+    public string name;
+    static Person()
     {
-        public Student()
-        {
-            TraceApi.TraceBlockEntry(6, "Student", new VariableData("this", this, this.GetType()));
-            TraceApi.TraceData(8);
-            TraceApi.TraceBlockExit(8);
-        }
-
-        static Student()
-        {
-            TraceApi.RegisterClassLoad("TraceSourceExample.Student");
-        }
+        TraceApi.RegisterClassLoad("Person");
     }
+}
 
-    class Program
+class TestPerson
+{
+    static void Main()
     {
-        static void Main(string[] args)
-        {
-            TraceApi.TraceMethodEntry(12, "Main", new VariableData("args", args, args.GetType()));
-            TraceApi.TraceData(14);
-            int c;
-            TraceApi.TraceData(15, new VariableData("c", "undefined", typeof(int)));
-            var s = new Student();
-            TraceApi.TraceData(16, new VariableData("s", s, s.GetType()));
-            Console.WriteLine("Hello World!");
-            TraceApi.TraceData(16);
-            TraceApi.TraceMethodExit(16, true);
-        }
+        TraceApi.TraceMethodEntry(10, "Main");
+        TraceApi.TraceData(12);
+        var person = new Person();
+        TraceApi.TraceData(14, new VariableData("person", person, person.GetType()));
+        Console.WriteLine("Name: {person.name}, Age: {person.age}");
+        TraceApi.TraceData(16);
+        // Keep the console window open in debug mode.
+        Console.WriteLine("Press any key to exit.");
+        TraceApi.TraceData(17);
+        Console.ReadLine();
+        TraceApi.TraceData(17);
+        TraceApi.TraceMethodExit(17, true);
     }
 }

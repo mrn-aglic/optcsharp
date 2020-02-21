@@ -1,74 +1,35 @@
 using System;
-using TracingCore;
-using TracingCore.TraceToPyDtos;
 
-class TimePeriod
+using TracingCore;usingTracingCore.TraceToPyDtos;namespace TraceSourceExample
 {
-    private double _seconds;
-    public double Hours
+    class Student
     {
-        get
+        public Student()
         {
-            TraceApi.TraceMethodEntry(9, "get Hours", new VariableData("this", this, this.GetType()));
-            TraceApi.TraceData(9);
-            double __return_9 = _seconds / 3600;
-            TraceApi.TraceMethodReturnExit(9, new VariableData("__return_9", __return_9, __return_9.GetType()));
-            return __return_9;
+            TraceApi.TraceMethodEntry(6, "Student", new VariableData("this", this, this.GetType()));
+            TraceApi.TraceData(8);
+            TraceApi.TraceMethodExit(8, false);
         }
 
-        set
+        static Student()
         {
-            TraceApi.TraceMethodEntry(10, "set Hours", new VariableData("value", value, value.GetType()), new VariableData("this", this, this.GetType()));
-            TraceApi.TraceData(11);
-            if (value < 0 || value > 24)
-            {
-                TraceApi.TraceData(12, new VariableData("value", value, value.GetType()));
-                TraceApi.TraceData(12);
-                throw new ArgumentOutOfRangeException($"{nameof(value)} must be between 0 and 24.");
-            }
-
-            TraceApi.TraceData(15, new VariableData("value", value, value.GetType()));
-            _seconds = value * 3600;
-            TraceApi.TraceData(15, new VariableData("_seconds", _seconds, _seconds.GetType()));
-            TraceApi.TraceMethodExit();
+            TraceApi.RegisterClassLoad("TraceSourceExample.Student");
         }
     }
 
-    public double __Pre_Ins_Prop_Hours
+    class Program
     {
-        get
+        static void Main(string[] args)
         {
-            return _seconds / 3600;
+            TraceApi.TraceMethodEntry(13, "Main", new VariableData("args", args, args.GetType()));
+            TraceApi.TraceData(15);
+            int c;
+            TraceApi.TraceData(16, new VariableData("c", "undefined", typeof(int)));
+            var s = new Student();
+            TraceApi.TraceData(17, new VariableData("s", s, s.GetType()));
+            Console.WriteLine("Hello World!");
+            TraceApi.TraceData(17);
+            TraceApi.TraceMethodExit(17, true);
         }
-
-        set
-        {
-            if (value < 0 || value > 24)
-                throw new ArgumentOutOfRangeException($"{nameof(value)} must be between 0 and 24.");
-            _seconds = value * 3600;
-        }
-    }
-
-    static TimePeriod()
-    {
-        TraceApi.RegisterClassLoad("TimePeriod");
-    }
-}
-
-class Program
-{
-    static void Main()
-    {
-        TraceApi.TraceMethodEntry(22, "Main");
-        TraceApi.TraceData(24);
-        TimePeriod t = new TimePeriod();
-        TraceApi.TraceData(26, new VariableData("t", t, t.GetType()));
-        // The property assignment causes the 'set' accessor to be called.
-        t.Hours = 24;
-        TraceApi.TraceData(29);
-        // Retrieving the property causes the 'get' accessor to be called.
-        Console.WriteLine($"Time in hours: {t.Hours}");
-        TraceApi.TraceData(29);
-        TraceApi.TraceMethodExit();
     }
 }

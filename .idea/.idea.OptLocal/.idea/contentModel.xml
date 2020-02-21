@@ -382,6 +382,7 @@
         <e p="CodeExamples" t="Include">
           <e p="ClassEmptyConstructor.txt" t="Include" />
           <e p="HelloWorld.txt" t="Include" />
+          <e p="InstanceExample1.txt" t="Include" />
           <e p="MethodsExample.txt" t="Include" />
           <e p="MultipleNamespacesExample.txt" t="Include" />
           <e p="Polymorphism.txt" t="Include" />

@@ -56,7 +56,11 @@ namespace TracingCore.RoslynRewriters
             );
             var hasStaticConstructor = implStaticCotr != null;
 
-            var staticCotrMember = (MemberDeclarationSyntax) (!hasStaticConstructor && node.Identifier.Text != "Program"
+            var hasMain = node.Members.OfType<MethodDeclarationSyntax>()
+                .Any(x => x.Identifier.Text == "Main" &&
+                          x.Modifiers.Any(SyntaxKind.StaticKeyword));
+            var staticCotrMember = (MemberDeclarationSyntax) (!hasStaticConstructor &&
+                                                              !hasMain
                 ? PrepareStaticConstructor(node)
                 : base.Visit(implStaticCotr));
 
@@ -129,12 +133,14 @@ namespace TracingCore.RoslynRewriters
             var classDeclaration = node.Ancestors().OfType<ClassDeclarationSyntax>().First();
 
             var isImmediateParentMethodLike = IsNodeMethodLike(parent);
-            
+
             var includeThisReference = isImmediateParentMethodLike &&
                                        classDeclaration.Modifiers.All(x => !x.IsKind(SyntaxKind.StaticKeyword)) &&
                                        !NodeHasStaticModifier(parent);
 
-            var entryName = isImmediateParentMethodLike ? TraceApiNames.TraceMethodEntry : TraceApiNames.TraceBlockEntry;
+            var entryName = isImmediateParentMethodLike
+                ? TraceApiNames.TraceMethodEntry
+                : TraceApiNames.TraceBlockEntry;
             var exitName = isImmediateParentMethodLike ? TraceApiNames.TraceMethodExit : TraceApiNames.TraceBlockExit;
 
             var dullTarget = hasStatements ? statements.First() : node;
@@ -161,7 +167,8 @@ namespace TracingCore.RoslynRewriters
                 return node.WithStatements(new SyntaxList<StatementSyntax>().AddRange(blockSpecificStatements));
 
             var exitMethodStatement =
-                _expressionGenerator.GetExitExpressionStatement(exitDetails, hasStatements, isImmediateParentMethodLike);
+                _expressionGenerator.GetExitExpressionStatement(exitDetails, hasStatements,
+                    isImmediateParentMethodLike);
             blockSpecificStatements.Add(exitMethodStatement);
 
             return node.WithStatements(new SyntaxList<StatementSyntax>().AddRange(blockSpecificStatements));
