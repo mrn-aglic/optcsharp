@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using TracingCore;
@@ -37,6 +38,12 @@ namespace OptLocal.Areas.Default.Controllers
             var pyTutorData = optBackend.Trace(compilationResult.Root, compilationResult);
 
             return PyTutorDataMapper.ToJson(pyTutorData);
+        }
+        
+        [HttpGet, Route("/api/statuscheck")]
+        public HttpStatusCode GetCSharpTrace()
+        {
+            return HttpStatusCode.OK;
         }
     }
 }
