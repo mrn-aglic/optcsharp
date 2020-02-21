@@ -2169,7 +2169,7 @@ function executeCodeAndCreateViz(codeToExec,
             // contentType:"application/json",
             data: {
                 user_script: codeToExec,
-                raw_input_json: rawInputLst.length > 0 ? JSON.stringify(rawInputLst) : '',
+                raw_input_json: rawInputLst.length > 0 ? JSON.stringify(rawInputLst) : JSON.stringify(''),
                 options_json: JSON.stringify(backendOptionsObj)
             },
             // success: function (data) {
