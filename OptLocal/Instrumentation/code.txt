@@ -1,30 +1,77 @@
 using System;
 
-using TracingCore;usingTracingCore.TraceToPyDtos;public class Person
+using TracingCore;usingTracingCore.TraceToPyDtos;namespace Polimorfizam
 {
-    public int age;
-    public string name;
-    static Person()
+    public class Zivotinja
     {
-        TraceApi.RegisterClassLoad("Person");
-    }
-}
+        public void Glas()
+        {
+            TraceApi.TraceMethodEntry(7, "Glas", new VariableData("this", this, this.GetType()));
+            TraceApi.TraceData(9);
+            Console.WriteLine("Zivotinja proizvodi glas.");
+            TraceApi.TraceData(9);
+            TraceApi.TraceMethodExit(9, true);
+        }
 
-class TestPerson
-{
-    static void Main()
+        static Zivotinja()
+        {
+            TraceApi.RegisterClassLoad("Polimorfizam.Zivotinja");
+        }
+    }
+
+    public class Macka : Zivotinja
     {
-        TraceApi.TraceMethodEntry(10, "Main");
-        TraceApi.TraceData(12);
-        var person = new Person();
-        TraceApi.TraceData(14, new VariableData("person", person, person.GetType()));
-        Console.WriteLine("Name: {person.name}, Age: {person.age}");
-        TraceApi.TraceData(16);
-        // Keep the console window open in debug mode.
-        Console.WriteLine("Press any key to exit.");
-        TraceApi.TraceData(17);
-        Console.ReadLine();
-        TraceApi.TraceData(17);
-        TraceApi.TraceMethodExit(17, true);
+        public void Glas()
+        {
+            TraceApi.TraceMethodEntry(15, "Glas", new VariableData("this", this, this.GetType()));
+            TraceApi.TraceData(17);
+            Console.WriteLine("Mijau mijau");
+            TraceApi.TraceData(17);
+            TraceApi.TraceMethodExit(17, true);
+        }
+
+        static Macka()
+        {
+            TraceApi.RegisterClassLoad("Polimorfizam.Macka");
+        }
+    }
+
+    public class Pas : Zivotinja
+    {
+        public void Glas()
+        {
+            TraceApi.TraceMethodEntry(23, "Glas", new VariableData("this", this, this.GetType()));
+            TraceApi.TraceData(25);
+            Console.WriteLine("Vau vau");
+            TraceApi.TraceData(25);
+            TraceApi.TraceMethodExit(25, true);
+        }
+
+        static Pas()
+        {
+            TraceApi.RegisterClassLoad("Polimorfizam.Pas");
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            TraceApi.TraceMethodEntry(31, "Main", new VariableData("args", args, args.GetType()));
+            TraceApi.TraceData(33);
+            Zivotinja mojaZivotinja = new Zivotinja();
+            TraceApi.TraceData(34, new VariableData("mojaZivotinja", mojaZivotinja, mojaZivotinja.GetType()));
+            Zivotinja mojaMacka = new Macka();
+            TraceApi.TraceData(35, new VariableData("mojaMacka", mojaMacka, mojaMacka.GetType()));
+            Zivotinja mojPas = new Pas();
+            TraceApi.TraceData(37, new VariableData("mojPas", mojPas, mojPas.GetType()));
+            mojaZivotinja.Glas();
+            TraceApi.TraceData(38);
+            mojaMacka.Glas();
+            TraceApi.TraceData(39);
+            mojPas.Glas();
+            TraceApi.TraceData(39);
+            TraceApi.TraceMethodExit(39, true);
+        }
     }
 }
