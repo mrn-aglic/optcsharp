@@ -23,9 +23,13 @@ namespace TracingCore.Data
         private string _currentFunctionName = "<module>";
         private readonly PyTutorData _pyTutorData;
 
+        // TODO: Implement
+        private Dictionary<string, string> _hideVariables;
+
         public PyTutorDataManager(string code)
         {
             _pyTutorData = new PyTutorData(code, new List<IPyTutorStep>());
+            _hideVariables = new Dictionary<string, string>();
 
             _currentFrameId = 1;
             _currentHeapId = 1;

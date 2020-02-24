@@ -17,6 +17,7 @@
               <e p="_ViewStart.cshtml" t="Include" />
               <e p="Shell" t="Include">
                 <e p="Index.cshtml" t="Include" />
+                <e p="Monaco.cshtml" t="Include" />
               </e>
             </e>
           </e>
@@ -31,6 +32,49 @@
         <e p="Models" t="Include">
           <e p="ErrorViewModel.cs" t="Include" />
         </e>
+        <e p="node_modules/@babel/core" t="IncludeRecursive" />
+        <e p="node_modules/@babel/preset-env" t="IncludeRecursive" />
+        <e p="node_modules/@types" t="IncludeRecursive">
+          <e p="events" t="IncludeRecursive" />
+          <e p="minimatch" t="IncludeRecursive" />
+          <e p="node" t="IncludeRecursive" />
+        </e>
+        <e p="node_modules/@vue/component-compiler-utils" t="IncludeRecursive" />
+        <e p="node_modules/axios" t="IncludeRecursive" />
+        <e p="node_modules/babel-loader" t="IncludeRecursive" />
+        <e p="node_modules/bootstrap-vue" t="IncludeRecursive" />
+        <e p="node_modules/chalk" t="IncludeRecursive" />
+        <e p="node_modules/commander" t="IncludeRecursive" />
+        <e p="node_modules/cross-env" t="IncludeRecursive" />
+        <e p="node_modules/css-loader" t="IncludeRecursive" />
+        <e p="node_modules/escodegen" t="IncludeRecursive" />
+        <e p="node_modules/filbert" t="IncludeRecursive" />
+        <e p="node_modules/file-loader" t="IncludeRecursive" />
+        <e p="node_modules/html-webpack-plugin" t="IncludeRecursive" />
+        <e p="node_modules/lodash" t="IncludeRecursive" />
+        <e p="node_modules/monaco-editor" t="IncludeRecursive" />
+        <e p="node_modules/monaco-editor-webpack-plugin" t="IncludeRecursive" />
+        <e p="node_modules/popper.js" t="IncludeRecursive" />
+        <e p="node_modules/portal-vue" t="IncludeRecursive" />
+        <e p="node_modules/postcss" t="IncludeRecursive" />
+        <e p="node_modules/postcss-selector-parser" t="IncludeRecursive" />
+        <e p="node_modules/rimraf" t="IncludeRecursive" />
+        <e p="node_modules/source-map" t="IncludeRecursive" />
+        <e p="node_modules/style-loader" t="IncludeRecursive" />
+        <e p="node_modules/terser" t="IncludeRecursive" />
+        <e p="node_modules/tslib" t="IncludeRecursive" />
+        <e p="node_modules/uglifyjs-webpack-plugin" t="IncludeRecursive" />
+        <e p="node_modules/vee-validate" t="IncludeRecursive" />
+        <e p="node_modules/vue" t="IncludeRecursive" />
+        <e p="node_modules/vue-functional-data-merge" t="IncludeRecursive" />
+        <e p="node_modules/vue-loader" t="IncludeRecursive" />
+        <e p="node_modules/vue-monaco" t="IncludeRecursive" />
+        <e p="node_modules/vue-router" t="IncludeRecursive" />
+        <e p="node_modules/vue-style-loader" t="IncludeRecursive" />
+        <e p="node_modules/vue-template-compiler" t="IncludeRecursive" />
+        <e p="node_modules/webpack" t="IncludeRecursive" />
+        <e p="node_modules/webpack-cli" t="IncludeRecursive" />
+        <e p="node_modules/webpack-dev-server" t="IncludeRecursive" />
         <e p="obj" t="ExcludeRecursive">
           <e p="Debug" t="Include">
             <e p="netcoreapp3.1" t="Include">
@@ -40,6 +84,8 @@
           </e>
         </e>
         <e p="OptLocal.csproj" t="IncludeRecursive" />
+        <e p="package-lock.json" t="Include" />
+        <e p="package.json" t="Include" />
         <e p="Program.cs" t="Include" />
         <e p="Properties" t="Include">
           <e p="launchSettings.json" t="Include" />
@@ -58,7 +104,67 @@
             <e p="Error.cshtml" t="Include" />
           </e>
         </e>
+        <e p="webpack.config.js" t="Include" />
         <e p="wwwroot" t="Include">
+          <e p="client" t="Include">
+            <e p="lib" t="Include">
+              <e p="bootstrap" t="Include">
+                <e p="bootstrap.bundle.min.js" t="Include" />
+                <e p="bootstrap.min.css" t="Include" />
+              </e>
+              <e p="font-awesome" t="Include">
+                <e p="all.min.css" t="Include" />
+                <e p="brands.min.js" t="Include" />
+                <e p="conflict-detection.min.js" t="Include" />
+                <e p="fontawesome.min.js" t="Include" />
+                <e p="regular.min.js" t="Include" />
+                <e p="solid.min.js" t="Include" />
+                <e p="v4-shims.min.js" t="Include" />
+              </e>
+              <e p="jquery-3.4.1.min.js" t="Include" />
+              <e p="vue" t="Include">
+                <e p="vue.js" t="Include" />
+              </e>
+              <e p="webfonts" t="Include">
+                <e p="fa-brands-400.eot" t="Include" />
+                <e p="fa-brands-400.svg" t="Include" />
+                <e p="fa-brands-400.ttf" t="Include" />
+                <e p="fa-brands-400.woff" t="Include" />
+                <e p="fa-brands-400.woff2" t="Include" />
+                <e p="fa-regular-400.eot" t="Include" />
+                <e p="fa-regular-400.svg" t="Include" />
+                <e p="fa-regular-400.ttf" t="Include" />
+                <e p="fa-regular-400.woff" t="Include" />
+                <e p="fa-regular-400.woff2" t="Include" />
+                <e p="fa-solid-900.eot" t="Include" />
+                <e p="fa-solid-900.svg" t="Include" />
+                <e p="fa-solid-900.ttf" t="Include" />
+                <e p="fa-solid-900.woff" t="Include" />
+                <e p="fa-solid-900.woff2" t="Include" />
+              </e>
+            </e>
+            <e p="src" t="Include">
+              <e p="App.vue" t="Include" />
+              <e p="classes" t="Include" />
+              <e p="components" t="Include">
+                <e p="CodeEditor.vue" t="Include" />
+                <e p="Examples.vue" t="Include" />
+                <e p="ExecutionControl.vue" t="Include" />
+                <e p="Visualizer.vue" t="Include" />
+                <e p="Workspace.vue" t="Include" />
+              </e>
+              <e p="Examples" t="Include">
+                <e p="Examples.js" t="Include" />
+              </e>
+              <e p="main.js" t="Include" />
+              <e p="Repositories" t="Include">
+                <e p="Compilation.js" t="Include" />
+              </e>
+              <e p="routes" t="Include">
+                <e p="ApiRoutes.js" t="Include" />
+              </e>
+            </e>
+          </e>
           <e p="css" t="Include">
             <e p="site.css" t="Include" />
           </e>
@@ -230,6 +336,7 @@
               <e p="jquery.qtip.min.js" t="Include" />
               <e p="jquery.simplemodal.js" t="Include" />
               <e p="matrixtutor.js" t="Include" />
+              <e p="myPytutor.js" t="Include" />
               <e p="opt-frontend-common.js" t="Include" />
               <e p="opt-frontend.js" t="Include" />
               <e p="opt-live.js" t="Include" />
@@ -371,6 +478,17 @@
               </e>
             </e>
             <e p="visualize.html" t="Include" />
+          </e>
+          <e p="vuebundles" t="Include">
+            <e p="1.build.js" t="Include" />
+            <e p="1.build.js.map" t="Include" />
+            <e p="2.build.js" t="Include" />
+            <e p="2.build.js.map" t="Include" />
+            <e p="codicon.ttf" t="Include" />
+            <e p="editor.worker.js" t="Include" />
+            <e p="editor.worker.js.map" t="Include" />
+            <e p="main.build.js" t="Include" />
+            <e p="main.build.js.map" t="Include" />
           </e>
         </e>
       </e>

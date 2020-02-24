@@ -11,3 +11,5 @@ SharpVis/wwwroot/vuebundles/1.build.js
 SharpVis/wwwroot/vuebundles/2.build.js
 SharpVis/wwwroot/vuebundles/editor.worker.js
 SharpVis/wwwroot/vuebundles/main.build.js
+/OptLocal/wwwroot/vuebundles/
+/OptLocal/package-lock.json
