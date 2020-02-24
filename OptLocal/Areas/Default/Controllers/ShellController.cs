@@ -10,5 +10,10 @@ namespace OptLocal.Areas.Default.Controllers
         {
             return View();
         }
+
+        public IActionResult Monaco()
+        {
+            return View();
+        }
     }
 }

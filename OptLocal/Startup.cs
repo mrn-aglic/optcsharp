@@ -54,6 +54,12 @@ namespace OptLocal
                     "",
                     new {controller = "Shell", action = "Index", area = "Default"}
                 );
+                
+                endpoints.MapControllerRoute(
+                    "Monaco",
+                    "monaco",
+                    new {controller = "Shell", action = "Monaco", area = "Default"}
+                );
             });
         }
     }

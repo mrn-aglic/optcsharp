@@ -31,9 +31,26 @@ namespace OptLocal.Areas.Default.Controllers
             var inputs = raw_input_json == null
                 ? new List<string>()
                 : JArray.Parse(raw_input_json).ToObject<List<string>>();
-            
+
             var sourceRewriter = new SourceCodeRewriter(new ExpressionGenerator(), _instrumentationConfig);
             var optBackend = new OptBackend(user_script, inputs, new InstrumentationManager(sourceRewriter));
+
+            var compilationResult = optBackend.Compile(CompilationName, true);
+            var pyTutorData = optBackend.Trace(compilationResult.Root, compilationResult);
+
+            return PyTutorDataMapper.ToJson(pyTutorData);
+        }
+
+        [HttpPost, Route("/api/getcsharptrace")]
+        public JObject GetCSharpTrace(
+            [FromBody] JObject json
+        )
+        {
+            var rawInput = json["rawInputJson"].ToObject<List<string>>();
+            var userCode = json["code"].ToObject<string>();
+
+            var sourceRewriter = new SourceCodeRewriter(new ExpressionGenerator(), _instrumentationConfig);
+            var optBackend = new OptBackend(userCode, rawInput, new InstrumentationManager(sourceRewriter));
 
             var compilationResult = optBackend.Compile(CompilationName, true);
             var pyTutorData = optBackend.Trace(compilationResult.Root, compilationResult);
