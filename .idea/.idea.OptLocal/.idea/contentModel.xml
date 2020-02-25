@@ -150,6 +150,7 @@
                 <e p="CodeEditor.vue" t="Include" />
                 <e p="Examples.vue" t="Include" />
                 <e p="ExecutionControl.vue" t="Include" />
+                <e p="LeftGutter.vue" t="Include" />
                 <e p="Visualizer.vue" t="Include" />
                 <e p="Workspace.vue" t="Include" />
               </e>
