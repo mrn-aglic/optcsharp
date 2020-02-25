@@ -1,5 +1,5 @@
 <template>
-    <div id="monaco-container" class="h-100">
+    <div id="monaco-container">
     </div>
 </template>
 
@@ -116,14 +116,15 @@
                 this.currentLine = number;
             },
             nextLine: function () {
-                this.currentLine += 1;
-                let range = this.getRangeForLine(this.currentLine);
-                this.setDecorations(range);
+                
+                // this.currentLine += 1;
+                // let range = this.getRangeForLine(this.currentLine);
+                // this.setDecorations(range);
             },
             prevLine: function () {
-                this.currentLine -= 1;
-                let range = this.getRangeForLine(this.currentLine);
-                this.setDecorations(range);
+                // this.currentLine -= 1;
+                // let range = this.getRangeForLine(this.currentLine);
+                // this.setDecorations(range);
             }
         }
     }

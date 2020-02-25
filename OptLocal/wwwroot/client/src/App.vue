@@ -1,5 +1,5 @@
 <template>
-    <div id='app' class='container-fluid'>
+    <div id='app' class='container-fluid min-vh-100'>
         <div class='row justify-content-end'>
             <div class='col-10 col-md-10 col-sm-10 col-lg-10 col-xl-10'>
             </div>

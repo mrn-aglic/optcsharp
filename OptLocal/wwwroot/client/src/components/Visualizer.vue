@@ -17,7 +17,12 @@
                     hideCode: true,
                     allowEditAnnotations: false
                 },
-                visualizer: null
+                registerVisualizer: function (vis) {
+
+                    return () => vis;
+                },
+                getVisualizer: () => {
+                }
             }
         },
         components: {},
@@ -26,19 +31,25 @@
         },
         methods: {
             crateVisInstance: function () {
-                return new ExecutionVisualizer(this.rootId, this.trace, this.options);
+                return new ExecutionVisualizer(this.rootId, this.trace, this.options, {});
             },
-            visualize: function (trace) {
+            visualize: function (trace, gutter) {
                 this.trace = trace;
-                this.visualizer = this.crateVisInstance();
+                this.getVisualizer = this.registerVisualizer(this.crateVisInstance());
+                gutter.show();
+                let vis = this.getVisualizer();
+
+                this.gutterSVG = gutter.$el.children[0];
+                vis.highlightCodeLine(this.gutterSVG, null, null, true);
             },
             stepForward: function () {
-                let vis = this.visualizer;
+                let vis = this.getVisualizer();
 
                 vis.stepForward();
+                vis.highlightCodeLine(this.gutterSVG, null, null, true);
             },
             stepBack: function () {
-                let vis = this.visualizer;
+                let vis = this.getVisualizer();
 
                 vis.stepBack();
             }

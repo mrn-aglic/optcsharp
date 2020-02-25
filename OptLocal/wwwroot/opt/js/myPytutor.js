@@ -121,7 +121,7 @@ var curVisualizerID = 1; // global to uniquely identify each ExecutionVisualizer
 //          'ts' for TypeScript, 'ruby' for Ruby, 'c' for C, 'cpp' for C++
 //          [default is Python-style labels]
 //   debugMode - some extra debugging printouts
-function ExecutionVisualizer(domRootID, dat, params) {
+function ExecutionVisualizer(domRootID, dat, params, codeEditor) {
     this.curInputCode = dat.code.rtrim(); // kill trailing spaces
     this.curTrace = dat.trace;
 
@@ -208,13 +208,19 @@ function ExecutionVisualizer(domRootID, dat, params) {
     this.domRoot = $('#' + domRootID);
     this.domRoot.data("vis", this);  // bnm store a reference to this as div data for use later.
     this.domRootD3 = d3.select('#' + domRootID);
-
+    
+    // console.log(this.domRootD3.select)
     // stick a new div.ExecutionVisualizer within domRoot and make that
     // the new domRoot:
     this.domRoot.html('<div class="ExecutionVisualizer"></div>');
 
     this.domRoot = this.domRoot.find('div.ExecutionVisualizer');
     this.domRootD3 = this.domRootD3.select('div.ExecutionVisualizer');
+    if (codeEditor) {
+        this.codeEditor = codeEditor;
+    } else {
+        this.codeEditor = null;
+    }
 
     // initialize in renderPyCodeOutput()
     this.codeOutputLines = null;
@@ -1201,32 +1207,6 @@ ExecutionVisualizer.prototype.renderPyCodeOutput = function () {
 }
 
 
-// takes a string inputStr and returns an HTML version with
-// the characters from [highlightIndex, highlightIndex+extent) highlighted with
-// a span of class highlightCssClass
-function htmlWithHighlight(inputStr, highlightInd, extent, highlightCssClass) {
-    var prefix = '';
-    if (highlightInd > 0) {
-        prefix = inputStr.slice(0, highlightInd);
-    }
-
-    var highlightedChars = inputStr.slice(highlightInd, highlightInd + extent);
-
-    var suffix = '';
-    if (highlightInd + extent < inputStr.length) {
-        suffix = inputStr.slice(highlightInd + extent, inputStr.length);
-    }
-
-    // ... then set the current line to lineHTML
-    var lineHTML = htmlspecialchars(prefix) +
-        '<span class="' + highlightCssClass + '">' +
-        htmlspecialchars(highlightedChars) +
-        '</span>' +
-        htmlspecialchars(suffix);
-    return lineHTML;
-}
-
-
 ExecutionVisualizer.prototype.renderStdout = function () {
     var curEntry = this.curTrace[this.curInstr];
 
@@ -1353,13 +1333,325 @@ ExecutionVisualizer.prototype.updateOutput = function (smoothTransition) {
     this.try_hook("end_updateOutput", {myViz: this});
 };
 
+function createArrow(id, color) {
+
+    let arrow = document.createElement('polygon');
+    arrow.setAttribute('id', id);
+    arrow.setAttribute('points', SVG_ARROW_POLYGON);
+    arrow.setAttribute('fill', color);
+    return arrow;
+}
+
+ExecutionVisualizer.createGutter = function (id) {
+
+    let leftCodeGutter = document.createElement('svg');
+    leftCodeGutter.setAttribute('id', id);
+    // leftCodeGutter.setAttribute('width', '100%');
+    leftCodeGutter.setAttribute('preserveAspectRatio', 'none');
+    leftCodeGutter.setAttribute('width', '20');
+    // leftCodeGutter.attr('id', 'leftCodeGutterSVG');
+
+    let prevLineArrow = createArrow('prevLineArrow', lightArrowColor);
+    let curLineArrow = createArrow('curLineArrow', darkArrowColor);
+
+    leftCodeGutter.appendChild(prevLineArrow);
+    leftCodeGutter.appendChild(curLineArrow);
+
+    // leftCodeGutter.append('polygon')
+    //     .attr('id')
+    //     .attr('points', SVG_ARROW_POLYGON)
+    //     .attr('fill', lightArrowColor);
+    // leftCodeGutter.append('polygon')
+    //     .attr('id', 'curLineArrow')
+    //     .attr('points', SVG_ARROW_POLYGON)
+    //     .attr('fill', darkArrowColor);
+    
+    // myViz.domRoot.find('#pyCodeOutput tr:first')
+    //     .prepend('<td id="gutterTD" valign="top" rowspan="' + this.codeOutputLines.length + '"><svg id="leftCodeGutterSVG"/></td>');
+
+    // create prevLineArrow and curLineArrow
+    // myViz.domRootD3.select('svg#leftCodeGutterSVG')
+    //     .append('polygon')
+    //     .attr('id', 'prevLineArrow')
+    //     .attr('points', SVG_ARROW_POLYGON)
+    //     .attr('fill', lightArrowColor);
+
+    // myViz.domRootD3.select('svg#leftCodeGutterSVG')
+    //     .append('polygon')
+    //     .attr('id', 'curLineArrow')
+    //     .attr('points', SVG_ARROW_POLYGON)
+    //     .attr('fill', darkArrowColor);
+
+    return leftCodeGutter.outerHTML;
+};
+
+ExecutionVisualizer.prototype.highlightCodeLine = function (gutter, pla, cla, smoothTransition) {
+
+    let myViz = this;
+    // console.log('test', gutterSVG, myViz.codeEditor)
+
+    if (myViz.codeEditor === null) {
+        return;
+    }
+    
+    const gutterSVG = $(gutter);
+    const d3Gutter = d3.select(gutter);
+    const curEntry = this.curTrace[this.curInstr];
+    const totalInstrs = this.curTrace.length;
+    const isLastInstr = (this.curInstr === (totalInstrs - 1));
+    let hasError = curEntry.event === 'exception' || curEntry.event === 'uncaught_exception';
+
+    const isTerminated = (!myViz.instrLimitReached && isLastInstr);
+
+    const pcod = myViz.codeEditor;
+
+    let curLineNumber = null;
+    let prevLineNumber = null;
+
+    // only relevant if in myViz.pyCrazyMode
+    let prevColumn = undefined;
+    let prevExprStartCol = undefined;
+    let prevExprWidth = undefined;
+
+    let curIsReturn = (curEntry.event === 'return');
+    let prevIsReturn = false;
+
+
+    if (myViz.curInstr > 0) {
+        prevLineNumber = myViz.curTrace[myViz.curInstr - 1].line;
+        prevIsReturn = (myViz.curTrace[myViz.curInstr - 1].event === 'return');
+
+        if (prevIsReturn) {
+            let idx = myViz.curInstr - 1;
+            let retStack = myViz.curTrace[idx].stack_to_render;
+            assert(retStack.length > 0);
+            let retFrameId = retStack[retStack.length - 1].frame_id;
+
+            // now go backwards until we find a 'call' to this frame
+            while (idx >= 0) {
+                let entry = myViz.curTrace[idx];
+                if (entry.event === 'call' && entry.stack_to_render) {
+                    let topFrame = entry.stack_to_render[entry.stack_to_render.length - 1];
+                    if (topFrame.frame_id === retFrameId) {
+                        break; // DONE, we found the call that corresponds to this return
+                    }
+                }
+                idx--;
+            }
+
+            // now idx is the index of the 'call' entry. we need to find the
+            // entry before that, which is the instruction before the call.
+            // THAT's the line of the call site.
+            if (idx > 0) {
+                let callingEntry = myViz.curTrace[idx - 1];
+                prevLineNumber = callingEntry.line; // WOOHOO!!!
+                prevIsReturn = false; // this is now a call site, not a return
+                smoothTransition = false;
+            }
+        }
+
+        if (myViz.pyCrazyMode) {
+            let p = myViz.curTrace[myViz.curInstr - 1];
+            prevColumn = p.column;
+            // if these don't exist, set reasonable defaults
+            prevExprStartCol = (p.expr_start_col !== undefined) ? p.expr_start_col : p.column;
+            prevExprWidth = (p.expr_width !== undefined) ? p.expr_width : 1;
+        }
+    }
+
+    curLineNumber = curEntry.line;
+
+    if (myViz.pyCrazyMode) {
+        var curColumn = curEntry.column;
+
+        // if these don't exist, set reasonable defaults
+        var curExprStartCol = (curEntry.expr_start_col !== undefined) ? curEntry.expr_start_col : curColumn;
+        var curExprWidth = (curEntry.expr_width !== undefined) ? curEntry.expr_width : 1;
+
+        var curLineInfo = myViz.codeOutputLines[curLineNumber - 1];
+        assert(curLineInfo.lineNumber == curLineNumber);
+        var codeAtLine = curLineInfo.text;
+
+        // shotgun approach: reset ALL lines to their natural (unbolded) state
+        $.each(myViz.codeOutputLines, function (i, e) {
+            var d = myViz.generateID('cod' + e.lineNumber);
+            myViz.domRoot.find('#' + d).html(htmlspecialchars(e.text));
+        });
+
+
+        // Three possible cases:
+        // 1. previous and current trace entries are on the SAME LINE
+        // 2. previous and current trace entries are on different lines
+        // 3. there is no previous trace entry
+
+        if (prevLineNumber == curLineNumber) {
+            var curLineHTML = '';
+
+            // tricky tricky!
+            // generate a combined line with both previous and current
+            // columns highlighted
+
+            for (var i = 0; i < codeAtLine.length; i++) {
+                var isCur = (curExprStartCol <= i) && (i < curExprStartCol + curExprWidth);
+                var isPrev = (prevExprStartCol <= i) && (i < prevExprStartCol + prevExprWidth);
+
+                var htmlEscapedChar = htmlspecialchars(codeAtLine[i]);
+
+                if (isCur && isPrev) {
+                    curLineHTML += '<span class="pycrazy-highlight-prev-and-cur">' + htmlEscapedChar + '</span>';
+                } else if (isPrev) {
+                    curLineHTML += '<span class="pycrazy-highlight-prev">' + htmlEscapedChar + '</span>';
+                } else if (isCur) {
+                    curLineHTML += '<span class="pycrazy-highlight-cur">' + htmlEscapedChar + '</span>';
+                } else {
+                    curLineHTML += htmlEscapedChar;
+                }
+            }
+
+            assert(curLineHTML);
+            myViz.domRoot.find('#' + myViz.generateID('cod' + curLineNumber)).html(curLineHTML);
+        } else {
+            if (prevLineNumber) {
+                var prevLineInfo = myViz.codeOutputLines[prevLineNumber - 1];
+                var prevLineHTML = htmlWithHighlight(prevLineInfo.text, prevExprStartCol, prevExprWidth, 'pycrazy-highlight-prev');
+                myViz.domRoot.find('#' + myViz.generateID('cod' + prevLineNumber)).html(prevLineHTML);
+            }
+            var curLineHTML = htmlWithHighlight(codeAtLine, curExprStartCol, curExprWidth, 'pycrazy-highlight-cur');
+            myViz.domRoot.find('#' + myViz.generateID('cod' + curLineNumber)).html(curLineHTML);
+        }
+    }
+
+    // on 'return' events, give a bit more of a vertical nudge to show that
+    // the arrow is aligned with the 'bottom' of the line ...
+    let prevVerticalNudge = prevIsReturn ? Math.floor(myViz.codeRowHeight / 3) : 0;
+    let curVerticalNudge = curIsReturn ? Math.floor(myViz.codeRowHeight / 3) : 0;
+
+
+    // edge case for the final instruction :0
+    if (isTerminated && !hasError) {
+        // don't show redundant arrows on the same line when terminated ...
+        if (prevLineNumber === curLineNumber) {
+            curLineNumber = null;
+        }
+        // otherwise have a smaller vertical nudge (to fit at bottom of display table)
+        else {
+            curVerticalNudge = curVerticalNudge - 2;
+        }
+    }
+
+    if (myViz.params.arrowLines) {
+        if (prevLineNumber) {
+            // let pla = myViz.domRootD3.select('#prevLineArrow');
+            let pla = d3Gutter.select('#prevLineArrow');
+            let translatePrevCmd = 'translate(0, ' + (((prevLineNumber - 1) * myViz.codeRowHeight) + myViz.arrowOffsetY + prevVerticalNudge) + ')';
+            console.log(translatePrevCmd)
+
+            if (smoothTransition) {
+                pla
+                    .transition()
+                    .duration(200)
+                    .attr('fill', 'white')
+                    .each('end', function () {
+                        pla
+                            .attr('transform', translatePrevCmd)
+                            .attr('fill', lightArrowColor);
+
+                        d3Gutter.find('#prevLineArrow').show(); // show at the end to avoid flickering
+                    });
+            } else {
+                pla.attr('transform', translatePrevCmd)
+                gutterSVG.find('#prevLineArrow').show();
+            }
+
+        } else {
+            gutterSVG.find('#prevLineArrow').hide();
+        }
+
+        if (curLineNumber) {
+            // let cla = myViz.domRootD3.select('#curLineArrow');
+            let cla = d3Gutter.select('#curLineArrow');
+            let translateCurCmd = 'translate(0, ' + (((curLineNumber - 1) * myViz.codeRowHeight) + myViz.arrowOffsetY + curVerticalNudge) + ')';
+
+            console.log(translateCurCmd)
+            if (smoothTransition) {
+                cla
+                    .transition()
+                    .delay(200)
+                    .duration(250)
+                    .attr('transform', translateCurCmd);
+            } else {
+                cla.attr('transform', translateCurCmd);
+            }
+
+            gutterSVG.find('#curLineArrow').show();
+        } else {
+            gutterSVG.find('#curLineArrow').hide();
+        }
+    }
+
+    myViz.domRootD3.selectAll('#pyCodeOutputDiv td.cod')
+        .style('border-top', function (d) {
+            if (hasError && (d.lineNumber === curEntry.line)) {
+                return '1px solid ' + errorColor;
+            } else {
+                return '';
+            }
+        })
+        .style('border-bottom', function (d) {
+            // COPY AND PASTE ALERT!
+            if (hasError && (d.lineNumber === curEntry.line)) {
+                return '1px solid ' + errorColor;
+            } else {
+                return '';
+            }
+        });
+
+    // returns True iff lineNo is visible in pyCodeOutputDiv
+    function isOutputLineVisible(lineNo) {
+        let lineNoTd = myViz.domRoot.find('#lineNo' + lineNo);
+        let LO = lineNoTd.offset().top;
+
+        let PO = pcod.offset().top;
+        let ST = pcod.scrollTop();
+        let H = pcod.height();
+
+        // add a few pixels of fudge factor on the bottom end due to bottom scrollbar
+        return (PO <= LO) && (LO < (PO + H - 30));
+    }
+
+
+    // smoothly scroll pyCodeOutputDiv so that the given line is at the center
+    function scrollCodeOutputToLine(lineNo) {
+        let lineNoTd = myViz.domRoot.find('#lineNo' + lineNo);
+        let LO = lineNoTd.offset().top;
+
+        let PO = pcod.offset().top;
+        let ST = pcod.scrollTop();
+        let H = pcod.height();
+
+        pcod.stop(); // first stop all previously-queued animations
+        pcod.animate({scrollTop: (ST + (LO - PO - (Math.round(H / 2))))}, 300);
+    }
+
+    // smoothly scroll code display
+    // if (!isOutputLineVisible(curEntry.line)) {
+    //     scrollCodeOutputToLine(curEntry.line);
+    // }
+
+    // add these fields to myViz
+    myViz.curLineNumber = curLineNumber;
+    myViz.prevLineNumber = prevLineNumber;
+    myViz.curLineIsReturn = curIsReturn;
+    myViz.prevLineIsReturn = prevIsReturn;
+};
+
 ExecutionVisualizer.prototype.updateOutputMini = function () {
 
     let myViz = this;
 
     let curEntry = myViz.curTrace[myViz.curInstr];
     let curToplevelLayout = myViz.curTraceLayouts[myViz.curInstr];
-    this.renderDataStructures(curEntry, curToplevelLayout);
+    myViz.renderDataStructures(curEntry, curToplevelLayout);
 
     this.enterViewAnnotationsMode(); // ... and render optional annotations (if any exist)
 
@@ -4151,4 +4443,4 @@ ExecutionVisualizer.prototype.activateJavaFrontend = function () {
         });
     };
 
-}
+};

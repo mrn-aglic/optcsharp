@@ -1,5 +1,5 @@
 <template>
-    <div class="col-12">
+    <div class="col-12 h-100">
         <div class="row col-6">
             <examples v-on:change="exampleChange"></examples>
         </div>
@@ -8,12 +8,15 @@
                 Vizualiziraj izvršavanje
             </button>
         </div>
-        <div class="row h-auto mt-2 mnh-90"> <!--h-75 ako ne zelimo cijelu visinu-->
+        <div class="row mt-2 h-75 d-flex flex-column"> <!--h-75 ako ne zelimo cijelu visinu-->
             <div class="col-6">
                 <b-card class="h-100">
                     <b-tabs class="h-100" lazy>
                         <b-tab v-for="editor in editors" :key="editor.tabKey" :title="editor.title">
-                            <code-editor :ref="editor.tabKey" :editor-data="editor"></code-editor>
+                            <b-row class="h-75">
+                                <left-gutter :ref="gutter" class="col-1 m-0 p-0 flex-grow-1"></left-gutter>
+                                <code-editor :ref="editor.tabKey" :editor-data="editor" class="col-11 flex-grow-1"></code-editor>
+                            </b-row>
                         </b-tab>
                     </b-tabs>
                 </b-card>
@@ -22,20 +25,20 @@
                 <visualizer :ref="visualizer"></visualizer>
             </div>
         </div>
-        <div class="row mxh-10">
+        <div class="row">
             <execution-control v-on:forward="forward()" v-on:backward="backward()"></execution-control>
         </div>
-        <!--        <visualization-canvas></visualization-canvas>-->
     </div>
 </template>
 
 <script>
 
     import CodeEditor from './CodeEditor.vue';
+    import LeftGutter from './LeftGutter.vue';
     import Visualizer from './Visualizer.vue';
     import Examples from './Examples.vue';
     import ExecutionControl from './ExecutionControl.vue';
-    import {BCard, BTabs, BTab} from 'bootstrap-vue';
+    import {BRow, BCard, BTabs, BTab} from 'bootstrap-vue';
 
     import Vue from 'vue';
     import {getCSharpTraceData} from '../Repositories/Compilation.js';
@@ -45,12 +48,14 @@
     export default {
         name: 'Workspace',
         components: {
+            LeftGutter,
             Visualizer,
             CodeEditor,
             ExecutionControl,
             BTabs,
             BTab,
             BCard,
+            BRow,
             Examples
         },
         data() {
@@ -60,6 +65,7 @@
                 nextLineData: {},
                 editors: [],
                 visualizer: 'visualizer',
+                gutter: 'gutter',
                 tabKey: 0,
                 currentTab: -1
             }
@@ -73,8 +79,11 @@
             getCurrentEditor: function () {
                 return this.$refs[this.currentTab][0];
             },
-            getVisualizer: function(){
+            getVisualizer: function () {
                 return this.$refs[this.visualizer];
+            },
+            getGutter: function () {
+                return this.$refs[this.gutter][0];
             },
             compile: function () {
                 let self = this;
@@ -87,8 +96,9 @@
                 };
 
                 getCSharpTraceData(workspaceData).then(data => {
-                    
-                    self.visComponent.visualize(data);
+
+                    let gutter = self.getGutter();
+                    self.visComponent.visualize(data, gutter);
                 });
                 // getCSharpTraceData(workspaceData).then(data => {
                 //     this.compilationData = data;
@@ -99,10 +109,12 @@
             forward: function () {
                 let editor = this.getCurrentEditor();
                 editor.nextLine();
+                this.visComponent.stepForward();
             },
             backward: function () {
                 let editor = this.getCurrentEditor();
                 editor.prevLine();
+                this.visComponent.stepBack();
             },
             addEditor: function () {
                 let self = this;
@@ -127,11 +139,12 @@
 
 <style scoped>
 
-    .mnh-90{
+    .mnh-90 {
         min-height: 90%
     }
-    .mxh-10{
+
+    .mxh-10 {
         max-height: 10%
     }
-    
+
 </style>
