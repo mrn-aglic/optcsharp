@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using TracingCore.Data;
 using TracingCore.Interceptors;
 using TracingCore.RoslynRewriters;
+using TracingCore.SourceCodeInstrumentation;
 using TracingCore.TraceToPyDtos;
 using TracingCore.TracingManagers;
 
@@ -49,7 +50,7 @@ namespace TracingCore
             var originalRoot = syntaxTree.GetCompilationUnitRoot();
             var root = instrument ? InstrumentSourceCode(originalRoot) : originalRoot;
 
-            // Instrumentation.WriteToFile(root);
+            Instrumentation.WriteToFile(root);
 
             var compilation = Compiler.Compile(compilationName, root.SyntaxTree, Compiler.DefaultCompilationOptions);
             var executionManager = new ExecutionManager();

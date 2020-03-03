@@ -1,62 +1,146 @@
 {
-  "code": "using System;\nnamespace TraceSourceExample\n{\n    class Student \n    {\n        public Student()\n        {\n        } \n    }\n\n    class Program\n    {\n        static void Main(string[] args)\n        {\n            int c;\n            var s = new Student();\n            Console.WriteLine(\"Hello World!\");\n        }\n    }\n}",
+  "code": "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int m = 15;\n        int n = 12;\n        if (m > 10)\n        {\n            if (n > 20)\n                Console.WriteLine(\"Result1\");\n        }\n        else if(m > 5)\n        {\n        }\n        else\n        {\n            Console.WriteLine(\"Result2\");\n        }\n    }\n}",
   "trace": [
     {
       "event": "call",
+      "stdout": "",
+      "line": 5,
+      "stack_to_render": [
+        {
+          "func_name": "Main",
+          "encoded_locals": {},
+          "ordered_varnames": [],
+          "parent_frame_id_list": [],
+          "is_highlighted": true,
+          "is_zombie": false,
+          "is_parent": false,
+          "unique_hash": "Main_f1",
+          "frame_id": 1
+        }
+      ],
+      "globals": {},
+      "ordered_globals": [],
+      "func_name": "Main",
+      "heap": {}
+    },
+    {
+      "event": "step_line",
+      "stdout": "",
+      "line": 7,
+      "stack_to_render": [
+        {
+          "func_name": "Main",
+          "encoded_locals": {},
+          "ordered_varnames": [],
+          "parent_frame_id_list": [],
+          "is_highlighted": true,
+          "is_zombie": false,
+          "is_parent": false,
+          "unique_hash": "Main_f1",
+          "frame_id": 1
+        }
+      ],
+      "globals": {},
+      "ordered_globals": [],
+      "func_name": "Main",
+      "heap": {}
+    },
+    {
+      "event": "step_line",
+      "stdout": "",
+      "line": 8,
+      "stack_to_render": [
+        {
+          "func_name": "Main",
+          "encoded_locals": {
+            "m": 15
+          },
+          "ordered_varnames": [
+            "m"
+          ],
+          "parent_frame_id_list": [],
+          "is_highlighted": true,
+          "is_zombie": false,
+          "is_parent": false,
+          "unique_hash": "Main_f1",
+          "frame_id": 1
+        }
+      ],
+      "globals": {},
+      "ordered_globals": [],
+      "func_name": "Main",
+      "heap": {}
+    },
+    {
+      "event": "step_line",
+      "stdout": "",
+      "line": 9,
+      "stack_to_render": [
+        {
+          "func_name": "Main",
+          "encoded_locals": {
+            "n": 12,
+            "m": 15
+          },
+          "ordered_varnames": [
+            "m",
+            "n"
+          ],
+          "parent_frame_id_list": [],
+          "is_highlighted": true,
+          "is_zombie": false,
+          "is_parent": false,
+          "unique_hash": "Main_f1",
+          "frame_id": 1
+        }
+      ],
+      "globals": {},
+      "ordered_globals": [],
+      "func_name": "Main",
+      "heap": {}
+    },
+    {
+      "event": "step_line",
+      "stdout": "",
+      "line": 11,
+      "stack_to_render": [
+        {
+          "func_name": "Main",
+          "encoded_locals": {
+            "n": 12,
+            "m": 15
+          },
+          "ordered_varnames": [
+            "m",
+            "n"
+          ],
+          "parent_frame_id_list": [],
+          "is_highlighted": true,
+          "is_zombie": false,
+          "is_parent": false,
+          "unique_hash": "Main_f1",
+          "frame_id": 1
+        }
+      ],
+      "globals": {},
+      "ordered_globals": [],
+      "func_name": "Main",
+      "heap": {}
+    },
+    {
+      "event": "step_line",
       "stdout": "",
       "line": 13,
       "stack_to_render": [
         {
           "func_name": "Main",
-          "encoded_locals": {},
-          "ordered_varnames": [],
-          "parent_frame_id_list": [],
-          "is_highlighted": true,
-          "is_zombie": false,
-          "is_parent": false,
-          "unique_hash": "Main_f1",
-          "frame_id": 1
-        }
-      ],
-      "globals": {},
-      "ordered_globals": [],
-      "func_name": "Main",
-      "heap": {}
-    },
-    {
-      "event": "step_line",
-      "stdout": "",
-      "line": 15,
-      "stack_to_render": [
-        {
-          "func_name": "Main",
-          "encoded_locals": {},
-          "ordered_varnames": [],
-          "parent_frame_id_list": [],
-          "is_highlighted": true,
-          "is_zombie": false,
-          "is_parent": false,
-          "unique_hash": "Main_f1",
-          "frame_id": 1
-        }
-      ],
-      "globals": {},
-      "ordered_globals": [],
-      "func_name": "Main",
-      "heap": {}
-    },
-    {
-      "event": "step_line",
-      "stdout": "",
-      "line": 16,
-      "stack_to_render": [
-        {
-          "func_name": "Main",
           "encoded_locals": {
-            "c": "undefined"
+            "n": 12,
+            "m": 15
           },
           "ordered_varnames": [
-            "c"
+            "m",
+            "n"
           ],
           "parent_frame_id_list": [],
           "is_highlighted": true,
@@ -70,357 +154,22 @@
       "ordered_globals": [],
       "func_name": "Main",
       "heap": {}
-    },
-    {
-      "event": "step_line",
-      "stdout": "",
-      "line": 4,
-      "stack_to_render": [
-        {
-          "func_name": "Main",
-          "encoded_locals": {
-            "c": "undefined"
-          },
-          "ordered_varnames": [
-            "c"
-          ],
-          "parent_frame_id_list": [],
-          "is_highlighted": true,
-          "is_zombie": false,
-          "is_parent": false,
-          "unique_hash": "Main_f1",
-          "frame_id": 1
-        }
-      ],
-      "globals": {
-        "Student": [
-          "REF",
-          1
-        ]
-      },
-      "ordered_globals": [
-        "Student"
-      ],
-      "func_name": "Main",
-      "heap": {
-        "1": [
-          "CLASS",
-          "TraceSourceExample.Student",
-          [],
-          [
-            "Student",
-            [
-              "REF",
-              2
-            ]
-          ]
-        ],
-        "2": [
-          "FUNCTION",
-          "Student()",
-          null
-        ]
-      }
-    },
-    {
-      "event": "call",
-      "stdout": "",
-      "line": 6,
-      "stack_to_render": [
-        {
-          "func_name": "Main",
-          "encoded_locals": {
-            "c": "undefined"
-          },
-          "ordered_varnames": [
-            "c"
-          ],
-          "parent_frame_id_list": [],
-          "is_highlighted": true,
-          "is_zombie": false,
-          "is_parent": false,
-          "unique_hash": "Main_f1",
-          "frame_id": 1
-        },
-        {
-          "func_name": "Student",
-          "encoded_locals": {
-            "this": [
-              "REF",
-              3
-            ]
-          },
-          "ordered_varnames": [
-            "this"
-          ],
-          "parent_frame_id_list": [],
-          "is_highlighted": true,
-          "is_zombie": false,
-          "is_parent": false,
-          "unique_hash": "Student_f2",
-          "frame_id": 2
-        }
-      ],
-      "globals": {
-        "Student": [
-          "REF",
-          1
-        ]
-      },
-      "ordered_globals": [
-        "Student"
-      ],
-      "func_name": "Student",
-      "heap": {
-        "1": [
-          "CLASS",
-          "TraceSourceExample.Student",
-          [],
-          [
-            "Student",
-            [
-              "REF",
-              2
-            ]
-          ]
-        ],
-        "2": [
-          "FUNCTION",
-          "Student()",
-          null
-        ],
-        "3": [
-          "INSTANCE",
-          "TraceSourceExample.Student"
-        ]
-      }
-    },
-    {
-      "event": "step_line",
-      "stdout": "",
-      "line": 8,
-      "stack_to_render": [
-        {
-          "func_name": "Main",
-          "encoded_locals": {
-            "c": "undefined"
-          },
-          "ordered_varnames": [
-            "c"
-          ],
-          "parent_frame_id_list": [],
-          "is_highlighted": true,
-          "is_zombie": false,
-          "is_parent": false,
-          "unique_hash": "Main_f1",
-          "frame_id": 1
-        },
-        {
-          "func_name": "Student",
-          "encoded_locals": {
-            "this": [
-              "REF",
-              3
-            ]
-          },
-          "ordered_varnames": [
-            "this"
-          ],
-          "parent_frame_id_list": [],
-          "is_highlighted": true,
-          "is_zombie": false,
-          "is_parent": false,
-          "unique_hash": "Student_f2",
-          "frame_id": 2
-        }
-      ],
-      "globals": {
-        "Student": [
-          "REF",
-          1
-        ]
-      },
-      "ordered_globals": [
-        "Student"
-      ],
-      "func_name": "Student",
-      "heap": {
-        "1": [
-          "CLASS",
-          "TraceSourceExample.Student",
-          [],
-          [
-            "Student",
-            [
-              "REF",
-              2
-            ]
-          ]
-        ],
-        "2": [
-          "FUNCTION",
-          "Student()",
-          null
-        ],
-        "3": [
-          "INSTANCE",
-          "TraceSourceExample.Student"
-        ]
-      }
     },
     {
       "event": "return",
       "stdout": "",
-      "line": 8,
-      "stack_to_render": [
-        {
-          "func_name": "Main",
-          "encoded_locals": {
-            "c": "undefined"
-          },
-          "ordered_varnames": [
-            "c"
-          ],
-          "parent_frame_id_list": [],
-          "is_highlighted": true,
-          "is_zombie": false,
-          "is_parent": false,
-          "unique_hash": "Main_f1",
-          "frame_id": 1
-        },
-        {
-          "func_name": "Student",
-          "encoded_locals": {
-            "__return__": null,
-            "this": [
-              "REF",
-              3
-            ]
-          },
-          "ordered_varnames": [
-            "this",
-            "__return__"
-          ],
-          "parent_frame_id_list": [],
-          "is_highlighted": true,
-          "is_zombie": false,
-          "is_parent": false,
-          "unique_hash": "Student_f2",
-          "frame_id": 2
-        }
-      ],
-      "globals": {
-        "Student": [
-          "REF",
-          1
-        ]
-      },
-      "ordered_globals": [
-        "Student"
-      ],
-      "func_name": "Student",
-      "heap": {
-        "1": [
-          "CLASS",
-          "TraceSourceExample.Student",
-          [],
-          [
-            "Student",
-            [
-              "REF",
-              2
-            ]
-          ]
-        ],
-        "2": [
-          "FUNCTION",
-          "Student()",
-          null
-        ],
-        "3": [
-          "INSTANCE",
-          "TraceSourceExample.Student"
-        ]
-      }
-    },
-    {
-      "event": "step_line",
-      "stdout": "",
-      "line": 17,
-      "stack_to_render": [
-        {
-          "func_name": "Main",
-          "encoded_locals": {
-            "s": [
-              "REF",
-              3
-            ],
-            "c": "undefined"
-          },
-          "ordered_varnames": [
-            "c",
-            "s"
-          ],
-          "parent_frame_id_list": [],
-          "is_highlighted": true,
-          "is_zombie": false,
-          "is_parent": false,
-          "unique_hash": "Main_f1",
-          "frame_id": 1
-        }
-      ],
-      "globals": {
-        "Student": [
-          "REF",
-          1
-        ]
-      },
-      "ordered_globals": [
-        "Student"
-      ],
-      "func_name": "Student",
-      "heap": {
-        "1": [
-          "CLASS",
-          "TraceSourceExample.Student",
-          [],
-          [
-            "Student",
-            [
-              "REF",
-              2
-            ]
-          ]
-        ],
-        "2": [
-          "FUNCTION",
-          "Student()",
-          null
-        ],
-        "3": [
-          "INSTANCE",
-          "TraceSourceExample.Student"
-        ]
-      }
-    },
-    {
-      "event": "return",
-      "stdout": "Hello World!\n",
-      "line": 17,
+      "line": 21,
       "stack_to_render": [
         {
           "func_name": "Main",
           "encoded_locals": {
             "__return__": null,
-            "s": [
-              "REF",
-              3
-            ],
-            "c": "undefined"
+            "m": 15,
+            "n": 12
           },
           "ordered_varnames": [
-            "c",
-            "s",
+            "n",
+            "m",
             "__return__"
           ],
           "parent_frame_id_list": [],
@@ -431,39 +180,10 @@
           "frame_id": 1
         }
       ],
-      "globals": {
-        "Student": [
-          "REF",
-          1
-        ]
-      },
-      "ordered_globals": [
-        "Student"
-      ],
-      "func_name": "Student",
-      "heap": {
-        "1": [
-          "CLASS",
-          "TraceSourceExample.Student",
-          [],
-          [
-            "Student",
-            [
-              "REF",
-              2
-            ]
-          ]
-        ],
-        "2": [
-          "FUNCTION",
-          "Student()",
-          null
-        ],
-        "3": [
-          "INSTANCE",
-          "TraceSourceExample.Student"
-        ]
-      }
+      "globals": {},
+      "ordered_globals": [],
+      "func_name": "Main",
+      "heap": {}
     }
   ]
 }

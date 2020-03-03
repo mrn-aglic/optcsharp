@@ -15,7 +15,7 @@ namespace TracingCore
         public const string MainName = "Main";
 
         public BindingFlags MainMethodBindingFlags =
-            BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.InvokeMethod;
+            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.InvokeMethod;
 
         public CompilationResult CompileAssembly(CSharpCompilation compilation)
         {

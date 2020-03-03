@@ -8,11 +8,17 @@ namespace TraceSourceExample
         private static string GetFileContents(string filename)
         {
             var directory =
-                AppContext.BaseDirectory.Substring(0, AppContext.BaseDirectory.IndexOf("bin", StringComparison.Ordinal));
+                AppContext.BaseDirectory.Substring(0,
+                    AppContext.BaseDirectory.IndexOf("bin", StringComparison.Ordinal));
             var filePath = $"{directory}CodeExamples/{filename}";
             return File.ReadAllText(filePath);
         }
-        
+
+        public static string GetIfElseExample()
+        {
+            return GetFileContents("IfElse.txt");
+        }
+
         public static string GetSimpleExample()
         {
             return @"using System;
@@ -36,12 +42,12 @@ namespace TraceSourceExample
     }
 }";
         }
-        
+
         public static string GetMethodsExample()
         {
             return GetFileContents("MethodsExample.txt");
         }
-        
+
         public static string GetSimpleExampleWithMethod()
         {
             return @"using System;
@@ -65,7 +71,7 @@ namespace TraceSourceExample
     }
 }";
         }
-        
+
         public static string GetSimpleClassInstanceExample()
         {
             return @"using System;
@@ -86,7 +92,7 @@ namespace TraceSourceExample
                 }
             }";
         }
-        
+
         public static string GetClassEmptyConstructorInstanceExample()
         {
             return GetFileContents("ClassEmptyConstructor.txt");
@@ -122,17 +128,17 @@ namespace TraceSourceExample
         {
             return GetFileContents("Polymorphism.txt");
         }
-        
+
         public static string GetPolymorphismOverrideExample()
         {
             return GetFileContents("PolymorphismOverride.txt");
         }
-        
+
         public static string GetHelloWorldExample()
         {
             return GetFileContents("HelloWorld.txt");
         }
-        
+
         public static string GetMultipleNamespacesExample()
         {
             return GetFileContents("MultipleNamespacesExample.txt");

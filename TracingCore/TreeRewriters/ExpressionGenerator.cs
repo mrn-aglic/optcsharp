@@ -89,6 +89,8 @@ namespace TracingCore.TreeRewriters
                     return args;
                 case ThrowStatementSyntax _:
                     return new List<ArgumentSyntax>();
+                case ElseClauseSyntax _:
+                    return new List<ArgumentSyntax>();
                 default:
                     throw new NotImplementedException("Imate izraz koji još nije podržan");
             }
@@ -104,6 +106,8 @@ namespace TracingCore.TreeRewriters
             switch (syntaxNode)
             {
                 case StatementSyntax _:
+                    return string.Empty;
+                case ElseClauseSyntax _:
                     return string.Empty;
                 case MethodDeclarationSyntax methodDeclarationSyntax:
                     return $"{methodDeclarationSyntax.Identifier.Text}";

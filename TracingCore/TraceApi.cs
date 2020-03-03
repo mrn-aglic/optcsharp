@@ -20,11 +20,13 @@ namespace TracingCore
         
         public static void TraceBlockEntry(int line, params VariableData[] variables)
         {
+            return;
             _traceApiManager.TraceData(line, variables);
         }
         
         public static void TraceBlockExit(int line)
         {
+            return;
             _traceApiManager.TraceData(line);
         }
 

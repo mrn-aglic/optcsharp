@@ -27,7 +27,9 @@ namespace TraceSourceExample
         static void Main(string[] args)
         {
             Console.WriteLine(args.GetType());
-            var code = Codes.GetClassEmptyConstructorInstanceExample();
+            // var code = Codes.GetMethodsExample();
+            var code = Codes.GetIfElseExample();
+            // var code = Codes.GetPropertiesExample();
 
             var config = LoadConfiguration();
             var appConfig = config.GetSection("Instrumentation").Get<InstrumentationConfig>();

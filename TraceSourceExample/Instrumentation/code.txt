@@ -1,35 +1,49 @@
 using System;
+using TracingCore;
+using TracingCore.TraceToPyDtos;
 
-using TracingCore;usingTracingCore.TraceToPyDtos;namespace TraceSourceExample
+class Program
 {
-    class Student
+    static void Main()
     {
-        public Student()
+        TraceApi.TraceMethodEntry(5, "Main");
+        TraceApi.TraceData(7);
+        int m = 15;
+        TraceApi.TraceData(8, new VariableData("m", m, m.GetType()));
+        int n = 12;
+        TraceApi.TraceData(9, new VariableData("n", n, n.GetType()));
+        if (m > 10)
         {
-            TraceApi.TraceMethodEntry(6, "Student", new VariableData("this", this, this.GetType()));
-            TraceApi.TraceData(8);
-            TraceApi.TraceMethodExit(8, false);
+            TraceApi.TraceBlockEntry(9, new VariableData("m", m, m.GetType()));
+            TraceApi.TraceData(11);
+            if (n > 20)
+            {
+                TraceApi.TraceBlockEntry(11, new VariableData("n", n, n.GetType()));
+                TraceApi.TraceData(12);
+                Console.WriteLine("Result1");
+                TraceApi.TraceData(12);
+                TraceApi.TraceBlockExit(12);
+            }
+
+            TraceApi.TraceData(13, new VariableData("n", n, n.GetType()));
+            TraceApi.TraceBlockExit(13);
+        }
+        else if (m > 5)
+        {
+            TraceApi.TraceBlockEntry(14, new VariableData("m", m, m.GetType()));
+            TraceApi.TraceData(16);
+            TraceApi.TraceBlockExit(16);
+        }
+        else
+        {
+            TraceApi.TraceBlockEntry(17);
+            TraceApi.TraceData(19);
+            Console.WriteLine("Result2");
+            TraceApi.TraceData(19);
+            TraceApi.TraceBlockExit(19);
         }
 
-        static Student()
-        {
-            TraceApi.RegisterClassLoad("TraceSourceExample.Student");
-        }
-    }
-
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            TraceApi.TraceMethodEntry(13, "Main", new VariableData("args", args, args.GetType()));
-            TraceApi.TraceData(15);
-            int c;
-            TraceApi.TraceData(16, new VariableData("c", "undefined", typeof(int)));
-            var s = new Student();
-            TraceApi.TraceData(17, new VariableData("s", s, s.GetType()));
-            Console.WriteLine("Hello World!");
-            TraceApi.TraceData(17);
-            TraceApi.TraceMethodExit(17, true);
-        }
+        TraceApi.TraceData(21, new VariableData("m", m, m.GetType()));
+        TraceApi.TraceMethodExit(21, true);
     }
 }
