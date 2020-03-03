@@ -125,6 +125,9 @@
                 // this.currentLine -= 1;
                 // let range = this.getRangeForLine(this.currentLine);
                 // this.setDecorations(range);
+            },
+            getMonacoEditor: function () {
+                return this.editor;
             }
         }
     }

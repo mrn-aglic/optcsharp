@@ -1,15 +1,13 @@
 <template>
-    <div class="">
-        <div class="col-12">
-            <button id="bk" value="" class="btn btn-primary"
-                    :disabled="currentLine === 0" v-on:click="back()">
-                <i class="fas fa-angle-left fa-lg"></i>
-            </button>
-            <button id="fd" class="btn btn-primary"
-                    :disabled="!hasForward()" v-on:click="forward()">
-                <i class="fas fa-angle-right fa-lg"></i>
-            </button>
-        </div>
+    <div class="col-12">
+        <button id="bk" value="" class="btn btn-primary"
+                :disabled="currentLine === 0" v-on:click="back()">
+            <i class="fas fa-angle-left fa-lg"></i>
+        </button>
+        <button id="fd" class="btn btn-primary"
+                :disabled="!hasForward()" v-on:click="forward()">
+            <i class="fas fa-angle-right fa-lg"></i>
+        </button>
     </div>
 </template>
 

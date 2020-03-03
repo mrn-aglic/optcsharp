@@ -4,7 +4,6 @@
                    :options="examples"
                    value-field="code"
                    text-field="name"
-                   class="mb-3"
     >
         <template v-slot:first>
             <b-form-select-option :value="null">-- Odaberi gotov primjer --</b-form-select-option>

@@ -1,5 +1,5 @@
 <template>
-    <div class="col-12 h-100">
+    <div class="col-12">
         <div class="row col-6">
             <examples v-on:change="exampleChange"></examples>
         </div>
@@ -8,15 +8,15 @@
                 Vizualiziraj izvršavanje
             </button>
         </div>
-        <div class="row mt-2 h-75 d-flex flex-column"> <!--h-75 ako ne zelimo cijelu visinu-->
+        <div class="row mt-2 mh-75"> <!--h-75 ako ne zelimo cijelu visinu-->
             <div class="col-6">
                 <b-card class="h-100">
-                    <b-tabs class="h-100" lazy>
+                    <b-tabs lazy>
                         <b-tab v-for="editor in editors" :key="editor.tabKey" :title="editor.title">
-                            <b-row class="h-75">
-                                <left-gutter :ref="gutter" class="col-1 m-0 p-0 flex-grow-1"></left-gutter>
-                                <code-editor :ref="editor.tabKey" :editor-data="editor" class="col-11 flex-grow-1"></code-editor>
-                            </b-row>
+                            <div class="row h-100">
+                                <left-gutter :ref="gutter" class="col-1 m-0 p-0"></left-gutter>
+                                <code-editor :ref="editor.tabKey" :editor-data="editor" class="col m-0 p-0"></code-editor>
+                            </div>
                         </b-tab>
                     </b-tabs>
                 </b-card>
@@ -98,7 +98,7 @@
                 getCSharpTraceData(workspaceData).then(data => {
 
                     let gutter = self.getGutter();
-                    self.visComponent.visualize(data, gutter);
+                    self.visComponent.visualize(data, gutter, editor.getMonacoEditor());
                 });
                 // getCSharpTraceData(workspaceData).then(data => {
                 //     this.compilationData = data;
@@ -108,12 +108,12 @@
             },
             forward: function () {
                 let editor = this.getCurrentEditor();
-                editor.nextLine();
+                // editor.nextLine();
                 this.visComponent.stepForward();
             },
             backward: function () {
                 let editor = this.getCurrentEditor();
-                editor.prevLine();
+                // editor.prevLine();
                 this.visComponent.stepBack();
             },
             addEditor: function () {
@@ -139,12 +139,8 @@
 
 <style scoped>
 
-    .mnh-90 {
-        min-height: 90%
-    }
-
-    .mxh-10 {
-        max-height: 10%
+    .mh-75 {
+        min-height: 75%
     }
 
 </style>

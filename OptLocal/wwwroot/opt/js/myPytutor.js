@@ -121,7 +121,32 @@ var curVisualizerID = 1; // global to uniquely identify each ExecutionVisualizer
 //          'ts' for TypeScript, 'ruby' for Ruby, 'c' for C, 'cpp' for C++
 //          [default is Python-style labels]
 //   debugMode - some extra debugging printouts
+
+function isFunction(functionToCheck) {
+    return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+}
+
+class CodeEditorInstance {
+    constructor(codeEditor, getRowHeight) {
+        this.codeEditor = codeEditor;
+        assert(isFunction(getRowHeight, 'GetHeight is not a function'));
+        this.getHeight = getRowHeight;
+    }
+
+    getElement() {
+
+        return this.codeEditor;
+    }
+
+    getRowHeight() {
+
+        return this.getHeight(this.codeEditor);
+    }
+}
+
 function ExecutionVisualizer(domRootID, dat, params, codeEditor) {
+
+    assert(codeEditor instanceof CodeEditorInstance);
     this.curInputCode = dat.code.rtrim(); // kill trailing spaces
     this.curTrace = dat.trace;
 
@@ -208,7 +233,7 @@ function ExecutionVisualizer(domRootID, dat, params, codeEditor) {
     this.domRoot = $('#' + domRootID);
     this.domRoot.data("vis", this);  // bnm store a reference to this as div data for use later.
     this.domRootD3 = d3.select('#' + domRootID);
-    
+
     // console.log(this.domRootD3.select)
     // stick a new div.ExecutionVisualizer within domRoot and make that
     // the new domRoot:
@@ -1339,6 +1364,7 @@ function createArrow(id, color) {
     arrow.setAttribute('id', id);
     arrow.setAttribute('points', SVG_ARROW_POLYGON);
     arrow.setAttribute('fill', color);
+    arrow.setAttribute('transform', 'translate(0,0)');
     return arrow;
 }
 
@@ -1349,6 +1375,7 @@ ExecutionVisualizer.createGutter = function (id) {
     // leftCodeGutter.setAttribute('width', '100%');
     leftCodeGutter.setAttribute('preserveAspectRatio', 'none');
     leftCodeGutter.setAttribute('width', '20');
+    leftCodeGutter.setAttribute('height', '100%');
     // leftCodeGutter.attr('id', 'leftCodeGutterSVG');
 
     let prevLineArrow = createArrow('prevLineArrow', lightArrowColor);
@@ -1365,7 +1392,7 @@ ExecutionVisualizer.createGutter = function (id) {
     //     .attr('id', 'curLineArrow')
     //     .attr('points', SVG_ARROW_POLYGON)
     //     .attr('fill', darkArrowColor);
-    
+
     // myViz.domRoot.find('#pyCodeOutput tr:first')
     //     .prepend('<td id="gutterTD" valign="top" rowspan="' + this.codeOutputLines.length + '"><svg id="leftCodeGutterSVG"/></td>');
 
@@ -1385,7 +1412,8 @@ ExecutionVisualizer.createGutter = function (id) {
     return leftCodeGutter.outerHTML;
 };
 
-ExecutionVisualizer.prototype.highlightCodeLine = function (gutter, pla, cla, smoothTransition) {
+
+ExecutionVisualizer.prototype.highlightCodeLine = function (gutter, smoothTransition) {
 
     let myViz = this;
     // console.log('test', gutterSVG, myViz.codeEditor)
@@ -1393,7 +1421,20 @@ ExecutionVisualizer.prototype.highlightCodeLine = function (gutter, pla, cla, sm
     if (myViz.codeEditor === null) {
         return;
     }
-    
+
+    function getGutterOffsetY(gutterSVG, editor) {
+
+        
+        let firstRowOffsetY = $(editor.getDomNode()).offset().top;
+        let gutterOffsetY = gutterSVG.offset().top;
+        let teenyAdjustment = gutterOffsetY - firstRowOffsetY;
+
+        // super-picky detail to adjust the vertical alignment of arrows so that they line up
+        // well with the pointed-to code text ...
+        // (if you want to manually adjust tableTop, then ~5 is a reasonable number)
+        return Math.floor((myViz.codeRowHeight / 2) - (SVG_ARROW_HEIGHT / 2)) - teenyAdjustment;
+    }
+
     const gutterSVG = $(gutter);
     const d3Gutter = d3.select(gutter);
     const curEntry = this.curTrace[this.curInstr];
@@ -1539,6 +1580,9 @@ ExecutionVisualizer.prototype.highlightCodeLine = function (gutter, pla, cla, sm
         }
     }
 
+    myViz.codeRowHeight = this.codeEditor.getRowHeight();
+    myViz.arrowOffsetY = getGutterOffsetY(gutterSVG, myViz.codeEditor.getElement());
+
     if (myViz.params.arrowLines) {
         if (prevLineNumber) {
             // let pla = myViz.domRootD3.select('#prevLineArrow');
@@ -1569,6 +1613,8 @@ ExecutionVisualizer.prototype.highlightCodeLine = function (gutter, pla, cla, sm
 
         if (curLineNumber) {
             // let cla = myViz.domRootD3.select('#curLineArrow');
+
+            console.log(curLineNumber, myViz.codeRowHeight, myViz.arrowOffsetY)
             let cla = d3Gutter.select('#curLineArrow');
             let translateCurCmd = 'translate(0, ' + (((curLineNumber - 1) * myViz.codeRowHeight) + myViz.arrowOffsetY + curVerticalNudge) + ')';
 

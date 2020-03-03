@@ -7,6 +7,32 @@ const Categories = {
 };
 
 const Examples = {
+    ifElse: {
+        name: 'If-else primjer',
+        categories: [Categories.Debug],
+        code: `using System;
+
+class Program
+{
+    static void Main()
+    {
+        int m = 15;
+        int n = 12;
+        if (m > 10)
+        {
+            if (n > 20)
+                Console.WriteLine("Result1");
+        }
+        else if(m > 5)
+        {
+        }
+        else
+        {
+            Console.WriteLine("Result2");
+        }
+    }
+}`
+    },
     methodsExample: {
         name: 'Methods example',
         categories: [Categories.Debug],
