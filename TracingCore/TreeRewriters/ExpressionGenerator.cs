@@ -91,6 +91,14 @@ namespace TracingCore.TreeRewriters
                     return new List<ArgumentSyntax>();
                 case ElseClauseSyntax _:
                     return new List<ArgumentSyntax>();
+                case ForEachStatementSyntax forEachStatementSyntax:
+                    return new List<ArgumentSyntax>
+                    {
+                        Argument(
+                            VariableData.GetObjectCreationSyntax(
+                                IdentifierName(forEachStatementSyntax.Identifier.Text))
+                        )
+                    };
                 default:
                     throw new NotImplementedException("Imate izraz koji još nije podržan");
             }

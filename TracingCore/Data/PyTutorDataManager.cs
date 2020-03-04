@@ -297,7 +297,8 @@ namespace TracingCore.Data
         {
             var prevStep = _pyTutorData.Trace.Last() as PyTutorStep;
 
-            if (prevStep.Line != line) return;
+            var isPrevStepLineSame = prevStep.Line == line; // TODO use to determine if method exit should replace the prevStepLine
+            if (!isPrevStepLineSame) return;
 
             var newStackToRender = prevStep.StackToRender.Pop(out var lastStack);
             var hd = GetHeapData(variableData);

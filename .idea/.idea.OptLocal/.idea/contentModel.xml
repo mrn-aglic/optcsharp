@@ -505,6 +505,7 @@
           <e p="InstanceExample1.txt" t="Include" />
           <e p="MethodsExample.txt" t="Include" />
           <e p="MultipleNamespacesExample.txt" t="Include" />
+          <e p="OOP_2.txt" t="Include" />
           <e p="Polymorphism.txt" t="Include" />
           <e p="PolymorphismOverride.txt" t="Include" />
           <e p="Properties.txt" t="Include" />

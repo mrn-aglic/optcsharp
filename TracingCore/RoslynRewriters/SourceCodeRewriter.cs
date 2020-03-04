@@ -313,6 +313,10 @@ namespace TracingCore.RoslynRewriters
                     VisitIfStatement(ifStatementSyntax) as StatementSyntax,
                     GetSimpleTraceStatement(statement, lineNum)
                 },
+                ForEachStatementSyntax forEachStatementSyntax => new List<StatementSyntax>
+                {
+                    VisitForEachStatement(forEachStatementSyntax) as StatementSyntax
+                },
                 _ => InstrumentSimpleStatement(statement, lineNum)
             };
         }
@@ -462,6 +466,24 @@ namespace TracingCore.RoslynRewriters
         public override SyntaxNode VisitAccessorDeclaration(AccessorDeclarationSyntax node)
         {
             return node.WithBody((BlockSyntax) VisitBlock(node.Body));
+        }
+
+        public override SyntaxNode VisitForEachStatement(ForEachStatementSyntax node)
+        {
+            var hasBlock = node.Statement.IsKind(SyntaxKind.Block);
+
+            if (hasBlock)
+                return node.WithStatement((StatementSyntax) VisitBlock(node.Statement as BlockSyntax));
+
+            var root = node.SyntaxTree.GetRoot();
+            var forEachWithBlock = node.WithStatement(_expressionGenerator.WrapInBlock(node.Statement))
+                .WithAdditionalAnnotations(_locationAnnotation);
+
+            root = root.ReplaceNode(node, forEachWithBlock);
+            var @foreach = (ForEachStatementSyntax) root.GetAnnotatedNodes(_locationAnnotation).First();
+
+            return @foreach.WithStatement((StatementSyntax) VisitBlock(@foreach.Statement as BlockSyntax));
+            return base.VisitForEachStatement(node);
         }
 
         public CompilationUnitSyntax Start(CompilationUnitSyntax root)

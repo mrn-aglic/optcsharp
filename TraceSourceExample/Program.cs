@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using TracingCore;
 using TracingCore.JsonMappers;
 using TracingCore.RoslynRewriters;
+using TracingCore.SourceCodeInstrumentation;
 using TracingCore.TreeRewriters;
 
 namespace TraceSourceExample
@@ -27,8 +28,8 @@ namespace TraceSourceExample
         static void Main(string[] args)
         {
             Console.WriteLine(args.GetType());
-            // var code = Codes.GetMethodsExample();
-            var code = Codes.GetIfElseExample();
+            var code = Codes.GetMethodsExample();
+            // var code = Codes.GetOOPExample(2);
             // var code = Codes.GetPropertiesExample();
 
             var config = LoadConfiguration();
@@ -56,7 +57,7 @@ namespace TraceSourceExample
 
             var compilationResult = optBackend.Compile("opt-compilation", true);
             var pyTutorData = optBackend.Trace(compilationResult.Root, compilationResult);
-            
+            Instrumentation.WriteToFile(newTree);
             TraceApi.FlushPyTutorData();
         }
     }
