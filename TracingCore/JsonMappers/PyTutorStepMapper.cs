@@ -34,7 +34,7 @@ namespace TracingCore.JsonMappers
 
         private static JToken ToJElement(string prop, int val)
         {
-            return new JArray {[0] = prop, [1] = val};
+            return new JArray {prop, val};
         }
 
         private static int? FindInHeap(ImmutableDictionary<int, HeapData> heap, object obj)

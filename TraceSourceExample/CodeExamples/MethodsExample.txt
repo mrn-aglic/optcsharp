@@ -26,10 +26,7 @@ namespace TraceSourceExample
 
         static void Main(string[] args)
         {
-            int c;
-            var a = 5;
-            var b = a + 2;
-            Console.WriteLine("Hello World!");
+            Test();
         }
     }
 }

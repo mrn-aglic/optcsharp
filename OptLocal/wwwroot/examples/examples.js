@@ -27,7 +27,6 @@ namespace Vj02
     }
     class Sprite
     {
-        public Color MyColor;
         private int x;
         private int y;
         private string smjer;
@@ -55,16 +54,6 @@ namespace Vj02
         {
             this.x = poz.x;
             this.y = poz.y;
-            
-            // PomakNa(poz.x, poz.y);
-        }
-
-        public void PomakNa(params Pozicija[] pozicije)
-        {
-            foreach (var pozicija in pozicije)
-            {
-                PomakNa(pozicija);
-            }
         }
     }
     class Program
@@ -78,6 +67,72 @@ namespace Vj02
             
             Pozicija poz = new Pozicija(2, 2);
             sprite.PomakNa(poz);
+        }
+    }
+}`  
+    },
+    Vj02_2:{
+        name: 'Primjer params',
+        categories: [Categories.Professor, Categories.Debug],
+        code: `using System;
+
+namespace Vj02
+{
+    class Pozicija
+    {
+        public int x;
+        public int y;
+
+        public Pozicija(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+    }
+    class Sprite
+    {
+        private int x;
+        private int y;
+        private string smjer;
+
+        public Sprite(int posX, int posY)
+        {
+            x = posX;
+            y = posY;
+        }
+
+        public void PomakNa(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+
+        public void PomakNa(int x, int y, string smjer)
+        {
+            this.x = x;
+            this.y = y;
+            this.smjer = smjer;
+        }
+
+        public void PomakNa(Pozicija poz)
+        {
+            this.x = poz.x;
+            this.y = poz.y;
+        }
+
+        public void PomakNa(params Pozicija[] pozicije)
+        {
+            foreach (Pozicija pozicija in pozicije)
+            {
+                PomakNa(pozicija);
+            }
+        }
+    }
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Sprite sprite = new Sprite(0, 0);
             
             Pozicija poz1 = new Pozicija(1, 1);
             Pozicija poz2 = new Pozicija(2, 3);
@@ -85,7 +140,7 @@ namespace Vj02
             sprite.PomakNa(poz1, poz2, poz3);
         }
     }
-}`  
+}`
     },
     ifElse: {
         name: 'If-else primjer',

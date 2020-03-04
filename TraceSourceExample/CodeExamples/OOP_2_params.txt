@@ -15,7 +15,6 @@ namespace ClrMD
     }
     class Sprite
     {
-        public Color MyColor;
         private int x;
         private int y;
         private string smjer;
@@ -43,8 +42,6 @@ namespace ClrMD
         {
             this.x = poz.x;
             this.y = poz.y;
-            
-            // PomakNa(poz.x, poz.y);
         }
 
         public void PomakNa(params Pozicija[] pozicije)
@@ -60,12 +57,6 @@ namespace ClrMD
         static void Main(string[] args)
         {
             Sprite sprite = new Sprite(0, 0);
-            
-            sprite.PomakNa(0, 0);
-            sprite.PomakNa(1, 1, "Gore");
-            
-            Pozicija poz = new Pozicija(2, 2);
-            sprite.PomakNa(poz);
             
             Pozicija poz1 = new Pozicija(1, 1);
             Pozicija poz2 = new Pozicija(2, 3);
