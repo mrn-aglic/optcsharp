@@ -29,8 +29,8 @@ namespace TraceSourceExample
         {
             Console.WriteLine(args.GetType());
             // var code = Codes.VoidMethodExample();
-            // var code = Codes.GetOOPExample("2_params");
-            var code = Codes.GetIfElseExample();
+            var code = Codes.GetOOPExample("2_params");
+            // var code = Codes.GetIfElseExample();
             // var code = Codes.GetPropertiesExample();
 
             var config = LoadConfiguration();

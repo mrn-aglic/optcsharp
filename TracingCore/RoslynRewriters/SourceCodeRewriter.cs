@@ -87,25 +87,6 @@ namespace TracingCore.RoslynRewriters
         private ExpressionGeneratorDetails.Long GetEgDetails
         (
             SyntaxNode node,
-            string traceApiMethod,
-            bool includeThisReference,
-            bool useEndLine = false
-        )
-        {
-            var egDetails = new ExpressionGeneratorDetails.Long
-            (
-                TraceApiNames.ClassName,
-                traceApiMethod,
-                RoslynHelper.GetLineData(node, useEndLine),
-                node,
-                includeThisReference
-            );
-            return egDetails;
-        }
-
-        private ExpressionGeneratorDetails.Long GetEgDetails
-        (
-            SyntaxNode node,
             LineData lineData,
             string traceApiMethod,
             bool includeThisReference
@@ -122,33 +103,12 @@ namespace TracingCore.RoslynRewriters
             return egDetails;
         }
 
-        private LineData[] GetLineNumbers(List<StatementSyntax> statements)
-        {
-            var lineNumbers = statements.Skip(1).Select(x => RoslynHelper.GetLineData(x));
-            var lastStatement = statements.LastOrDefault();
-            var anyStatements = lastStatement != null;
-
-            var lastStatementHasStatements =
-                anyStatements && lastStatement.ChildNodes().OfType<StatementSyntax>().Any();
-
-            var lineNums = anyStatements
-                ? lastStatementHasStatements
-                    ? lineNumbers.Append(RoslynHelper.GetLineData(lastStatement.Parent, true)) // Handle edge case
-                    : lineNumbers.Append(RoslynHelper.GetLineData(lastStatement))
-                : lineNumbers;
-
-            return lineNums.ToArray();
-        }
-
-        private bool IsNodeMethodLike(SyntaxNode node)
-        {
-            return _methodLikeDeclarations.Contains(node.Kind());
-        }
-
         private bool NodeHasStaticModifier(SyntaxNode node)
         {
             return node switch
             {
+                ClassDeclarationSyntax classDeclarationSyntax =>
+                classDeclarationSyntax.Modifiers.Any(x => x.IsKind(SyntaxKind.StaticKeyword)),
                 AccessorDeclarationSyntax accessorDeclarationSyntax => accessorDeclarationSyntax.Modifiers.Any(x =>
                     x.IsKind(SyntaxKind.StaticKeyword)),
                 BaseMethodDeclarationSyntax baseMethodDeclarationSyntax => baseMethodDeclarationSyntax.Modifiers.Any(
@@ -158,7 +118,7 @@ namespace TracingCore.RoslynRewriters
             };
         }
 
-        private LineData[] DetermineLineNumbers(List<StatementSyntax> statements)
+        private LineData[] DetermineLineNumbers(List<StatementSyntax> statements, bool isParentMethodLike)
         {
             // skip first statement in block
             var butFirst = statements.Skip(1);
@@ -170,16 +130,23 @@ namespace TracingCore.RoslynRewriters
             // if there are any statements, append the last one.
             // if the last statement can have its own statements, use the endline
             // else append the parent node last line. 
-            var lastStatementHasStatements =
+            var lastStatementHasItsOwnStatements =
                 anyStatements && lastStatement.ChildNodes().OfType<StatementSyntax>().Any();
 
-            var lineNums = lastStatementHasStatements
+            var nonMethodParentAndAnyStatements = anyStatements && !isParentMethodLike;
+            
+            var lineNums = nonMethodParentAndAnyStatements
                 ? butLastLineNumbers.Append(RoslynHelper.GetLineData(lastStatement.Parent, true))
                 : anyStatements
                     ? butLastLineNumbers
                         .Append(RoslynHelper.GetLineData(lastStatement))
                     : butLastLineNumbers; // last statement now may appear twice 
             return lineNums.ToArray();
+        }
+
+        private bool IsNodeMethodLike(SyntaxNode node)
+        {
+            return _methodLikeDeclarations.Contains(node.Kind());
         }
 
         public override SyntaxNode VisitBlock(BlockSyntax node)
@@ -189,24 +156,26 @@ namespace TracingCore.RoslynRewriters
             var hasStatements = statements.Any();
 
             var @class = node.Ancestors().OfType<ClassDeclarationSyntax>().First();
-            var parentMethodLike = IsNodeMethodLike(parent);
+            var isParentMethodLike = IsNodeMethodLike(parent);
 
-            var includeThisReference = parentMethodLike &&
+            var includeThisReference = isParentMethodLike &&
                                        @class.Modifiers.All(x => !x.IsKind(SyntaxKind.StaticKeyword)) &&
                                        !NodeHasStaticModifier(parent);
 
-            var entryName = parentMethodLike
+            var entryName = isParentMethodLike
                 ? TraceApiNames.TraceMethodEntry
                 : TraceApiNames.TraceBlockEntry;
-            var exitName = parentMethodLike
+            var exitName = isParentMethodLike
                 ? TraceApiNames.TraceMethodExit
                 : TraceApiNames.TraceBlockExit;
 
-            var lineNumbers = DetermineLineNumbers(statements);
+            var lineNumbers = DetermineLineNumbers(statements, isParentMethodLike);
             var insStatements = statements.Zip(lineNumbers)
                 .SelectMany(x => InstrumentStatement(x.First, x.Second)).ToList();
 
-            var entryLineData = RoslynHelper.GetLineData(parent);
+            var entryLineData = IsNodeMethodLike(parent)
+                ? RoslynHelper.GetLineData(parent)
+                : RoslynHelper.GetLineData(node);
             var enterDetails = GetEgDetails(parent, entryLineData, entryName, includeThisReference);
 
             var dullLineNumber = hasStatements
@@ -228,71 +197,52 @@ namespace TracingCore.RoslynRewriters
             var exitDetails = GetEgDetails(statements.LastOrDefault(), exitLineNumber, exitName, includeThisReference);
             var exitMethodStatement =
                 _expressionGenerator.GetExitExpressionStatement(exitDetails, hasStatements,
-                    parentMethodLike);
+                    isParentMethodLike);
 
             blockSpecificStatements.Add(exitMethodStatement);
 
             return node.WithStatements(new SyntaxList<StatementSyntax>().AddRange(blockSpecificStatements));
         }
 
-        public SyntaxNode VisitBlockOld(BlockSyntax node)
+        public SyntaxNode VisitBlock2(BlockSyntax node)
         {
             var parent = node.Parent;
             var statements = node.Statements.ToList();
             var hasStatements = statements.Any();
-            var classDeclaration = node.Ancestors().OfType<ClassDeclarationSyntax>().First();
 
-            var isImmediateParentMethodLike = IsNodeMethodLike(parent);
+            var includeThisReference = false;
 
-            var includeThisReference = isImmediateParentMethodLike &&
-                                       classDeclaration.Modifiers.All(x => !x.IsKind(SyntaxKind.StaticKeyword)) &&
-                                       !NodeHasStaticModifier(parent);
+            var entryName = TraceApiNames.TraceBlockEntry;
+            var exitName = TraceApiNames.TraceBlockExit;
 
-            var entryName = isImmediateParentMethodLike
-                ? TraceApiNames.TraceMethodEntry
-                : TraceApiNames.TraceBlockEntry;
-            var exitName = isImmediateParentMethodLike ? TraceApiNames.TraceMethodExit : TraceApiNames.TraceBlockExit;
-
-            var exitEdgeCase = hasStatements && statements.Last().ChildNodes().OfType<StatementSyntax>().Any();
-
-            var dullTarget = hasStatements ? statements.First() : node;
-            var exitTarget = hasStatements && !exitEdgeCase ? statements.Last() : node;
-
-            var egDetails = GetEgDetails(parent, entryName, includeThisReference);
-            var dullDetails = GetEgDetails(dullTarget, TraceApiNames.TraceApiMethodFirstStep, includeThisReference,
-                !hasStatements);
-
-            var exitDetails = GetEgDetails(exitTarget, exitName, includeThisReference,
-                !hasStatements || exitEdgeCase);
-
-            var enterMethodStatement = _expressionGenerator.GetExpressionStatement(egDetails);
-            var dullMethodStatement = _expressionGenerator.GetDullExpressionStatement(dullDetails);
-
-            var blockSpecificStatements = new List<StatementSyntax>
-                {dullMethodStatement};
-
-            if (isImmediateParentMethodLike)
-            {
-                blockSpecificStatements = blockSpecificStatements.Prepend(enterMethodStatement).ToList();
-            }
-
-            var insStatements = statements.Zip(GetLineNumbers(statements))
+            var lineNumbers = DetermineLineNumbers(statements, false);
+            var insStatements = statements.Zip(lineNumbers)
                 .SelectMany(x => InstrumentStatement(x.First, x.Second)).ToList();
 
-            blockSpecificStatements.AddRange(insStatements);
+            var entryLineData = RoslynHelper.GetLineData(node);
+            var enterDetails = GetEgDetails(parent, entryLineData, entryName, includeThisReference);
 
-            if (insStatements.Any() && insStatements.Last().IsKind(SyntaxKind.ReturnStatement))
+            var dullLineNumber = hasStatements
+                ? RoslynHelper.GetLineData(statements.First())
+                : RoslynHelper.GetLineData(node, true);
+
+            var dullDetails = GetEgDetails(statements.FirstOrDefault(), dullLineNumber,
+                TraceApiNames.TraceApiMethodFirstStep, includeThisReference);
+
+            var enterMethodStatement = _expressionGenerator.GetExpressionStatement(enterDetails);
+            var dullMethodStatement = _expressionGenerator.GetDullExpressionStatement(dullDetails);
+            var blockSpecificStatements = new List<StatementSyntax>
+                {enterMethodStatement, dullMethodStatement}.Concat(insStatements).ToList();
+
+            if (insStatements.Any() && insStatements.Last().IsKind(SyntaxKind.ReturnStatement)) // TODO will need to fix
                 return node.WithStatements(new SyntaxList<StatementSyntax>().AddRange(blockSpecificStatements));
 
+            var exitLineNumber = hasStatements ? lineNumbers.Last() : RoslynHelper.GetLineData(node, true);
+            var exitDetails = GetEgDetails(statements.LastOrDefault(), exitLineNumber, exitName, includeThisReference);
             var exitMethodStatement =
-                _expressionGenerator.GetExitExpressionStatement(exitDetails, hasStatements && !exitEdgeCase,
-                    isImmediateParentMethodLike);
-            // blockSpecificStatements.Add(exitMethodStatement);
+                _expressionGenerator.GetExitExpressionStatement(exitDetails, hasStatements, false);
 
-            if (isImmediateParentMethodLike)
-            {
-                blockSpecificStatements.Add(exitMethodStatement);
-            }
+            blockSpecificStatements.Add(exitMethodStatement);
 
             return node.WithStatements(new SyntaxList<StatementSyntax>().AddRange(blockSpecificStatements));
         }
@@ -483,7 +433,112 @@ namespace TracingCore.RoslynRewriters
             var @foreach = (ForEachStatementSyntax) root.GetAnnotatedNodes(_locationAnnotation).First();
 
             return @foreach.WithStatement((StatementSyntax) VisitBlock(@foreach.Statement as BlockSyntax));
-            return base.VisitForEachStatement(node);
+        }
+
+        public SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
+        {
+            var statements = node.Body.Statements.ToList();
+            var hasStatements = statements.Any();
+
+            var @class = node.Ancestors().OfType<ClassDeclarationSyntax>().First();
+
+            var includeThisReference = !(NodeHasStaticModifier(@class) || NodeHasStaticModifier(node));
+
+            var entryName = TraceApiNames.TraceMethodEntry;
+            var exitName = TraceApiNames.TraceMethodExit;
+
+            var lineNumbers = DetermineLineNumbers(statements, true);
+            var insStatements = statements.Zip(lineNumbers)
+                .SelectMany(x => InstrumentStatement(x.First, x.Second)).ToList();
+
+            var entryLineData = RoslynHelper.GetLineData(node);
+            var enterDetails = GetEgDetails(node, entryLineData, entryName, includeThisReference);
+
+            var dullLineNumber = hasStatements
+                ? RoslynHelper.GetLineData(statements.First())
+                : RoslynHelper.GetLineData(node, true);
+
+            var dullDetails = GetEgDetails(statements.FirstOrDefault(), dullLineNumber,
+                TraceApiNames.TraceApiMethodFirstStep, includeThisReference);
+
+            var enterMethodStatement = _expressionGenerator.GetExpressionStatement(enterDetails);
+            var dullMethodStatement = _expressionGenerator.GetDullExpressionStatement(dullDetails);
+            var blockSpecificStatements = new List<StatementSyntax>
+                {enterMethodStatement, dullMethodStatement}.Concat(insStatements).ToList();
+
+            if (insStatements.Any() && insStatements.Last().IsKind(SyntaxKind.ReturnStatement)) // TODO will need to fix
+                return node.WithBody(
+                    node.Body.WithStatements(new SyntaxList<StatementSyntax>().AddRange(blockSpecificStatements)));
+
+            var exitLineNumber = hasStatements ? lineNumbers.Last() : RoslynHelper.GetLineData(node, true);
+            var exitDetails = GetEgDetails(statements.LastOrDefault(), exitLineNumber, exitName, includeThisReference);
+            var exitMethodStatement =
+                _expressionGenerator.GetExitExpressionStatement(exitDetails, hasStatements, true);
+
+            blockSpecificStatements.Add(exitMethodStatement);
+
+            return node.WithBody(
+                node.Body.WithStatements(new SyntaxList<StatementSyntax>().AddRange(blockSpecificStatements)));
+        }
+
+        public SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
+        {
+            var accessors = node.AccessorList;
+            return VisitAccessorList(accessors);
+        }
+
+        public SyntaxNode VisitAccessorList(AccessorListSyntax node)
+        {
+            var accessors = node.Accessors;
+            return node.WithAccessors(
+                new SyntaxList<AccessorDeclarationSyntax>().AddRange(accessors.Select(InstrumentAccessor)));
+        }
+
+        private AccessorDeclarationSyntax InstrumentAccessor(AccessorDeclarationSyntax node)
+        {
+            var statements = node.Body.Statements.ToList();
+            var hasStatements = statements.Any();
+
+            var @class = node.Ancestors().OfType<ClassDeclarationSyntax>().First();
+            var property = node.Ancestors().OfType<PropertyDeclarationSyntax>().First();
+
+            var includeThisReference = !(NodeHasStaticModifier(@class) || NodeHasStaticModifier(property));
+
+            var entryName = TraceApiNames.TraceMethodEntry;
+            var exitName = TraceApiNames.TraceMethodExit;
+
+            var lineNumbers = DetermineLineNumbers(statements, true);
+            var insStatements = statements.Zip(lineNumbers)
+                .SelectMany(x => InstrumentStatement(x.First, x.Second)).ToList();
+
+            var entryLineData = RoslynHelper.GetLineData(node);
+            var enterDetails = GetEgDetails(node, entryLineData, entryName, includeThisReference);
+
+            var dullLineNumber = hasStatements
+                ? RoslynHelper.GetLineData(statements.First())
+                : RoslynHelper.GetLineData(node, true);
+
+            var dullDetails = GetEgDetails(statements.FirstOrDefault(), dullLineNumber,
+                TraceApiNames.TraceApiMethodFirstStep, includeThisReference);
+
+            var enterMethodStatement = _expressionGenerator.GetExpressionStatement(enterDetails);
+            var dullMethodStatement = _expressionGenerator.GetDullExpressionStatement(dullDetails);
+            var blockSpecificStatements = new List<StatementSyntax>
+                {enterMethodStatement, dullMethodStatement}.Concat(insStatements).ToList();
+
+            if (insStatements.Any() && insStatements.Last().IsKind(SyntaxKind.ReturnStatement)) // TODO will need to fix
+                return node.WithBody(
+                    node.Body.WithStatements(new SyntaxList<StatementSyntax>().AddRange(blockSpecificStatements)));
+
+            var exitLineNumber = hasStatements ? lineNumbers.Last() : RoslynHelper.GetLineData(node, true);
+            var exitDetails = GetEgDetails(statements.LastOrDefault(), exitLineNumber, exitName, includeThisReference);
+            var exitMethodStatement =
+                _expressionGenerator.GetExitExpressionStatement(exitDetails, hasStatements, true);
+
+            blockSpecificStatements.Add(exitMethodStatement);
+
+            return node.WithBody(
+                node.Body.WithStatements(new SyntaxList<StatementSyntax>().AddRange(blockSpecificStatements)));
         }
 
         public CompilationUnitSyntax Start(CompilationUnitSyntax root)

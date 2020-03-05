@@ -142,6 +142,48 @@ namespace Vj02
     }
 }`
     },
+    P2Vj_021: {
+      name: 'Slijed primjer',
+      categories: [Categories.Debug, Categories.Professor],
+      code: `using System;
+
+namespace Vj02
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            string ime;
+            
+            Console.WriteLine("Kako se zoveš?");
+            ime = Console.ReadLine();
+            Console.WriteLine(ime);
+        }
+    }
+}`  
+    },
+    P2Vj_022: {
+        name: 'Int parse primjer',
+        categories: [Categories.Debug, Categories.Professor],
+        code: `using System;
+
+namespace Vj02
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            string s;
+            int broj;
+            
+            Console.WriteLine("Unesi broj?");
+            s = Console.ReadLine();
+            broj = int.Parse(s);
+            Console.WriteLine(broj);
+        }
+    }
+}`
+    },
     ifElse: {
         name: 'If-else primjer',
         categories: [Categories.Debug],

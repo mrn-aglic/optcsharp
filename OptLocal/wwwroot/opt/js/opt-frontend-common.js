@@ -2350,7 +2350,7 @@ var survey_v8 = '\n\
 var survey_html = survey_v8;
 
 function setSurveyHTML() {
-    $('#surveyPane').html(survey_html);
+    // $('#surveyPane').html(survey_html);
 }
 
 function getSurveyObject() {
