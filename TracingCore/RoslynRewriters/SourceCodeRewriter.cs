@@ -135,7 +135,7 @@ namespace TracingCore.RoslynRewriters
 
             var nonMethodParentAndAnyStatements = anyStatements && !isParentMethodLike;
             
-            var lineNums = nonMethodParentAndAnyStatements
+            var lineNums = nonMethodParentAndAnyStatements || lastStatementHasItsOwnStatements
                 ? butLastLineNumbers.Append(RoslynHelper.GetLineData(lastStatement.Parent, true))
                 : anyStatements
                     ? butLastLineNumbers

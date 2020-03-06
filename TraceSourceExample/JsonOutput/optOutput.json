@@ -803,18 +803,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "Sprite",
       "heap": {
@@ -961,18 +961,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "Pozicija",
       "heap": {
@@ -1131,18 +1131,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "Pozicija",
       "heap": {
@@ -1301,18 +1301,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "Pozicija",
       "heap": {
@@ -1473,18 +1473,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "Pozicija",
       "heap": {
@@ -1626,18 +1626,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "Pozicija",
       "heap": {
@@ -1801,18 +1801,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "Pozicija",
       "heap": {
@@ -1988,18 +1988,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "Pozicija",
       "heap": {
@@ -2175,18 +2175,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "Pozicija",
       "heap": {
@@ -2364,18 +2364,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "Pozicija",
       "heap": {
@@ -2534,18 +2534,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "Pozicija",
       "heap": {
@@ -2726,18 +2726,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "Pozicija",
       "heap": {
@@ -2930,18 +2930,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "Pozicija",
       "heap": {
@@ -3134,18 +3134,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "Pozicija",
       "heap": {
@@ -3340,18 +3340,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "Pozicija",
       "heap": {
@@ -3527,18 +3527,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "Pozicija",
       "heap": {
@@ -3737,18 +3737,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -3962,18 +3962,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -4192,18 +4192,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -4422,18 +4422,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -4675,18 +4675,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -4928,18 +4928,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -5181,18 +5181,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -5436,18 +5436,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -5666,18 +5666,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -5896,18 +5896,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -6126,18 +6126,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -6356,18 +6356,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -6609,18 +6609,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -6862,18 +6862,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -7115,18 +7115,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -7370,18 +7370,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -7600,18 +7600,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -7830,18 +7830,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -8060,18 +8060,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -8290,18 +8290,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -8543,18 +8543,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -8796,18 +8796,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -9049,18 +9049,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -9304,18 +9304,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -9534,18 +9534,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -9764,18 +9764,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -9929,7 +9929,7 @@
     {
       "event": "return",
       "stdout": "",
-      "line": 49,
+      "line": 53,
       "stack_to_render": [
         {
           "func_name": "Main",
@@ -9996,18 +9996,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {
@@ -10200,18 +10200,18 @@
         }
       ],
       "globals": {
-        "Pozicija": [
-          "REF",
-          8
-        ],
         "Sprite": [
           "REF",
           1
+        ],
+        "Pozicija": [
+          "REF",
+          8
         ]
       },
       "ordered_globals": [
-        "Pozicija",
-        "Sprite"
+        "Sprite",
+        "Pozicija"
       ],
       "func_name": "PomakNa",
       "heap": {

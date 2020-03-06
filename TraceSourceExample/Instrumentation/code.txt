@@ -89,7 +89,7 @@ namespace ClrMD
                 TraceApi.TraceBlockExit(52);
             }
 
-            TraceApi.TraceMethodExit(49, true);
+            TraceApi.TraceMethodExit(53, true);
         }
 
         static Sprite()
