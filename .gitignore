@@ -12,3 +12,6 @@ node_modules/
 /OptLocal/wwwroot/vuebundles/editor.worker.js
 /OptLocal/wwwroot/vuebundles/main.build.js
 /OptLocal/package-lock.json
+/OptLocal/Instrumentation/
+/TraceSourceExample/Instrumentation/
+/TraceSourceExample/JsonOutput
