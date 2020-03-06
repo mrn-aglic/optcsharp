@@ -5,11 +5,10 @@ node_modules/
 /node_modules/
 /node_modules/*
 /monacobundles/
-/wwwroot/vuebundles/
-/wwwroot/monacobundles/
-SharpVis/wwwroot/vuebundles/1.build.js
-SharpVis/wwwroot/vuebundles/2.build.js
-SharpVis/wwwroot/vuebundles/editor.worker.js
-SharpVis/wwwroot/vuebundles/main.build.js
+/OptLocal/wwwroot/monacobundles/
 /OptLocal/wwwroot/vuebundles/
+/OptLocal/wwwroot/vuebundles/1.build.js
+/OptLocal/wwwroot/vuebundles/2.build.js
+/OptLocal/wwwroot/vuebundles/editor.worker.js
+/OptLocal/wwwroot/vuebundles/main.build.js
 /OptLocal/package-lock.json
