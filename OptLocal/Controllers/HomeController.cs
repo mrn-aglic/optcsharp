@@ -22,7 +22,7 @@ namespace OptLocal.Controllers
 
         public IActionResult Index()
         {
-            var visualizeHtml = Path.Combine(_environment.WebRootPath, "opt", "visualize.html");
+            var visualizeHtml = Path.Combine(_environment.WebRootPath, "opt", "visualize.html"); // FILE DELETED
 
             return PhysicalFile(visualizeHtml, "text/html");
         }

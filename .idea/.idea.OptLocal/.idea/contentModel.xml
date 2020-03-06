@@ -478,7 +478,6 @@
                 <e p="togetherjs.js" t="Include" />
               </e>
             </e>
-            <e p="visualize.html" t="Include" />
           </e>
           <e p="vuebundles" t="Include">
             <e p="1.build.js" t="Include" />
