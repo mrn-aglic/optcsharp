@@ -14,4 +14,4 @@ node_modules/
 /OptLocal/package-lock.json
 /OptLocal/Instrumentation/
 /TraceSourceExample/Instrumentation/
-/TraceSourceExample/JsonOutput
+/TraceSourceExample/JsonOutput/
