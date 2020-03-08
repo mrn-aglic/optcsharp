@@ -107,7 +107,7 @@ namespace Vj02
         {
             foreach (Pozicija pozicija in pozicije)
             {
-                PomakNa(pozicija);
+                PomakNa(pozicija.x, pozicija.y);
             }
         }
     }
