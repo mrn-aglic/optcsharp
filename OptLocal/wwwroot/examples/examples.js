@@ -102,6 +102,12 @@ namespace Vj02
             x = posX;
             y = posY;
         }
+        
+        public void PomakNa(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+        }
 
         public void PomakNa(params Pozicija[] pozicije)
         {
