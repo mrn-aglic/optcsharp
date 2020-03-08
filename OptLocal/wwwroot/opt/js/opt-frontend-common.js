@@ -1055,9 +1055,10 @@ function genericOptFrontendReady() {
                 setFronendError(["Server error! Your code might be too long for this tool. Shorten your code and re-try."]);
             }
         } else {
+            // TODO Better error messages
             setFronendError(["Server error! Your code might be taking too much time to run or using too much memory.",
-                "Report a bug to philip@pgbovine.net by clicking the 'Generate permanent link' button",
-                "at the bottom of this page and including a URL in your email."]);
+                "",
+                ""]);
         }
 
         doneExecutingCode();
@@ -1512,9 +1513,10 @@ function executeCodeAndCreateViz(codeToExec,
                 killerException = trace[trace.length - 1]; // killer!
                 setFronendError([trace[trace.length - 1].exception_msg]);
             } else {
-                setFronendError(["Unknown error. Reload the page and try again. Or report a bug to",
-                    "philip@pgbovine.net by clicking on the 'Generate permanent link'",
-                    "button at the bottom and including a URL in your email."]);
+                // TODO: BETTER ERROR MESSAGES
+                setFronendError(["Dogodila se pogreška tijekom kompajliranja.",
+                    "",
+                    ""]);
             }
         } else {
             // fail-soft to prevent running off of the end of trace
