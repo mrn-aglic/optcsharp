@@ -3,14 +3,16 @@
 const Categories = {
     Debug: 'Debug',
     Microsoft: 'Microsoft',
-    Professor: 'Professor'
+    Professor: 'Professor',
+    OOP: 'OOP',
+    P2: 'P2'
 };
 
 const Examples = {
     Vj02_1: {
-      name: 'Primjer overload',
-      categories: [Categories.Professor, Categories.Debug],
-      code: `using System;
+        name: 'Primjer preopterećene metode',
+        categories: [Categories.Professor, Categories.Debug, Categories.OOP],
+        code: `using System;
 
 namespace Vj02
 {
@@ -69,11 +71,11 @@ namespace Vj02
             sprite.PomakNa(poz);
         }
     }
-}`  
+}`
     },
-    Vj02_2:{
+    Vj02_2: {
         name: 'Primjer params',
-        categories: [Categories.Professor, Categories.Debug],
+        categories: [Categories.Professor, Categories.Debug, Categories.OOP],
         code: `using System;
 
 namespace Vj02
@@ -101,25 +103,6 @@ namespace Vj02
             y = posY;
         }
 
-        public void PomakNa(int x, int y)
-        {
-            this.x = x;
-            this.y = y;
-        }
-
-        public void PomakNa(int x, int y, string smjer)
-        {
-            this.x = x;
-            this.y = y;
-            this.smjer = smjer;
-        }
-
-        public void PomakNa(Pozicija poz)
-        {
-            this.x = poz.x;
-            this.y = poz.y;
-        }
-
         public void PomakNa(params Pozicija[] pozicije)
         {
             foreach (Pozicija pozicija in pozicije)
@@ -143,9 +126,9 @@ namespace Vj02
 }`
     },
     P2Vj_021: {
-      name: 'Slijed primjer',
-      categories: [Categories.Debug, Categories.Professor],
-      code: `using System;
+        name: 'Primjer slijed',
+        categories: [Categories.Debug, Categories.Professor, Categories.P2],
+        code: `using System;
 
 namespace Vj02
 {
@@ -160,11 +143,11 @@ namespace Vj02
             Console.WriteLine(ime);
         }
     }
-}`  
+}`
     },
     P2Vj_022: {
-        name: 'Int parse primjer',
-        categories: [Categories.Debug, Categories.Professor],
+        name: 'Primjer parsiranje (int)',
+        categories: [Categories.Debug, Categories.Professor, Categories.P2],
         code: `using System;
 
 namespace Vj02

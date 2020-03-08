@@ -44,9 +44,9 @@
 
     <script type="text/javascript">
     
-        function loadExample() {
-          
-            const select = document.getElementById('csharp-examples');
+        function loadExample(idEnd) {
+            
+            const select = document.getElementById(`csharp-examples-${idEnd}`);
             const code = select.value;
             pyInputAceEditor.setValue(code);
             pyInputAceEditor.clearSelection();
@@ -72,8 +72,8 @@
           pyInputAceEditor.clearSelection();
           pyInputAceEditor.focus();
           
-          function populateCsharpExamples(category) {
-            const select = document.getElementById('csharp-examples');
+          function populateCsharpExamples(idEnd, category) {
+            const select = document.getElementById(`csharp-examples-${idEnd}`);
             const examples = Examples;
             
             for(let k in examples){
@@ -91,9 +91,14 @@
             select.options[0].selected = 'selected';
           }
           
-          let useCategory = Categories.Debug;
-          populateCsharpExamples(useCategory);
-          loadExample();
+          // TODO: Remove after experiment
+          // const urlParams = new URLSearchParams(window.location.search);
+          // const category = urlParams.get('c');
+          // let useCategory = category == null ? Categories.Debug : category;
+          populateCsharpExamples('p2', 'P2');
+          populateCsharpExamples('oop', 'OOP');
+          loadExample('p2');
+          loadExample('oop');
         });
     </script>
     <!-- insert google-analytics.txt contents here -->
@@ -117,11 +122,16 @@
 <div id="frontendErrorOutput"></div>
 <div id="surveyPane"></div>
 
-<p style="margin-top: 25px; font-weight: bold;">C# Examples</p>
+<p style="margin-top: 25px; font-weight: bold;">C# Primjeri</p>
 
-<p style="margin-top: 10px;">Basic:
+<p style="margin-top: 10px;">P2:
 
-    <select id="csharp-examples" onchange="loadExample()">
+    <select id="csharp-examples-p2" onchange="loadExample('p2')">
+    </select>
+</p>
+<p style="margin-top: 10px;">OOP:
+
+    <select id="csharp-examples-oop" onchange="loadExample('oop')">
     </select>
 </p>
 <p>
