@@ -7,7 +7,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using TracingCore.Data;
 using TracingCore.Interceptors;
 using TracingCore.RoslynRewriters;
-using TracingCore.SourceCodeInstrumentation;
 using TracingCore.TraceToPyDtos;
 using TracingCore.TracingManagers;
 
@@ -63,7 +62,7 @@ namespace TracingCore
                 compilation
             );
         }
-
+        
         private SemanticModel GetSemanticModel(CompilationUnitSyntax root)
         {
             var syntaxTree = root.SyntaxTree;
@@ -95,9 +94,22 @@ namespace TracingCore
             {
                 ConsoleHandler.RestoreDefaults();
                 pyTutorData = PyTutorDataManager.GetData();
+                PyTutorDataManager.Clear();
             }
 
             return pyTutorData;
+        }
+
+        public PyTutorData ReportCompilationError(CompilationResult compilationResult)
+        {
+            foreach (var resultDiagnostic in compilationResult.Diagnostics)
+            {
+                int line = resultDiagnostic.Location.GetLineSpan().StartLinePosition.Line;
+                string msg = resultDiagnostic.GetMessage();
+                PyTutorDataManager.RegisterUncaughtException(line, msg);
+            }
+            PyTutorDataManager.RegisterUncaughtException(0, "");
+            return PyTutorDataManager.GetData();
         }
     }
 }

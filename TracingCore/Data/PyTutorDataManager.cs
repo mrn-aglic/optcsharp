@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 using TracingCore.Common;
 using TracingCore.JsonMappers;
 using TracingCore.TraceToPyDtos;
@@ -297,7 +298,8 @@ namespace TracingCore.Data
         {
             var prevStep = _pyTutorData.Trace.Last() as PyTutorStep;
 
-            var isPrevStepLineSame = prevStep.Line == line; // TODO use to determine if method exit should replace the prevStepLine
+            var isPrevStepLineSame =
+                prevStep.Line == line; // TODO use to determine if method exit should replace the prevStepLine
 
             var newStackToRender = prevStep.StackToRender.Pop(out var lastStack);
             var hd = GetHeapData(variableData);
@@ -388,6 +390,12 @@ namespace TracingCore.Data
             _pyTutorData.Trace.Add(new PyTutorRawInputStep("", RawInputEvent));
         }
 
+        public void Clear()
+        {
+            _pyTutorData.Trace.Clear();
+        }
+        
+        
         public void FlushPyTutorData()
         {
             var jObject = PyTutorDataMapper.ToJson(_pyTutorData);
