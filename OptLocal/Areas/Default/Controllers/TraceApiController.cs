@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Newtonsoft.Json.Linq;
 using TracingCore;
 using TracingCore.JsonMappers;
@@ -53,8 +56,13 @@ namespace OptLocal.Areas.Default.Controllers
             var optBackend = new OptBackend(userCode, rawInput, new InstrumentationManager(sourceRewriter));
 
             var compilationResult = optBackend.Compile(CompilationName, true);
-            var pyTutorData = optBackend.Trace(compilationResult.Root, compilationResult);
 
+            if (!compilationResult.Success)
+            {
+                return PyTutorDataMapper.ToJson(optBackend.ReportCompilationError(compilationResult));
+            }
+            
+            var pyTutorData = optBackend.Trace(compilationResult.Root, compilationResult);
             return PyTutorDataMapper.ToJson(pyTutorData);
         }
 
