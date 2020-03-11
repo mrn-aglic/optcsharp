@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.Loader;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -93,8 +94,8 @@ namespace TracingCore
             finally
             {
                 ConsoleHandler.RestoreDefaults();
+                // AssemblyLoadContext.GetLoadContext(compilationResult.Assembly).Unload();
                 pyTutorData = PyTutorDataManager.GetData();
-                PyTutorDataManager.Clear();
             }
 
             return pyTutorData;

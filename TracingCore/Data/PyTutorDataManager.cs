@@ -390,12 +390,6 @@ namespace TracingCore.Data
             _pyTutorData.Trace.Add(new PyTutorRawInputStep("", RawInputEvent));
         }
 
-        public void Clear()
-        {
-            _pyTutorData.Trace.Clear();
-        }
-        
-        
         public void FlushPyTutorData()
         {
             var jObject = PyTutorDataMapper.ToJson(_pyTutorData);
