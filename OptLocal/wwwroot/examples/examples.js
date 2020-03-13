@@ -131,6 +131,47 @@ namespace Vj02
     }
 }`
     },
+    Vj03_01: {
+        name: 'Primjer enkapsulacija',
+        categories: [Categories.Debug, Categories.Professor, Categories.OOP],
+        code: `using System;
+
+namespace Vj02
+{
+    class Student
+    {
+        private int godine;
+
+        public int Godine
+        {
+            get { return godine; }
+            set
+            {
+                if (value <= 0)
+                    godine = 1;
+                else
+                    godine = value;
+            }
+        }
+
+        public Student(int godine)
+        {
+            Godine = godine;
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            Student student1 = new Student(-1);
+            Console.WriteLine(student1.Godine);
+            Student student2 = new Student(15);
+            Console.WriteLine(student2.Godine);
+        }
+    }
+}`
+    },
     P2Vj_021: {
         name: 'Primjer slijed',
         categories: [Categories.Debug, Categories.Professor, Categories.P2],

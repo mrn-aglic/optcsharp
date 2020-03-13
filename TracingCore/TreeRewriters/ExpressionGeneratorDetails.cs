@@ -4,6 +4,7 @@ namespace TracingCore.TreeRewriters
 {
     public abstract class ExpressionGeneratorDetails
     {
+        public string InstanceName { get; }
         public string ClassName { get; }
         public string MemberName { get; }
         public LineData LineData { get; }

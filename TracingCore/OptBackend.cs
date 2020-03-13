@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.Loader;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -16,21 +15,20 @@ namespace TracingCore
     public class OptBackend
     {
         public string Code { get; }
+        public SyntaxTree UserSyntaxTree { get; }
         public Compiler Compiler { get; }
         public ConsoleHandler ConsoleHandler { get; }
         public ExecutionManager ExecutionManager { get; }
         public PyTutorDataManager PyTutorDataManager { get; }
-        private readonly InstrumentationManager _instrumentationManager;
 
         public OptBackend
         (
             string code,
-            IList<string> rawInputs,
-            InstrumentationManager instrumentationManager
+            IList<string> rawInputs
         )
         {
-            _instrumentationManager = instrumentationManager;
             Code = code;
+            UserSyntaxTree = CSharpSyntaxTree.ParseText(code);
             Compiler = new Compiler();
             ConsoleHandler = new ConsoleHandler();
             ExecutionManager = new ExecutionManager();
@@ -39,16 +37,33 @@ namespace TracingCore
             ConsoleHandler.AddRangeToRead(rawInputs);
         }
 
-        public CompilationUnitSyntax InstrumentSourceCode(CompilationUnitSyntax originalRoot)
+        public CompilationUnitSyntax InstrumentSourceCode(CompilationUnitSyntax originalRoot,
+            InstrumentationManager instrumentationManager)
         {
-            return _instrumentationManager.Start(originalRoot);
+            return instrumentationManager.Start(originalRoot);
         }
 
-        public CompilationResult Compile(string compilationName, bool instrument)
+        public CompilationResult Compile(string compilationName)
         {
-            var syntaxTree = CSharpSyntaxTree.ParseText(Code);
-            var originalRoot = syntaxTree.GetCompilationUnitRoot();
-            var root = instrument ? InstrumentSourceCode(originalRoot) : originalRoot;
+            var root = UserSyntaxTree.GetCompilationUnitRoot();
+
+            var compilation = Compiler.Compile(compilationName, root.SyntaxTree, Compiler.DefaultCompilationOptions);
+            var executionManager = new ExecutionManager();
+
+            return new CompilationResult
+            (
+                executionManager.CompileAssembly(compilation),
+                root,
+                compilation
+            );
+        }
+
+        public CompilationResult Compile(string compilationName, InstrumentationManager instrumentationManager,
+            SemanticModel semanticModel = null)
+        {
+            var originalRoot = UserSyntaxTree.GetCompilationUnitRoot();
+
+            var root = InstrumentSourceCode(originalRoot, instrumentationManager);
 
             // Instrumentation.WriteToFile(root);
 
@@ -58,30 +73,27 @@ namespace TracingCore
             return new CompilationResult
             (
                 executionManager.CompileAssembly(compilation),
-                originalRoot,
-                instrument ? root : null,
+                root,
                 compilation
             );
         }
-        
-        private SemanticModel GetSemanticModel(CompilationUnitSyntax root)
-        {
-            var syntaxTree = root.SyntaxTree;
-            var compilation = Compiler.Compile("user-source", syntaxTree, Compiler.DefaultCompilationOptions);
-            return compilation.GetSemanticModel(syntaxTree);
-        }
 
-        public PyTutorData Trace(CompilationUnitSyntax root, CompilationResult compilationResult)
+        public PyTutorData Trace
+        (
+            CompilationResult compilationResult,
+            bool flushData = false
+        )
         {
-            var semanticModel = GetSemanticModel(root);
+            var semanticModel = compilationResult.GetSemanticModel();
             var classManager = new ClassManager(semanticModel, new Dictionary<string, ClassData>());
 
-            TraceApi.Init(root, new TraceApiManager(PyTutorDataManager, ConsoleHandler, classManager));
+            TraceApi.Init(UserSyntaxTree.GetCompilationUnitRoot(),
+                new TraceApiManager(PyTutorDataManager, ConsoleHandler, classManager));
 
             PyTutorData pyTutorData;
             try
             {
-                ExecutionManager.StartMain(compilationResult, root);
+                ExecutionManager.StartMain(compilationResult, compilationResult.Root);
             }
             catch (ExitExecutionException)
             {
@@ -96,6 +108,8 @@ namespace TracingCore
                 ConsoleHandler.RestoreDefaults();
                 // AssemblyLoadContext.GetLoadContext(compilationResult.Assembly).Unload();
                 pyTutorData = PyTutorDataManager.GetData();
+                if (flushData) PyTutorDataManager.FlushPyTutorData();
+                TraceApi.Clear();
             }
 
             return pyTutorData;
@@ -109,6 +123,7 @@ namespace TracingCore
                 string msg = resultDiagnostic.GetMessage();
                 PyTutorDataManager.RegisterUncaughtException(line, msg);
             }
+
             PyTutorDataManager.RegisterUncaughtException(0, "");
             return PyTutorDataManager.GetData();
         }

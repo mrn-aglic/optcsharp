@@ -67,7 +67,6 @@ namespace TracingCore
 
         private void InvokeMethod(MethodInfo method)
         {
-            var @params = method.GetParameters().Length == 0 ? new object[0] : new object[] {new string[1]};
             if (method.GetParameters().Length > 0)
             {
                 var del = (Action<string[]>) Delegate.CreateDelegate(typeof(Action<string[]>), null, method);
@@ -78,7 +77,6 @@ namespace TracingCore
                 var del = (Action) Delegate.CreateDelegate(typeof(Action), null, method);
                 del();
             }
-            // method.Invoke(null, @params);
         }
     }
 }

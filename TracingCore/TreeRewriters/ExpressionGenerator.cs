@@ -12,11 +12,30 @@ namespace TracingCore.TreeRewriters
 {
     public class ExpressionGenerator
     {
+        public readonly SemanticModel _semanticModel;
+
+        public ExpressionGenerator(SemanticModel semanticModel)
+        {
+            _semanticModel = semanticModel;
+        }
+
         private MemberAccessExpressionSyntax GetMemberAccessExpressionSyntax(ExpressionGeneratorDetails details)
         {
             return MemberAccessExpression(
                 SyntaxKind.SimpleMemberAccessExpression,
                 IdentifierName(details.ClassName),
+                IdentifierName(details.MemberName)
+            );
+        }
+
+        private MemberAccessExpressionSyntax GetMemberAccessExpressionSyntaxNew(ExpressionGeneratorDetails details)
+        {
+            return MemberAccessExpression(
+                SyntaxKind.SimpleMemberAccessExpression,
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    IdentifierName(details.ClassName),
+                    IdentifierName(details.InstanceName)),
                 IdentifierName(details.MemberName)
             );
         }
@@ -66,6 +85,22 @@ namespace TracingCore.TreeRewriters
                             }
 
                             var left = (IdentifierNameSyntax) assignmentExpressionSyntax.Left;
+
+                            // var compilation =
+                            //     CSharpCompilation.Create("temp", new[] {assignmentExpressionSyntax.SyntaxTree});
+
+                            // if (compilation
+                            //     .GetSemanticModel(assignmentExpressionSyntax.SyntaxTree)
+                            //     .GetSymbolInfo(left)
+                            //     .Symbol is IPropertySymbol)
+                            var equivalentNode = _semanticModel.SyntaxTree.GetCompilationUnitRoot().DescendantNodes()
+                                .FirstOrDefault(x =>
+                                    x.IsEquivalentTo(left));
+                            if (_semanticModel.GetSymbolInfo(equivalentNode).Symbol is IPropertySymbol)
+                            {
+                                return new List<ArgumentSyntax>();
+                            }
+
                             return new List<ArgumentSyntax>
                             {
                                 Argument(
@@ -295,6 +330,24 @@ namespace TracingCore.TreeRewriters
                             Literal(fullyQualifiedName)
                         )))
                     )
+                )
+            );
+        }
+
+        public FieldDeclarationSyntax GenerateCreateTraceApiInstance()
+        {
+            return FieldDeclaration(
+                VariableDeclaration(IdentifierName("TraceApi"))
+                    .WithVariables(
+                        new SeparatedSyntaxList<VariableDeclaratorSyntax>().Add(
+                            VariableDeclarator(Identifier("TRACEAPI"))
+                                .WithInitializer(EqualsValueClause(
+                                    ObjectCreationExpression(IdentifierName("TraceApi"))
+                                )))
+                    )
+            ).WithModifiers(TokenList(
+                    Token(SyntaxKind.PublicKeyword),
+                    Token(SyntaxKind.StaticKeyword)
                 )
             );
         }

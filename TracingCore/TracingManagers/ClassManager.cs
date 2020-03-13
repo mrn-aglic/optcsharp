@@ -14,12 +14,6 @@ namespace TracingCore.TracingManagers
         private readonly Dictionary<string, ClassData> _classes;
         private readonly SemanticModel _semanticModel;
 
-        private readonly IList<SyntaxKind> _supportedMemberKinds = new List<SyntaxKind>
-        {
-            SyntaxKind.MethodDeclaration,
-            SyntaxKind.ConstructorDeclaration
-        };
-
         public ClassManager(SemanticModel semanticModel, Dictionary<string, ClassData> classes)
         {
             _classes = classes;
@@ -104,8 +98,6 @@ namespace TracingCore.TracingManagers
 
         public IList<MethodData> GetMethodsAndProperties(ClassDeclarationSyntax @class)
         {
-            _semanticModel.LookupNamespacesAndTypes(0);
-
             var members = @class.Members;
             var baseMethodTypes = members.OfType<BaseMethodDeclarationSyntax>();
             var properties = members.OfType<PropertyDeclarationSyntax>();

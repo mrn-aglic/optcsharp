@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TracingCore;
+using TracingCore.Common;
 using TracingCore.JsonMappers;
 using TracingCore.RoslynRewriters;
-using TracingCore.SourceCodeInstrumentation;
 using TracingCore.TreeRewriters;
 
 namespace TraceSourceExample
@@ -25,11 +26,12 @@ namespace TraceSourceExample
 
             return builder.Build();
         }
+
         static void Main(string[] args)
         {
             Console.WriteLine(args.GetType());
             // var code = Codes.VoidMethodExample();
-            var code = Codes.GetOOPExample("2_params");
+            var code = Codes.GetOOPExample("3_enkapsulacija");
             // var code = Codes.GetIfElseExample();
             // var code = Codes.GetPropertiesExample();
 
@@ -41,25 +43,26 @@ namespace TraceSourceExample
             var provider = serviceCollection.BuildServiceProvider();
 
             var service = provider.GetService<InstrumentationConfig>();
-            
+
             PyTutorStepMapper.RegisterConfig(service);
-
-            var tree = CSharpSyntaxTree.ParseText(code);
             
-            var srcRew = new SourceCodeRewriter(new ExpressionGenerator(), service);
-            var rewriter = new InstrumentationManager(srcRew);
-
-            var newTree = rewriter.Start(tree.GetCompilationUnitRoot());
             
+            
+
+            var optBackend = new OptBackend(code, new List<string>());
+            var originalSourceCompilation = optBackend.Compile("user-code");
+            var userSemanticModel =
+                originalSourceCompilation.GetSemanticModel();
+            var sourceRewriter = new SourceCodeRewriter(new ExpressionGenerator(userSemanticModel), service);
+            var newTree = sourceRewriter.Start(optBackend.UserSyntaxTree.GetCompilationUnitRoot());
+
             // return;
-            
-            // var sourceRewriter = new SourceCodeRewriter(new ExpressionGenerator(), service);
-            var optBackend = new OptBackend(code, new List<string>(),  rewriter);
 
-            var compilationResult = optBackend.Compile("opt-compilation", true);
-            var pyTutorData = optBackend.Trace(compilationResult.Root, compilationResult);
-            Instrumentation.WriteToFile(newTree);
-            TraceApi.FlushPyTutorData();
+            // var instrumentationManager = new InstrumentationManager(sourceRewriter);
+            // var compilationResult = optBackend.Compile("opt-compilation", instrumentationManager);
+            // var pyTutorData = optBackend.Trace(compilationResult, true);
+            FileIO.WriteToFile(newTree.ToFullString(), "Instrumentation", "code.txt");
+            // TraceApi.FlushPyTutorData();
         }
     }
 }

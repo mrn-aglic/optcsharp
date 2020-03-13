@@ -32,12 +32,23 @@ namespace OptLocal.Areas.Default.Controllers
                 ? new List<string>()
                 : JArray.Parse(raw_input_json).ToObject<List<string>>();
 
-            var sourceRewriter = new SourceCodeRewriter(new ExpressionGenerator(), _instrumentationConfig);
-            var optBackend = new OptBackend(user_script, inputs, new InstrumentationManager(sourceRewriter));
+            var optBackend = new OptBackend(user_script, inputs);
 
-            var compilationResult = optBackend.Compile(CompilationName, true);
-            var pyTutorData = optBackend.Trace(compilationResult.Root, compilationResult);
+            var scriptCompilation = optBackend.Compile("user-code");
+            var scriptSemanticModel = scriptCompilation.GetSemanticModel();
 
+            var sourceRewriter =
+                new SourceCodeRewriter(new ExpressionGenerator(scriptSemanticModel), _instrumentationConfig);
+            var instrumentationManager = new InstrumentationManager(sourceRewriter);
+
+            var compilationResult = optBackend.Compile(CompilationName, instrumentationManager, scriptSemanticModel);
+
+            if (!compilationResult.Success)
+            {
+                return PyTutorDataMapper.ToJson(optBackend.ReportCompilationError(compilationResult));
+            }
+
+            var pyTutorData = optBackend.Trace(compilationResult);
             return PyTutorDataMapper.ToJson(pyTutorData);
         }
 
@@ -49,17 +60,22 @@ namespace OptLocal.Areas.Default.Controllers
             var rawInput = json["rawInputJson"].ToObject<List<string>>();
             var userCode = json["code"].ToObject<string>();
 
-            var sourceRewriter = new SourceCodeRewriter(new ExpressionGenerator(), _instrumentationConfig);
-            var optBackend = new OptBackend(userCode, rawInput, new InstrumentationManager(sourceRewriter));
+            var optBackend = new OptBackend(userCode, rawInput);
+            var originalSourceCompilation = optBackend.Compile("user-code");
+            var userSemanticModel =
+                originalSourceCompilation.Compilation.GetSemanticModel(optBackend.UserSyntaxTree);
+            var sourceRewriter =
+                new SourceCodeRewriter(new ExpressionGenerator(userSemanticModel), _instrumentationConfig);
+            var instrumentationManager = new InstrumentationManager(sourceRewriter);
 
-            var compilationResult = optBackend.Compile(CompilationName, true);
+            var compilationResult = optBackend.Compile(CompilationName, instrumentationManager);
 
             if (!compilationResult.Success)
             {
                 return PyTutorDataMapper.ToJson(optBackend.ReportCompilationError(compilationResult));
             }
-            
-            var pyTutorData = optBackend.Trace(compilationResult.Root, compilationResult);
+
+            var pyTutorData = optBackend.Trace(compilationResult);
             return PyTutorDataMapper.ToJson(pyTutorData);
         }
 

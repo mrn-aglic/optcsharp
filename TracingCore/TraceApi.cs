@@ -13,19 +13,25 @@ namespace TracingCore
             RegisterClasses(root);
         }
 
+        public static void Clear()
+        {
+            _traceApiManager = null;
+        }
+
         public static void TraceMethodEntry(int line, string funcName, params VariableData[] variables)
         {
             _traceApiManager.AddMethodEntry(line, funcName, variables);
         }
-        
+
         public static void TraceBlockEntry(int line, params VariableData[] variables)
         {
             // TODO implement traceBlockEntry and exit
             _traceApiManager.TraceData(line, variables);
         }
-        
+
         public static void TraceBlockExit(int line)
         {
+            return;
             _traceApiManager.TraceData(line);
         }
 
