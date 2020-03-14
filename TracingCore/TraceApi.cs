@@ -1,4 +1,4 @@
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using TracingCore.TraceToPyDtos;
 
 namespace TracingCore
@@ -7,10 +7,10 @@ namespace TracingCore
     {
         private static TraceApiManager _traceApiManager;
 
-        public static void Init(CompilationUnitSyntax root, TraceApiManager traceApiManager)
+        public static void Init(TraceApiManager traceApiManager)
         {
             _traceApiManager = traceApiManager;
-            RegisterClasses(root);
+            RegisterClasses();
         }
 
         public static void Clear()
@@ -31,7 +31,7 @@ namespace TracingCore
 
         public static void TraceBlockExit(int line)
         {
-            return;
+            return; // TODO: Finish implemntation
             _traceApiManager.TraceData(line);
         }
 
@@ -55,9 +55,9 @@ namespace TracingCore
             _traceApiManager.AddMethodExit(line, variableData, false);
         }
 
-        public static void RegisterClasses(CompilationUnitSyntax root)
+        public static void RegisterClasses()
         {
-            _traceApiManager.RegisterClasses(root);
+            _traceApiManager.RegisterClasses();
         }
 
         public static void RegisterClassLoad(string fullyQualifiedName)

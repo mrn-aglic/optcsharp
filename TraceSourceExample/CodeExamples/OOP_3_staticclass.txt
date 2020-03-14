@@ -1,0 +1,21 @@
+using System;
+
+namespace Vj02
+{
+    static class Postavke
+    {
+        public static int VelicinaSvijeta = 0;
+        public static int SirinaSvijeta = 0;
+        public static string Naziv = "";
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            Postavke.Naziv = "Primjer static klase";
+            Postavke.VelicinaSvijeta = 150;
+            Postavke.SirinaSvijeta = 420;
+        }
+    }
+}

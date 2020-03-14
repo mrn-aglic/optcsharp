@@ -17,12 +17,14 @@ namespace TracingCore.JsonMappers
             BindingFlags.NonPublic |
             BindingFlags.Public |
             BindingFlags.Instance |
+            BindingFlags.Static |
             BindingFlags.DeclaredOnly;
 
         private static BindingFlags _propertyBindingFlags =
             BindingFlags.DeclaredOnly |
             BindingFlags.NonPublic | // Should we include non-public properties?
             BindingFlags.Public |
+            BindingFlags.Static |
             BindingFlags.Instance;
 
         private static string _backupPropPrefix;
@@ -118,7 +120,8 @@ namespace TracingCore.JsonMappers
             var heapTypeString = value.HeapType.ToString().ToUpper();
             var extends = JArray.FromObject(value.Extends);
 
-            var jArray = new JArray {heapTypeString, value.FullyQualifiedName, extends};
+            var jArray = new JArray
+                {heapTypeString, $"{value.FullyQualifiedName + (value.IsStatic ? " static" : "")}", extends};
 
             var methods = heap.Values.OfType<MethodHeapData>()
                 .Where(x => x.EnclosingParentFullName == value.FullyQualifiedName);
@@ -128,7 +131,12 @@ namespace TracingCore.JsonMappers
                 jArray.Add(new JArray {method.FuncName, new JArray {"REF", method.HeapId}});
             }
 
-            return jArray;
+            if (!value.IsStatic) return jArray;
+
+            var type = value.Type;
+            var fields = type.GetFields(_fieldBindingFlags).Select(x => (x.Name, x.GetValue(null)))
+                .ToList();
+            return PopulateJArray(jArray, heap, fields);
         }
 
         public static JObject HeapToJson(ImmutableDictionary<int, HeapData> heap)

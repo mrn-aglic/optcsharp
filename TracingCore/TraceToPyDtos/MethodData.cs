@@ -13,7 +13,7 @@ namespace TracingCore.TraceToPyDtos
         public MethodData(string name, int line, string declaration, bool isMain)
         {
             Name = name;
-            Line = line;
+            Line = line; // TODO remove in future since method lines are determined by runtime, not class manager
             Declaration = declaration;
             IsMain = isMain;
         }

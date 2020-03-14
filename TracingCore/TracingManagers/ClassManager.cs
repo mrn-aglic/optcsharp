@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using TracingCore.Common;
+using TracingCore.SyntaxTreeEnhancers;
 using TracingCore.TraceToPyDtos;
 
 namespace TracingCore.TracingManagers
@@ -13,16 +15,21 @@ namespace TracingCore.TracingManagers
         private readonly string _mainMethod = "Main";
         private readonly Dictionary<string, ClassData> _classes;
         private readonly SemanticModel _semanticModel;
+        private readonly Assembly _assembly;
+        private readonly AnnotationsManager _annotationsManager;
 
-        public ClassManager(SemanticModel semanticModel, Dictionary<string, ClassData> classes)
+        public ClassManager(CompilationResult compilationResult,
+            Dictionary<string, ClassData> classes)
         {
             _classes = classes;
-            _semanticModel = semanticModel;
+            _assembly = compilationResult.Assembly;
+            _semanticModel = compilationResult.GetSemanticModel();
+            _annotationsManager = new AnnotationsManager();
         }
 
         private string GetParameterTypes(ParameterListSyntax parameterListSyntax)
         {
-            return string.Join(",", parameterListSyntax.Parameters.Select(x => x.Identifier.Text));
+            return string.Join(",", parameterListSyntax.Parameters.Select(x => x.Type));
         }
 
         private MethodData GetMemberData
@@ -98,7 +105,7 @@ namespace TracingCore.TracingManagers
 
         public IList<MethodData> GetMethodsAndProperties(ClassDeclarationSyntax @class)
         {
-            var members = @class.Members;
+            var members = @class.Members.Where(_annotationsManager.IsNotAugmentation).ToList();
             var baseMethodTypes = members.OfType<BaseMethodDeclarationSyntax>();
             var properties = members.OfType<PropertyDeclarationSyntax>();
 
@@ -108,24 +115,32 @@ namespace TracingCore.TracingManagers
             return accessors.Concat(methods).ToList();
         }
 
-        public void RegisterClasses(CompilationUnitSyntax root)
+        private ClassData ConstructClassData(ClassDeclarationSyntax @class)
         {
+            var fullName = RoslynHelper.GetClassParentPath(@class);
+            return new ClassData
+            (
+                @class.Identifier.Text,
+                @class.Modifiers.Any(SyntaxKind.StaticKeyword),
+                GetExtendedTypes(@class),
+                fullName,
+                GetMethodsAndProperties(@class),
+                _annotationsManager
+                    .GetLineDataFromAnnotation(@class.GetAnnotations(_annotationsManager.OriginalLineAnnotation.Kind)
+                        .FirstOrDefault()).startLine,
+                _assembly.GetType(fullName)
+            );
+        }
+
+        public void RegisterClasses()
+        {
+            var root = _semanticModel.SyntaxTree.GetCompilationUnitRoot();
             var namespaces = root.DescendantNodes().OfType<NamespaceDeclarationSyntax>().ToList();
             var classes = namespaces.Any()
                 ? namespaces.SelectMany(x => x.ChildNodes().OfType<ClassDeclarationSyntax>()).ToList()
                 : root.ChildNodes().OfType<ClassDeclarationSyntax>();
 
-            var classesData = classes
-                .Select(@class =>
-                    new ClassData
-                    (
-                        @class.Identifier.Text.ToString(),
-                        GetExtendedTypes(@class), 
-                        RoslynHelper.GetClassParentPath(@class),
-                        GetMethodsAndProperties(@class),
-                        RoslynHelper.GetLineData(@class)
-                    )
-                );
+            var classesData = classes.Select(ConstructClassData);
 
             foreach (var classData in classesData)
             {

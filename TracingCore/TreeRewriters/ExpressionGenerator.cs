@@ -329,6 +329,7 @@ namespace TracingCore.TreeRewriters
                             SyntaxKind.StringLiteralExpression,
                             Literal(fullyQualifiedName)
                         )))
+                        // .Add(Argument(TypeOfExpression(IdentifierName(egDetails.ClassName)))) // throws exception for fully qualified name
                     )
                 )
             );

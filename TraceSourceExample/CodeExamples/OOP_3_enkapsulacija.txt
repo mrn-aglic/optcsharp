@@ -11,7 +11,7 @@ namespace Vj02
             get { return godine; }
             set
             {
-                if (godine <= 0)
+                if (value <= 0)
                     godine = 1;
                 else
                     godine = value;
@@ -28,6 +28,8 @@ namespace Vj02
     {
         static void Main()
         {
+            Student student1 = new Student(-1);
+            Console.WriteLine(student1.Godine);
             Student student2 = new Student(15);
             Console.WriteLine(student2.Godine);
         }

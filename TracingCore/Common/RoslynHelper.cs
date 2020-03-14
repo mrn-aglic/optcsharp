@@ -30,7 +30,7 @@ namespace TracingCore.Common
             return string.Join(".", names);
         }
 
-        public  static string ClassNameFromFullName(string fullyQualifiedName)
+        public static string ClassNameFromFullName(string fullyQualifiedName)
         {
             return fullyQualifiedName.Substring(fullyQualifiedName.LastIndexOf(".", StringComparison.Ordinal));
         }

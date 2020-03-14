@@ -4,19 +4,19 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using TracingCore.Common;
+using TracingCore.SyntaxTreeEnhancers;
 using TracingCore.TreeRewriters;
+using static TracingCore.Common.RoslynHelper;
 
 namespace TracingCore.RoslynRewriters
 {
     public class SourceCodeRewriter : CSharpSyntaxRewriter, IInstrumentationEngine
     {
-        private readonly SyntaxAnnotation _locationAnnotation;
         private readonly ExpressionGenerator _expressionGenerator;
         private readonly PropertyInstrumentationConfig _propertyConfig;
         private readonly string _returnVarTemplate;
 
-        private const string AnnotationKind = "location";
+        private readonly AnnotationsManager _annotationsManager;
 
         private readonly HashSet<SyntaxKind> _methodLikeDeclarations = new HashSet<SyntaxKind>
         {
@@ -32,12 +32,12 @@ namespace TracingCore.RoslynRewriters
             _propertyConfig = instrumentationConfig.Property;
             _returnVarTemplate = instrumentationConfig.ReturnVarTemplate;
 
-            _locationAnnotation = new SyntaxAnnotation(AnnotationKind);
+            _annotationsManager = new AnnotationsManager();
         }
 
         private ConstructorDeclarationSyntax PrepareStaticConstructor(ClassDeclarationSyntax classDeclarationSyntax)
         {
-            var lineData = RoslynHelper.GetLineData(classDeclarationSyntax);
+            var lineData = GetLineData(classDeclarationSyntax);
             var egDetails = new ExpressionGeneratorDetails.Short(
                 TraceApiNames.ClassName,
                 TraceApiNames.RegisterClassLoad,
@@ -45,7 +45,7 @@ namespace TracingCore.RoslynRewriters
             );
 
             var staticCotr = _expressionGenerator.CreateStaticConstructorForClass(classDeclarationSyntax);
-            var fullyQualifiedName = RoslynHelper.GetClassParentPath(classDeclarationSyntax);
+            var fullyQualifiedName = GetClassParentPath(classDeclarationSyntax);
             var registerStatement =
                 _expressionGenerator.GetRegisterClassLoadExpression(egDetails, staticCotr, fullyQualifiedName);
             return staticCotr.WithBody(_expressionGenerator.WrapInBlock(registerStatement));
@@ -64,15 +64,16 @@ namespace TracingCore.RoslynRewriters
                           x.Modifiers.Any(SyntaxKind.StaticKeyword));
             var staticCotrMember = (MemberDeclarationSyntax) (!hasStaticConstructor &&
                                                               !hasMain
-                ? PrepareStaticConstructor(node)
+                ? PrepareStaticConstructor(node).WithAdditionalAnnotations(_annotationsManager.AugmentationAnnotation)
                 : base.Visit(implStaticCotr));
 
             var backupProperties = node.Members
                 .OfType<PropertyDeclarationSyntax>()
                 .Select(x =>
                     x.WithIdentifier(
-                        SyntaxFactory.Identifier($"{_propertyConfig.BackupNamePrefix}{x.Identifier.Text}")
-                    )
+                            SyntaxFactory.Identifier($"{_propertyConfig.BackupNamePrefix}{x.Identifier.Text}")
+                        )
+                        .WithAdditionalAnnotations(_annotationsManager.AugmentationAnnotation)
                 );
 
             var visitsForEachMember = node.Members.Select(x => base.Visit(x) as MemberDeclarationSyntax);
@@ -80,7 +81,11 @@ namespace TracingCore.RoslynRewriters
                 .AddRange(backupProperties);
             var nodeWithNewMembers = node.WithMembers(members);
 
-            return staticCotrMember != null ? nodeWithNewMembers.AddMembers(staticCotrMember) : nodeWithNewMembers;
+            var newNode = staticCotrMember != null
+                ? nodeWithNewMembers.AddMembers(staticCotrMember)
+                : nodeWithNewMembers;
+
+            return newNode.WithAdditionalAnnotations(_annotationsManager.OriginalLine(node));
         }
 
         private ExpressionGeneratorDetails.Long GetEgDetails
@@ -124,7 +129,7 @@ namespace TracingCore.RoslynRewriters
             var lastStatement = statements.LastOrDefault();
             var anyStatements = lastStatement != null;
 
-            var butLastLineNumbers = butFirst.Select(x => RoslynHelper.GetLineData(x));
+            var butLastLineNumbers = butFirst.Select(x => GetLineData(x));
 
             // if there are any statements, append the last one.
             // if the last statement can have its own statements, use the endline
@@ -135,12 +140,21 @@ namespace TracingCore.RoslynRewriters
             var nonMethodParentAndAnyStatements = anyStatements && !isParentMethodLike;
 
             var lineNums = nonMethodParentAndAnyStatements || lastStatementHasItsOwnStatements
-                ? butLastLineNumbers.Append(RoslynHelper.GetLineData(lastStatement.Parent, true))
+                ? butLastLineNumbers.Append(GetLineData(lastStatement.Parent, true))
                 : anyStatements
                     ? butLastLineNumbers
-                        .Append(RoslynHelper.GetLineData(lastStatement))
+                        .Append(GetLineData(lastStatement))
                     : butLastLineNumbers; // last statement now may appear twice 
             return lineNums.ToArray();
+        }
+
+        private LineData[] GetLineNumbers(BlockSyntax blockSyntax, bool isParentMethodLike)
+        {
+            var statements = blockSyntax.Statements;
+            var prevAndNext = statements.Zip(statements.Skip(1), (p, c) => (Previous: p, Current: c));
+            var lineNumbers = prevAndNext.Select(x => GetLineData(x.Current))
+                .Append(GetLineData(blockSyntax, true));
+            return null;
         }
 
         private bool IsNodeMethodLike(SyntaxNode node)
@@ -150,6 +164,7 @@ namespace TracingCore.RoslynRewriters
 
         public override SyntaxNode VisitBlock(BlockSyntax node)
         {
+            var isVirtualBlock = _annotationsManager.IsAugmentation(node);
             var parent = node.Parent;
             var statements = node.Statements.ToList();
             var hasStatements = statements.Any();
@@ -167,32 +182,41 @@ namespace TracingCore.RoslynRewriters
             var exitName = isParentMethodLike
                 ? TraceApiNames.TraceMethodExit
                 : TraceApiNames.TraceBlockExit;
+            // GetLineNumbers(node, isParentMethodLike);
 
             var lineNumbers = DetermineLineNumbers(statements, isParentMethodLike);
             var insStatements = statements.Zip(lineNumbers)
                 .SelectMany(x => InstrumentStatement(x.First, x.Second)).ToList();
 
             var entryLineData = IsNodeMethodLike(parent)
-                ? RoslynHelper.GetLineData(parent)
-                : RoslynHelper.GetLineData(node);
+                ? GetLineData(parent)
+                : GetLineData(node);
             var enterDetails = GetEgDetails(parent, entryLineData, entryName, includeThisReference);
 
             var dullLineNumber = hasStatements
-                ? RoslynHelper.GetLineData(statements.First())
-                : RoslynHelper.GetLineData(node, true);
+                ? GetLineData(statements.First())
+                : GetLineData(node, true);
 
             var dullDetails = GetEgDetails(statements.FirstOrDefault(), dullLineNumber,
                 TraceApiNames.TraceApiMethodFirstStep, includeThisReference);
 
             var enterMethodStatement = _expressionGenerator.GetExpressionStatement(enterDetails);
             var dullMethodStatement = _expressionGenerator.GetDullExpressionStatement(dullDetails);
-            var blockSpecificStatements = new List<StatementSyntax>
-                {enterMethodStatement, dullMethodStatement}.Concat(insStatements).ToList();
+
+            var specialStatements = new List<StatementSyntax>();
+            specialStatements.Add(enterMethodStatement);
+
+            if (!isVirtualBlock)
+            {
+                specialStatements.Add(dullMethodStatement);
+            }
+
+            var blockSpecificStatements = specialStatements.Concat(insStatements).ToList();
 
             if (insStatements.Any() && insStatements.Last().IsKind(SyntaxKind.ReturnStatement)) // TODO will need to fix
                 return node.WithStatements(new SyntaxList<StatementSyntax>().AddRange(blockSpecificStatements));
 
-            var exitLineNumber = hasStatements ? lineNumbers.Last() : RoslynHelper.GetLineData(node, true);
+            var exitLineNumber = hasStatements ? lineNumbers.Last() : GetLineData(node, true);
             var exitDetails = GetEgDetails(statements.LastOrDefault(), exitLineNumber, exitName, includeThisReference);
             var exitMethodStatement =
                 _expressionGenerator.GetExitExpressionStatement(exitDetails, hasStatements,
@@ -203,6 +227,7 @@ namespace TracingCore.RoslynRewriters
             return node.WithStatements(new SyntaxList<StatementSyntax>().AddRange(blockSpecificStatements));
         }
 
+        [Obsolete]
         public SyntaxNode VisitBlock2(BlockSyntax node)
         {
             var parent = node.Parent;
@@ -218,12 +243,12 @@ namespace TracingCore.RoslynRewriters
             var insStatements = statements.Zip(lineNumbers)
                 .SelectMany(x => InstrumentStatement(x.First, x.Second)).ToList();
 
-            var entryLineData = RoslynHelper.GetLineData(node);
+            var entryLineData = GetLineData(node);
             var enterDetails = GetEgDetails(parent, entryLineData, entryName, includeThisReference);
 
             var dullLineNumber = hasStatements
-                ? RoslynHelper.GetLineData(statements.First())
-                : RoslynHelper.GetLineData(node, true);
+                ? GetLineData(statements.First())
+                : GetLineData(node, true);
 
             var dullDetails = GetEgDetails(statements.FirstOrDefault(), dullLineNumber,
                 TraceApiNames.TraceApiMethodFirstStep, includeThisReference);
@@ -236,7 +261,7 @@ namespace TracingCore.RoslynRewriters
             if (insStatements.Any() && insStatements.Last().IsKind(SyntaxKind.ReturnStatement)) // TODO will need to fix
                 return node.WithStatements(new SyntaxList<StatementSyntax>().AddRange(blockSpecificStatements));
 
-            var exitLineNumber = hasStatements ? lineNumbers.Last() : RoslynHelper.GetLineData(node, true);
+            var exitLineNumber = hasStatements ? lineNumbers.Last() : GetLineData(node, true);
             var exitDetails = GetEgDetails(statements.LastOrDefault(), exitLineNumber, exitName, includeThisReference);
             var exitMethodStatement =
                 _expressionGenerator.GetExitExpressionStatement(exitDetails, hasStatements, false);
@@ -293,7 +318,8 @@ namespace TracingCore.RoslynRewriters
             var root = node.SyntaxTree.GetRoot();
             var parent = node.Parent;
 
-            var dummyBlock = _expressionGenerator.WrapInBlock(node);
+            var dummyBlock = _expressionGenerator.WrapInBlock(node)
+                .WithAdditionalAnnotations(_annotationsManager.AugmentationAnnotation);
 
             SyntaxNode typedParent = parent switch
             {
@@ -302,10 +328,10 @@ namespace TracingCore.RoslynRewriters
                 _ => throw new NotImplementedException()
             };
             var nodeWithAnnotation = typedParent
-                .WithAdditionalAnnotations(_locationAnnotation);
+                .WithAdditionalAnnotations(_annotationsManager.LocationAnnotation);
 
             root = root.ReplaceNode(parent, nodeWithAnnotation);
-            var result = root.GetAnnotatedNodes(_locationAnnotation).First();
+            var result = root.GetAnnotatedNodes(_annotationsManager.LocationAnnotation).First();
             return result.ChildNodes().OfType<BlockSyntax>().First();
         }
 
@@ -334,14 +360,7 @@ namespace TracingCore.RoslynRewriters
                 return node.WithStatement((StatementSyntax) VisitBlock(node.Statement as BlockSyntax))
                     .WithElse(elseClause);
 
-            var root = node.SyntaxTree.GetRoot();
-            var ifWithBlock = node.WithStatement(_expressionGenerator.WrapInBlock(node.Statement))
-                .WithAdditionalAnnotations(_locationAnnotation);
-
-            root = root.ReplaceNode(node, ifWithBlock);
-            var @if = (IfStatementSyntax) root.GetAnnotatedNodes(_locationAnnotation).First();
-
-            return @if.WithStatement((StatementSyntax) VisitBlock(@if.Statement as BlockSyntax)).WithElse(elseClause);
+            return node.WithStatement(VisitBlock(WrapInBlock(node.Statement)) as BlockSyntax).WithElse(elseClause);
         }
 
         private List<StatementSyntax> InstrumentReturnStatement
@@ -378,7 +397,7 @@ namespace TracingCore.RoslynRewriters
 
         private List<StatementSyntax> InstrumentReturnStatement(ReturnStatementSyntax statement)
         {
-            var returnLineData = RoslynHelper.GetLineData(statement);
+            var returnLineData = GetLineData(statement);
             var firstBlockSyntax = statement.Ancestors().OfType<BlockSyntax>().First();
             var parentType = firstBlockSyntax.Parent switch
             {
@@ -427,10 +446,11 @@ namespace TracingCore.RoslynRewriters
 
             var root = node.SyntaxTree.GetRoot();
             var forEachWithBlock = node.WithStatement(_expressionGenerator.WrapInBlock(node.Statement))
-                .WithAdditionalAnnotations(_locationAnnotation);
+                .WithAdditionalAnnotations(_annotationsManager.LocationAnnotation);
 
             root = root.ReplaceNode(node, forEachWithBlock);
-            var @foreach = (ForEachStatementSyntax) root.GetAnnotatedNodes(_locationAnnotation).First();
+            var @foreach =
+                (ForEachStatementSyntax) root.GetAnnotatedNodes(_annotationsManager.LocationAnnotation).First();
 
             return @foreach.WithStatement((StatementSyntax) VisitBlock(@foreach.Statement as BlockSyntax));
         }

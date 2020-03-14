@@ -20,6 +20,20 @@ namespace TracingCore
         public ConsoleHandler ConsoleHandler { get; }
         public ExecutionManager ExecutionManager { get; }
         public PyTutorDataManager PyTutorDataManager { get; }
+        
+        private class OriginalLocation
+        {
+            public int StartLine { get; }
+            public int EndLine { get; }
+
+            public OriginalLocation(int startLine, int endLine)
+            {
+                StartLine = startLine;
+                EndLine = endLine;
+            }
+        }
+
+        private Dictionary<SyntaxNode, OriginalLocation> _locationsMap;
 
         public OptBackend
         (
@@ -33,6 +47,8 @@ namespace TracingCore
             ConsoleHandler = new ConsoleHandler();
             ExecutionManager = new ExecutionManager();
             PyTutorDataManager = new PyTutorDataManager(code);
+            
+            _locationsMap = new Dictionary<SyntaxNode, OriginalLocation>();
 
             ConsoleHandler.AddRangeToRead(rawInputs);
         }
@@ -40,6 +56,10 @@ namespace TracingCore
         public CompilationUnitSyntax InstrumentSourceCode(CompilationUnitSyntax originalRoot,
             InstrumentationManager instrumentationManager)
         {
+            foreach (var descendantNode in originalRoot.DescendantNodes())
+            {
+            }
+
             return instrumentationManager.Start(originalRoot);
         }
 
@@ -81,14 +101,14 @@ namespace TracingCore
         public PyTutorData Trace
         (
             CompilationResult compilationResult,
+            CompilationResult userCompilationResult,
             bool flushData = false
         )
         {
-            var semanticModel = compilationResult.GetSemanticModel();
-            var classManager = new ClassManager(semanticModel, new Dictionary<string, ClassData>());
+            // var semanticModel = compilationResult.GetSemanticModel();
+            var classManager = new ClassManager(compilationResult, new Dictionary<string, ClassData>());
 
-            TraceApi.Init(UserSyntaxTree.GetCompilationUnitRoot(),
-                new TraceApiManager(PyTutorDataManager, ConsoleHandler, classManager));
+            TraceApi.Init(new TraceApiManager(PyTutorDataManager, ConsoleHandler, classManager));
 
             PyTutorData pyTutorData;
             try

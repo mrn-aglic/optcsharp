@@ -507,7 +507,7 @@
           <e p="OOP_2_overload.txt" t="Include" />
           <e p="OOP_2_params.txt" t="Include" />
           <e p="OOP_3_enkapsulacija.txt" t="Include" />
-          <e p="OOP_3_enkapsulacija2.txt" t="Include" />
+          <e p="OOP_3_staticclass.txt" t="Include" />
           <e p="Polymorphism.txt" t="Include" />
           <e p="PolymorphismOverride.txt" t="Include" />
           <e p="Properties.txt" t="Include" />
@@ -577,6 +577,9 @@
           <e p="IInstrumentationEngine.cs" t="Include" />
           <e p="InstrumentationManager.cs" t="Include" />
           <e p="SourceCodeRewriter.cs" t="Include" />
+        </e>
+        <e p="SyntaxTreeEnhancers" t="Include">
+          <e p="AnnotationsManager.cs" t="Include" />
         </e>
         <e p="TraceApi.cs" t="Include" />
         <e p="TraceApiManager.cs" t="Include" />

@@ -156,7 +156,7 @@ namespace Vj02
 
         public Student(int godine)
         {
-            Godine = godine;
+            this.Godine = godine;
         }
     }
 
@@ -168,6 +168,31 @@ namespace Vj02
             Console.WriteLine(student1.Godine);
             Student student2 = new Student(15);
             Console.WriteLine(student2.Godine);
+        }
+    }
+}`
+    },
+    Vj03_02:{
+        name: 'Primjer static klasa',
+        categories: [Categories.Debug, Categories.Professor, Categories.OOP],
+        code: `using System;
+
+namespace Vj02
+{
+    static class Postavke
+    {
+        public static int VelicinaSvijeta = 0;
+        public static int SirinaSvijeta = 0;
+        public static string Naziv = "";
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            Postavke.Naziv = "Primjer static klase";
+            Postavke.VelicinaSvijeta = 150;
+            Postavke.SirinaSvijeta = 420;
         }
     }
 }`

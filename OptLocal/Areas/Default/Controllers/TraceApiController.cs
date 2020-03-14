@@ -48,7 +48,7 @@ namespace OptLocal.Areas.Default.Controllers
                 return PyTutorDataMapper.ToJson(optBackend.ReportCompilationError(compilationResult));
             }
 
-            var pyTutorData = optBackend.Trace(compilationResult);
+            var pyTutorData = optBackend.Trace(compilationResult, scriptCompilation);
             return PyTutorDataMapper.ToJson(pyTutorData);
         }
 
@@ -75,7 +75,7 @@ namespace OptLocal.Areas.Default.Controllers
                 return PyTutorDataMapper.ToJson(optBackend.ReportCompilationError(compilationResult));
             }
 
-            var pyTutorData = optBackend.Trace(compilationResult);
+            var pyTutorData = optBackend.Trace(compilationResult, originalSourceCompilation);
             return PyTutorDataMapper.ToJson(pyTutorData);
         }
 

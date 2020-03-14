@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -38,9 +39,9 @@ namespace TracingCore
             _pyTutorDataManager.AddMethodExit(line, varData, replacePrev);
         }
 
-        public void RegisterClasses(CompilationUnitSyntax root)
+        public void RegisterClasses()
         {
-            _classManager.RegisterClasses(root);
+            _classManager.RegisterClasses();
         }
 
         public void RegisterClassLoad(string fullyQualifiedName)

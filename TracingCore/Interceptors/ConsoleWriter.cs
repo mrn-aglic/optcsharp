@@ -8,7 +8,7 @@ namespace TracingCore.Interceptors
     public class ConsoleWriter : TextWriter
     {
         private readonly IList<string> _msgQueue;
-        
+
         public override Encoding Encoding { get; }
 
         public ConsoleWriter()
@@ -19,6 +19,11 @@ namespace TracingCore.Interceptors
         public override void WriteLine(string value)
         {
             _msgQueue.Add($"{value}\n");
+        }
+
+        public override void WriteLine()
+        {
+            _msgQueue.Add("\n");
         }
 
         public override void Write(string value)

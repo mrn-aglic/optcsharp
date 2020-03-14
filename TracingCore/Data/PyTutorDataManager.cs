@@ -245,6 +245,8 @@ namespace TracingCore.Data
         {
             var heapData = new ClassHeapData(
                 _currentHeapId,
+                classData.IsStatic,
+                classData.Type,
                 classData.FullyQualifiedPath,
                 classData.ExtendedTypes
             );
