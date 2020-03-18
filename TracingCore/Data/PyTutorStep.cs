@@ -30,10 +30,13 @@ namespace TracingCore.Data
 
         private readonly Func<HeapData, bool> _ignore;
 
+        public bool IsFakeReturn { get; }
+        
         public PyTutorStep
         (
             int lineNum,
             string @event,
+            bool isFakeReturn,
             string funcName,
             string stdOut,
             IImmutableDictionary<string, object> globals,
@@ -46,6 +49,7 @@ namespace TracingCore.Data
             Event = @event;
             FuncName = funcName;
             StdOut = stdOut;
+            IsFakeReturn = isFakeReturn;
 
             StackToRender = ImmutableStack<FuncStack>.Empty;
             foreach (var stack in stacks.Reverse())

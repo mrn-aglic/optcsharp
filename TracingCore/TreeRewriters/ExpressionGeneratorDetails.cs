@@ -27,6 +27,7 @@ namespace TracingCore.TreeRewriters
         {
             public SyntaxNode InsTargetNode { get; }
             public bool IncludeSelfReference { get; }
+            public bool ExcludeDeclaration { get; }
 
             public Long(
                 string className,
@@ -38,6 +39,20 @@ namespace TracingCore.TreeRewriters
             {
                 InsTargetNode = insTargetNode;
                 IncludeSelfReference = includeSelfReference;
+            }
+
+            public Long(
+                string className,
+                string memberName,
+                LineData lineData,
+                SyntaxNode insTargetNode,
+                bool includeSelfReference,
+                bool excludeDeclaration
+            ) : base(className, memberName, lineData)
+            {
+                InsTargetNode = insTargetNode;
+                IncludeSelfReference = includeSelfReference;
+                ExcludeDeclaration = excludeDeclaration;
             }
         }
     }

@@ -12,6 +12,8 @@ namespace TracingCore.RoslynRewriters
 {
     public class SourceCodeRewriter : CSharpSyntaxRewriter, IInstrumentationEngine
     {
+        private readonly bool _extractForDeclaration = false;
+
         private readonly ExpressionGenerator _expressionGenerator;
         private readonly PropertyInstrumentationConfig _propertyConfig;
         private readonly string _returnVarTemplate;
@@ -148,13 +150,18 @@ namespace TracingCore.RoslynRewriters
             return lineNums.ToArray();
         }
 
-        private LineData[] GetLineNumbers(BlockSyntax blockSyntax, bool isParentMethodLike)
+        private LineData[] GetLineNumbers(BlockSyntax blockSyntax, bool isParentMethodLike, bool isAugmentation)
         {
             var statements = blockSyntax.Statements;
+
+            if (isAugmentation && statements.Any()) return new[] {GetLineData(blockSyntax.Statements.Last())};
+
             var prevAndNext = statements.Zip(statements.Skip(1), (p, c) => (Previous: p, Current: c));
             var lineNumbers = prevAndNext.Select(x => GetLineData(x.Current))
-                .Append(GetLineData(blockSyntax, true));
-            return null;
+                .Append(isParentMethodLike && statements.Any()
+                    ? GetLineData(statements.Last(), true)
+                    : GetLineData(blockSyntax, true));
+            return lineNumbers.ToArray();
         }
 
         private bool IsNodeMethodLike(SyntaxNode node)
@@ -164,7 +171,7 @@ namespace TracingCore.RoslynRewriters
 
         public override SyntaxNode VisitBlock(BlockSyntax node)
         {
-            var isVirtualBlock = _annotationsManager.IsAugmentation(node);
+            var isAugmentation = _annotationsManager.IsAugmentation(node);
             var parent = node.Parent;
             var statements = node.Statements.ToList();
             var hasStatements = statements.Any();
@@ -182,9 +189,8 @@ namespace TracingCore.RoslynRewriters
             var exitName = isParentMethodLike
                 ? TraceApiNames.TraceMethodExit
                 : TraceApiNames.TraceBlockExit;
-            // GetLineNumbers(node, isParentMethodLike);
 
-            var lineNumbers = DetermineLineNumbers(statements, isParentMethodLike);
+            var lineNumbers = GetLineNumbers(node, isParentMethodLike, isAugmentation);
             var insStatements = statements.Zip(lineNumbers)
                 .SelectMany(x => InstrumentStatement(x.First, x.Second)).ToList();
 
@@ -200,15 +206,15 @@ namespace TracingCore.RoslynRewriters
             var dullDetails = GetEgDetails(statements.FirstOrDefault(), dullLineNumber,
                 TraceApiNames.TraceApiMethodFirstStep, includeThisReference);
 
-            var enterMethodStatement = _expressionGenerator.GetExpressionStatement(enterDetails);
-            var dullMethodStatement = _expressionGenerator.GetDullExpressionStatement(dullDetails);
+            var enterBlockStatement = _expressionGenerator.GetExpressionStatement(enterDetails);
+            var dullStatement = _expressionGenerator.GetDullExpressionStatement(dullDetails);
 
             var specialStatements = new List<StatementSyntax>();
-            specialStatements.Add(enterMethodStatement);
+            specialStatements.Add(enterBlockStatement);
 
-            if (!isVirtualBlock)
+            if (!isAugmentation)
             {
-                specialStatements.Add(dullMethodStatement);
+                specialStatements.Add(dullStatement);
             }
 
             var blockSpecificStatements = specialStatements.Concat(insStatements).ToList();
@@ -218,55 +224,11 @@ namespace TracingCore.RoslynRewriters
 
             var exitLineNumber = hasStatements ? lineNumbers.Last() : GetLineData(node, true);
             var exitDetails = GetEgDetails(statements.LastOrDefault(), exitLineNumber, exitName, includeThisReference);
-            var exitMethodStatement =
+            var exitBlockStatement =
                 _expressionGenerator.GetExitExpressionStatement(exitDetails, hasStatements,
                     isParentMethodLike);
 
-            blockSpecificStatements.Add(exitMethodStatement);
-
-            return node.WithStatements(new SyntaxList<StatementSyntax>().AddRange(blockSpecificStatements));
-        }
-
-        [Obsolete]
-        public SyntaxNode VisitBlock2(BlockSyntax node)
-        {
-            var parent = node.Parent;
-            var statements = node.Statements.ToList();
-            var hasStatements = statements.Any();
-
-            var includeThisReference = false;
-
-            var entryName = TraceApiNames.TraceBlockEntry;
-            var exitName = TraceApiNames.TraceBlockExit;
-
-            var lineNumbers = DetermineLineNumbers(statements, false);
-            var insStatements = statements.Zip(lineNumbers)
-                .SelectMany(x => InstrumentStatement(x.First, x.Second)).ToList();
-
-            var entryLineData = GetLineData(node);
-            var enterDetails = GetEgDetails(parent, entryLineData, entryName, includeThisReference);
-
-            var dullLineNumber = hasStatements
-                ? GetLineData(statements.First())
-                : GetLineData(node, true);
-
-            var dullDetails = GetEgDetails(statements.FirstOrDefault(), dullLineNumber,
-                TraceApiNames.TraceApiMethodFirstStep, includeThisReference);
-
-            var enterMethodStatement = _expressionGenerator.GetExpressionStatement(enterDetails);
-            var dullMethodStatement = _expressionGenerator.GetDullExpressionStatement(dullDetails);
-            var blockSpecificStatements = new List<StatementSyntax>
-                {enterMethodStatement, dullMethodStatement}.Concat(insStatements).ToList();
-
-            if (insStatements.Any() && insStatements.Last().IsKind(SyntaxKind.ReturnStatement)) // TODO will need to fix
-                return node.WithStatements(new SyntaxList<StatementSyntax>().AddRange(blockSpecificStatements));
-
-            var exitLineNumber = hasStatements ? lineNumbers.Last() : GetLineData(node, true);
-            var exitDetails = GetEgDetails(statements.LastOrDefault(), exitLineNumber, exitName, includeThisReference);
-            var exitMethodStatement =
-                _expressionGenerator.GetExitExpressionStatement(exitDetails, hasStatements, false);
-
-            blockSpecificStatements.Add(exitMethodStatement);
+            blockSpecificStatements.Add(exitBlockStatement);
 
             return node.WithStatements(new SyntaxList<StatementSyntax>().AddRange(blockSpecificStatements));
         }
@@ -287,11 +249,32 @@ namespace TracingCore.RoslynRewriters
                     VisitIfStatement(ifStatementSyntax) as StatementSyntax,
                     GetSimpleTraceStatement(statement, lineNum)
                 },
+                ForStatementSyntax forStatementSyntax => HandleForLoop(forStatementSyntax, lineNum),
                 ForEachStatementSyntax forEachStatementSyntax => new List<StatementSyntax>
                 {
                     VisitForEachStatement(forEachStatementSyntax) as StatementSyntax
                 },
                 _ => InstrumentSimpleStatement(statement, lineNum)
+            };
+        }
+
+        private List<StatementSyntax> HandleForLoop(ForStatementSyntax forStatementSyntax, LineData lineNum)
+        {
+            // var list = _extractForDeclaration
+            //     ? new List<StatementSyntax>
+            //     {
+            //         ExtractForStatementDeclarations(forStatementSyntax, _extractForDeclaration)
+            //     }
+            //     : new List<StatementSyntax>();
+            // return list.Concat(new List<StatementSyntax>
+            // {
+            //     VisitForStatement(forStatementSyntax) as StatementSyntax,
+            //     GetSimpleTraceStatement(forStatementSyntax, lineNum, !_extractForDeclaration)
+            // }).ToList();
+            return new List<StatementSyntax>
+            {
+                VisitForStatement(forStatementSyntax) as StatementSyntax,
+                GetSimpleTraceStatement(forStatementSyntax, lineNum, !_extractForDeclaration)
             };
         }
 
@@ -340,14 +323,11 @@ namespace TracingCore.RoslynRewriters
             if (@else == null) return null;
 
             var statement = @else.Statement;
-            var newStatement = statement switch
-            {
-                BlockSyntax blockSyntax => VisitBlock(blockSyntax),
-                IfStatementSyntax ifStatementSyntax => VisitIfStatement(ifStatementSyntax),
-                _ => VisitBlock(WrapInBlock(statement))
-            };
+            var hasBlock = statement.IsKind(SyntaxKind.Block);
 
-            return @else.WithStatement(newStatement as StatementSyntax);
+            return hasBlock
+                ? @else.WithStatement((StatementSyntax) VisitBlock(@else.Statement as BlockSyntax))
+                : @else.WithStatement(VisitBlock(WrapInBlock(@else.Statement)) as BlockSyntax);
         }
 
         public override SyntaxNode VisitIfStatement(IfStatementSyntax node)
@@ -357,10 +337,48 @@ namespace TracingCore.RoslynRewriters
             var elseClause = HandleElseClause(node.Else);
 
             if (hasBlock)
-                return node.WithStatement((StatementSyntax) VisitBlock(node.Statement as BlockSyntax))
+                return node
+                    .WithStatement((StatementSyntax) VisitBlock(node.Statement as BlockSyntax))
                     .WithElse(elseClause);
 
-            return node.WithStatement(VisitBlock(WrapInBlock(node.Statement)) as BlockSyntax).WithElse(elseClause);
+            return node
+                .WithStatement(VisitBlock(WrapInBlock(node.Statement)) as BlockSyntax)
+                .WithElse(elseClause);
+        }
+
+        public override SyntaxNode VisitForStatement(ForStatementSyntax node)
+        {
+            var hasBlock = node.Statement.IsKind(SyntaxKind.Block);
+
+            var block = hasBlock
+                ? VisitBlock(node.Statement as BlockSyntax) as BlockSyntax
+                : WrapInBlock(node.Statement);
+
+            // var forKeywordTrace = GetSimpleTraceStatement(node, GetLineData(node));
+            var blockWithLoopTrace =
+                block.WithStatements(block.Statements
+                    .InsertRange(0, new[] {_expressionGenerator.GetRegisterLoopIteration(node)}));
+
+            var egDetails = new ExpressionGeneratorDetails.Long
+            (
+                TraceApiNames.ClassName,
+                TraceApiNames.ConditionalTrace,
+                GetLineData(node),
+                node,
+                false,
+                false
+            );
+
+            return node.WithStatement(blockWithLoopTrace)
+                .WithIncrementors(
+                    new SeparatedSyntaxList<ExpressionSyntax>()
+                        .AddRange(node.Incrementors)
+                        .Add(
+                            _expressionGenerator.StatementToExpressionSyntax(
+                                _expressionGenerator.GetConditionalExpressionStatement(egDetails, node.Condition)
+                            )
+                        )
+                );
         }
 
         private List<StatementSyntax> InstrumentReturnStatement
@@ -411,7 +429,8 @@ namespace TracingCore.RoslynRewriters
             return InstrumentReturnStatement(returnType, returnLineData, statement);
         }
 
-        private StatementSyntax GetSimpleTraceStatement(StatementSyntax statement, LineData lineNum)
+        private StatementSyntax GetSimpleTraceStatement(StatementSyntax statement, LineData lineNum,
+            bool excludeDeclaration = false)
         {
             var egDetails = new ExpressionGeneratorDetails.Long
             (
@@ -419,14 +438,14 @@ namespace TracingCore.RoslynRewriters
                 TraceApiNames.TraceData,
                 lineNum,
                 statement,
-                false
+                false,
+                excludeDeclaration
             );
             return _expressionGenerator.GetExpressionStatement(egDetails);
         }
 
         private List<StatementSyntax> InstrumentSimpleStatement(StatementSyntax statement, LineData lineNum)
         {
-            // if(statement.IsKind(SyntaxKind.SimpleAssignmentExpression))
             var statementToInsert = GetSimpleTraceStatement(statement, lineNum);
 
             return new List<StatementSyntax> {statement, statementToInsert};

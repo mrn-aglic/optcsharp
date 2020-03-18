@@ -499,9 +499,11 @@
         <e p="bin" t="ExcludeRecursive" />
         <e p="CodeExamples" t="Include">
           <e p="ClassEmptyConstructor.txt" t="Include" />
+          <e p="For_1.txt" t="Include" />
           <e p="HelloWorld.txt" t="Include" />
           <e p="IfElse.txt" t="Include" />
           <e p="InstanceExample1.txt" t="Include" />
+          <e p="Methods.txt" t="Include" />
           <e p="MethodsExample.txt" t="Include" />
           <e p="MultipleNamespacesExample.txt" t="Include" />
           <e p="OOP_2_overload.txt" t="Include" />
@@ -513,6 +515,7 @@
           <e p="Properties.txt" t="Include" />
           <e p="SimpleWithMethod.txt" t="Include" />
           <e p="VoidMethodExample.txt" t="Include" />
+          <e p="While_1.txt" t="Include" />
         </e>
         <e p="Codes.cs" t="Include" />
         <e p="Instrumentation" t="Include">
@@ -551,6 +554,10 @@
           <e p="PyTutorDataManager.cs" t="Include" />
           <e p="PyTutorStep.cs" t="Include" />
           <e p="VarHeapData.cs" t="Include" />
+        </e>
+        <e p="Exceptions" t="Include">
+          <e p="ExitExecutionException.cs" t="Include" />
+          <e p="NumIterationsException.cs" t="Include" />
         </e>
         <e p="ExecutionManager.cs" t="Include" />
         <e p="Interceptors" t="Include">
@@ -594,6 +601,7 @@
         <e p="TracingCore.csproj" t="IncludeRecursive" />
         <e p="TracingManagers" t="Include">
           <e p="ClassManager.cs" t="Include" />
+          <e p="LoopManager.cs" t="Include" />
         </e>
         <e p="TreeRewriters" t="Include">
           <e p="ExpressionGenerator.cs" t="Include" />

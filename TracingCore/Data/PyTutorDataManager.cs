@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
-using Newtonsoft.Json.Linq;
 using TracingCore.Common;
 using TracingCore.JsonMappers;
 using TracingCore.TraceToPyDtos;
@@ -135,6 +133,8 @@ namespace TracingCore.Data
         public void AddLineStep(int line, string stdOut, IList<VariableData> variables)
         {
             var lastStep = _pyTutorData.Trace.Last() as PyTutorStep;
+            // var @event = lastStep.Line == line ? ReturnEvent : StepLineEvent;
+            var @event = StepLineEvent;
 
             var existingStacks = GetFuncStacks();
             if (IsReturnFromFunction())
@@ -153,7 +153,8 @@ namespace TracingCore.Data
 
             var pyTutorStep = new PyTutorStep(
                 line,
-                StepLineEvent,
+                @event,
+                @event == ReturnEvent,
                 _currentFunctionName,
                 stdOut,
                 lastStep.Globals,
@@ -167,7 +168,9 @@ namespace TracingCore.Data
 
         private bool IsReturnFromFunction()
         {
-            return _pyTutorData.Trace.Last() is PyTutorStep lastStep && lastStep.Event == ReturnEvent;
+            return _pyTutorData.Trace.Last() is PyTutorStep lastStep &&
+                   !lastStep.IsFakeReturn &&
+                   lastStep.Event == ReturnEvent;
         }
 
         private void SimpleGC()
@@ -191,6 +194,7 @@ namespace TracingCore.Data
             var newLastStep = new PyTutorStep(
                 lastStep.Line,
                 lastStep.Event,
+                false,
                 lastStep.FuncName,
                 lastStep.StdOut,
                 lastStep.Globals,
@@ -281,6 +285,7 @@ namespace TracingCore.Data
             var pyTutorStep = new PyTutorStep(
                 line,
                 FunctionCallEvent,
+                false,
                 methodName,
                 stdOut,
                 globals,
@@ -300,9 +305,6 @@ namespace TracingCore.Data
         {
             var prevStep = _pyTutorData.Trace.Last() as PyTutorStep;
 
-            var isPrevStepLineSame =
-                prevStep.Line == line; // TODO use to determine if method exit should replace the prevStepLine
-
             var newStackToRender = prevStep.StackToRender.Pop(out var lastStack);
             var hd = GetHeapData(variableData);
             var heapId = hd?.HeapId;
@@ -315,6 +317,7 @@ namespace TracingCore.Data
             var newStep = new PyTutorStep(
                 line,
                 ReturnEvent,
+                false,
                 prevStep.FuncName,
                 prevStep.StdOut,
                 prevStep.Globals,
@@ -323,7 +326,7 @@ namespace TracingCore.Data
                 PyTutorStepMapper.HeapToJson(heap)
             );
 
-            if ((replacePrevStep || prevStep.StackToRender.Count() == 1) && isPrevStepLineSame)
+            if (replacePrevStep || prevStep.StackToRender.Count() == 1)
             {
                 _pyTutorData.Trace.Remove(prevStep);
             }
@@ -348,6 +351,7 @@ namespace TracingCore.Data
             var newStep = new PyTutorStep(
                 classData.LineData.StartLine,
                 StepLineEvent,
+                false,
                 lastStep.FuncName,
                 lastStep.StdOut,
                 globals,

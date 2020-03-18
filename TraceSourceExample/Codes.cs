@@ -19,6 +19,11 @@ namespace TraceSourceExample
             return GetFileContents("IfElse.txt");
         }
 
+        public static string GetForExample(int id)
+        {
+            return GetFileContents($"For_{id}.txt");
+        }
+
         public static string GetOOPExample(string name)
         {
             return GetFileContents($"OOP_{name}.txt");

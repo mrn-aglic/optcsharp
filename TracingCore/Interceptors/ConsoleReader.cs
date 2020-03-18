@@ -1,14 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using TracingCore.Exceptions;
 
 namespace TracingCore.Interceptors
 {
-    public class ExitExecutionException : Exception
-    {
-        public override string Message => "Exit execution to prompt user for ReadLine input";
-    }
-
     public class ConsoleReader : TextReader
     {
         private readonly TextWriter _defaultOutStream;

@@ -1,0 +1,22 @@
+using System;
+
+namespace Vj02
+{
+    class Program
+    {
+        static void Main()
+        {
+            Console.WriteLine("Unesi neki broj");
+            int num = int.Parse(Console.ReadLine());
+            int sum = 0;
+
+            while (num > 0)
+            {
+                int j = num % 10;
+                sum += j;
+                num = num / 10;
+            }
+            Console.WriteLine($"Suma je {sum}");
+        }
+    }
+}

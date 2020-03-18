@@ -1,4 +1,3 @@
-using System;
 using TracingCore.TraceToPyDtos;
 
 namespace TracingCore
@@ -43,6 +42,26 @@ namespace TracingCore
         public static void TraceData(int line, params VariableData[] variables)
         {
             _traceApiManager.TraceData(line, variables);
+        }
+
+        public static void ConditionalTrace(int line, bool conditionResult, params VariableData[] variables)
+        {
+            _traceApiManager.ConditionalTrace(line, conditionResult, variables);
+        }
+
+        public static void RegisterIteration(string keyword, string location)
+        {
+            _traceApiManager.RegisterLoopIteration(keyword, location);
+        }
+
+        public static void TraceDataWithStatementHits
+        (
+            int line,
+            string statement,
+            string location,
+            params VariableData[] variables
+        )
+        {
         }
 
         public static void TraceMethodExit(int line, bool replacePrev)

@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using TracingCore.Data;
 using TracingCore.Interceptors;
 using TracingCore.TraceToPyDtos;
@@ -11,15 +9,18 @@ namespace TracingCore
 {
     public class TraceApiManager
     {
-
         private readonly PyTutorDataManager _pyTutorDataManager;
         private readonly ConsoleHandler _consoleHandler;
         private readonly ClassManager _classManager;
-        public TraceApiManager(PyTutorDataManager pyTutorDataManager, ConsoleHandler consoleHandler, ClassManager classManager)
+        private readonly LoopManager _loopManager;
+
+        public TraceApiManager(PyTutorDataManager pyTutorDataManager, ConsoleHandler consoleHandler,
+            ClassManager classManager, LoopManager loopManager)
         {
             _pyTutorDataManager = pyTutorDataManager;
             _consoleHandler = consoleHandler;
             _classManager = classManager;
+            _loopManager = loopManager;
         }
 
         public void TraceData(int line, params VariableData[] variables)
@@ -53,6 +54,23 @@ namespace TracingCore
         public void FlushPyTutorData()
         {
             _pyTutorDataManager.FlushPyTutorData();
+        }
+
+        public void RegisterLoopIteration(string keyword, string location)
+        {
+            _loopManager.UpdateLoopIteration(keyword, location);
+        }
+
+        public int GetLoopIteration(string keyword, string location)
+        {
+            return _loopManager.GetLoopIteration(keyword, location);
+        }
+
+        public void ConditionalTrace(int line, bool expressionResult, VariableData[] variables)
+        {
+            var vars = expressionResult ? variables : new VariableData[0];
+            TraceData(line, vars);
+            // _pyTutorDataManager.AddNextTraceEntry(line, stdOut, new List<VariableData>());
         }
     }
 }

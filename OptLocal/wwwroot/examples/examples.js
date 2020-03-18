@@ -239,6 +239,28 @@ namespace Vj02
     }
 }`
     },
+    P2Vj_031:{
+      name: 'Primjer for (parni brojevi)',
+      categories: [Categories.Debug, Categories.Professor, Categories.P2],
+      code: `using System;
+
+namespace Vj02
+{
+    class Program
+    {
+        static void Main()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    Console.WriteLine(i);
+                }
+            }
+        }
+    }
+}`  
+    },
     ifElse: {
         name: 'If-else primjer',
         categories: [Categories.Debug],

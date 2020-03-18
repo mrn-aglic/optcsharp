@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using TracingCore.Data;
+using TracingCore.Exceptions;
 using TracingCore.Interceptors;
 using TracingCore.RoslynRewriters;
 using TracingCore.TraceToPyDtos;
@@ -20,7 +21,7 @@ namespace TracingCore
         public ConsoleHandler ConsoleHandler { get; }
         public ExecutionManager ExecutionManager { get; }
         public PyTutorDataManager PyTutorDataManager { get; }
-        
+
         private class OriginalLocation
         {
             public int StartLine { get; }
@@ -47,7 +48,7 @@ namespace TracingCore
             ConsoleHandler = new ConsoleHandler();
             ExecutionManager = new ExecutionManager();
             PyTutorDataManager = new PyTutorDataManager(code);
-            
+
             _locationsMap = new Dictionary<SyntaxNode, OriginalLocation>();
 
             ConsoleHandler.AddRangeToRead(rawInputs);
@@ -107,8 +108,9 @@ namespace TracingCore
         {
             // var semanticModel = compilationResult.GetSemanticModel();
             var classManager = new ClassManager(compilationResult, new Dictionary<string, ClassData>());
+            var loopManager = new LoopManager();
 
-            TraceApi.Init(new TraceApiManager(PyTutorDataManager, ConsoleHandler, classManager));
+            TraceApi.Init(new TraceApiManager(PyTutorDataManager, ConsoleHandler, classManager, loopManager));
 
             PyTutorData pyTutorData;
             try
@@ -118,6 +120,10 @@ namespace TracingCore
             catch (ExitExecutionException)
             {
                 PyTutorDataManager.RegisterRawData();
+            }
+            catch (NumIterationsException numIterationsException)
+            {
+                PyTutorDataManager.RegisterUncaughtException(numIterationsException.Line, numIterationsException.Message);
             }
             catch (Exception e)
             {

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.IO.Compression;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -40,7 +42,7 @@ namespace TracingCore.TreeRewriters
             );
         }
 
-        private IEnumerable<ArgumentSyntax> GetParameters(SyntaxNode syntaxNode)
+        private IEnumerable<ArgumentSyntax> GetParameters(SyntaxNode syntaxNode, bool excludeDeclaration)
         {
             switch (syntaxNode)
             {
@@ -68,6 +70,25 @@ namespace TracingCore.TreeRewriters
                         .GroupBy(x => x.Identifier.Text)
                         .Select(group => group.First());
                     return identifiers.Select(x => Argument(VariableData.GetObjectCreationSyntax(x)));
+                case ForStatementSyntax forStatementSyntax:
+                    var conditionIdentifiers =
+                        forStatementSyntax.Condition.DescendantNodes().OfType<IdentifierNameSyntax>();
+                    var incrementors =
+                        forStatementSyntax.Incrementors.SelectMany(x =>
+                            x.DescendantNodes().OfType<IdentifierNameSyntax>());
+
+                    var declaration = forStatementSyntax.Declaration == null
+                        ? new HashSet<string>()
+                        : forStatementSyntax.Declaration.Variables.Select(x => x.Identifier.Text)
+                            .ToHashSet();
+
+                    var allVars = conditionIdentifiers
+                        .Concat(incrementors)
+                        .GroupBy(x => x.Identifier.Text)
+                        .Select(x => x.First())
+                        .Where(x => !(excludeDeclaration && declaration.Contains(x.Identifier.Text)));
+
+                    return allVars.Select(x => Argument(VariableData.GetObjectCreationSyntax(x)));
                 case ExpressionStatementSyntax expressionStatementSyntax:
 
                     switch (expressionStatementSyntax.Expression)
@@ -166,13 +187,17 @@ namespace TracingCore.TreeRewriters
             }
         }
 
-        private InvocationExpressionSyntax GetMethodInvocationExpressionSyntax(ExpressionGeneratorDetails.Long details)
+        private InvocationExpressionSyntax GetMethodInvocationExpressionSyntax
+        (
+            ExpressionGeneratorDetails.Long details,
+            ArgumentSyntax condition = null
+        )
         {
             var invocationSyntax = InvocationExpression(
                 GetMemberAccessExpressionSyntax(details)
             );
 
-            var @params = GetParameters(details.InsTargetNode).ToList();
+            var @params = GetParameters(details.InsTargetNode, details.ExcludeDeclaration).ToList();
 
             if (details.IncludeSelfReference)
             {
@@ -195,9 +220,14 @@ namespace TracingCore.TreeRewriters
                     Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(statementString)))
                 );
 
-            var methodInvocationSyntax = invocationSyntax
-                .WithArgumentList(ArgumentList(arguments))
-                .AddArgumentListArguments(@params.ToArray());
+            var methodInvocationSyntax = invocationSyntax.WithArgumentList(ArgumentList(arguments));
+
+            if (condition != null)
+            {
+                methodInvocationSyntax = methodInvocationSyntax.AddArgumentListArguments(condition);
+            }
+
+            methodInvocationSyntax = methodInvocationSyntax.AddArgumentListArguments(@params.ToArray());
 
             return methodInvocationSyntax;
         }
@@ -206,6 +236,22 @@ namespace TracingCore.TreeRewriters
         {
             return ExpressionStatement(
                 GetMethodInvocationExpressionSyntax(details)
+            );
+        }
+
+        public ExpressionStatementSyntax GetConditionalExpressionStatement
+        (
+            ExpressionGeneratorDetails.Long details,
+            ExpressionSyntax condition
+        )
+        {
+            var conditionalArgument = Argument(
+                PrefixUnaryExpression(SyntaxKind.LogicalNotExpression,
+                    ParenthesizedExpression(condition))
+            );
+
+            return ExpressionStatement(
+                GetMethodInvocationExpressionSyntax(details, conditionalArgument)
             );
         }
 
@@ -325,14 +371,65 @@ namespace TracingCore.TreeRewriters
                 InvocationExpression(
                     GetMemberAccessExpressionSyntax(egDetails),
                     ArgumentList(new SeparatedSyntaxList<ArgumentSyntax>()
-                        .Add(Argument(LiteralExpression(
-                            SyntaxKind.StringLiteralExpression,
-                            Literal(fullyQualifiedName)
-                        )))
+                            .Add(Argument(LiteralExpression(
+                                SyntaxKind.StringLiteralExpression,
+                                Literal(fullyQualifiedName)
+                            )))
                         // .Add(Argument(TypeOfExpression(IdentifierName(egDetails.ClassName)))) // throws exception for fully qualified name
                     )
                 )
             );
+        }
+
+        public ExpressionStatementSyntax GetRegisterLoopIteration(StatementSyntax statementSyntax)
+        {
+            var keyword = statementSyntax switch
+            {
+                ForStatementSyntax forStatementSyntax => forStatementSyntax.ForKeyword,
+                WhileStatementSyntax whileStatementSyntax => whileStatementSyntax.WhileKeyword,
+                DoStatementSyntax doStatementSyntax => doStatementSyntax.DoKeyword,
+                _ => throw new ArgumentException("Unsupported loop exception")
+            };
+
+            var lineSpan = statementSyntax.GetLocation().GetLineSpan();
+            var startLine = lineSpan.StartLinePosition;
+            var endLine = lineSpan.EndLinePosition;
+            var location =
+                $"{startLine.Line + 1},{startLine.Character + 1}-{endLine.Line + 1}";
+
+            var keywordArgument =
+                Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(keyword.Text)));
+            var locationArgument =
+                Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(location)));
+
+            var invocation = InvocationExpression(
+                MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                    IdentifierName(TraceApiNames.ClassName),
+                    IdentifierName(TraceApiNames.RegisterIteration))
+            );
+
+            return ExpressionStatement(
+                invocation.WithArgumentList(ArgumentList(
+                        new SeparatedSyntaxList<ArgumentSyntax>()
+                            .Add(keywordArgument)
+                            .Add(locationArgument)
+                    )
+                )
+            );
+        }
+
+        public StatementSyntax ExtractVariableDeclaration(VariableDeclarationSyntax variableDeclarationSyntax)
+        {
+            return LocalDeclarationStatement(variableDeclarationSyntax);
+        }
+
+        public ExpressionSyntax StatementToExpressionSyntax(StatementSyntax statementSyntax)
+        {
+            if (!(statementSyntax is ExpressionStatementSyntax expressionStatement))
+                throw new ArgumentException("Statement is not an Expression statement.");
+
+            var expression = expressionStatement.Expression;
+            return expression;
         }
 
         public FieldDeclarationSyntax GenerateCreateTraceApiInstance()
