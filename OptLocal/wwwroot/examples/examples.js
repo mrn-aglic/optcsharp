@@ -172,7 +172,7 @@ namespace Vj02
     }
 }`
     },
-    Vj03_02:{
+    Vj03_02: {
         name: 'Primjer static klasa',
         categories: [Categories.Debug, Categories.Professor, Categories.OOP],
         code: `using System;
@@ -239,10 +239,10 @@ namespace Vj02
     }
 }`
     },
-    P2Vj_031:{
-      name: 'Primjer for (parni brojevi)',
-      categories: [Categories.Debug, Categories.Professor, Categories.P2],
-      code: `using System;
+    P2Vj_031: {
+        name: 'Primjer for (parni brojevi)',
+        categories: [Categories.Debug, Categories.Professor, Categories.P2],
+        code: `using System;
 
 namespace Vj02
 {
@@ -259,7 +259,31 @@ namespace Vj02
             }
         }
     }
-}`  
+}`
+    },
+    P2Vj_032: {
+        name: 'Primer while (suma znamenaka)',
+        categories: [Categories.Debug, Categories.Professor, Categories.P2],
+        code: `using System;
+
+namespace Vj02
+{
+    class Program
+    {
+        static void Main()
+        {
+            int br = 123;
+            int suma = 0;
+            while (br > 0)
+            {
+                int znam = br % 10;
+                suma = suma + znam;
+                br = br / 10;
+            }
+            Console.WriteLine(suma);
+        }
+    }
+}`
     },
     ifElse: {
         name: 'If-else primjer',
