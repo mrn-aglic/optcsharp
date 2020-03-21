@@ -1055,6 +1055,7 @@ function genericOptFrontendReady() {
                 setFronendError(["Server error! Your code might be too long for this tool. Shorten your code and re-try."]);
             }
         } else {
+            console.log(exception)
             // TODO Better error messages
             setFronendError(["Server error! Your code might be taking too much time to run or using too much memory.",
                 "",
@@ -1514,9 +1515,9 @@ function executeCodeAndCreateViz(codeToExec,
                 setFronendError([trace[trace.length - 1].exception_msg]);
             } else {
                 // TODO: BETTER ERROR MESSAGES
-                setFronendError(["Dogodila se pogreška tijekom kompajliranja.",
-                    "",
-                    ""]);
+                let firstLine = ["Dogodila se pogreška tijekom kompajliranja."];
+                const errors = firstLine.concat(trace.map(x => x.exception_msg).reduce((acc, cur) => `${acc}\n${cur}`));
+                setFronendError(errors);
             }
         } else {
             // fail-soft to prevent running off of the end of trace

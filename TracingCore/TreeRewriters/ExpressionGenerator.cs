@@ -89,6 +89,10 @@ namespace TracingCore.TreeRewriters
                         .Where(x => !(excludeDeclaration && declaration.Contains(x.Identifier.Text)));
 
                     return allVars.Select(x => Argument(VariableData.GetObjectCreationSyntax(x)));
+                case WhileStatementSyntax whileStatementSyntax:
+                    var whileCondIdentifiers =
+                        whileStatementSyntax.Condition.DescendantNodes().OfType<IdentifierNameSyntax>();
+                    return whileCondIdentifiers.Select(x => Argument(VariableData.GetObjectCreationSyntax(x)));
                 case ExpressionStatementSyntax expressionStatementSyntax:
 
                     switch (expressionStatementSyntax.Expression)
@@ -107,13 +111,6 @@ namespace TracingCore.TreeRewriters
 
                             var left = (IdentifierNameSyntax) assignmentExpressionSyntax.Left;
 
-                            // var compilation =
-                            //     CSharpCompilation.Create("temp", new[] {assignmentExpressionSyntax.SyntaxTree});
-
-                            // if (compilation
-                            //     .GetSemanticModel(assignmentExpressionSyntax.SyntaxTree)
-                            //     .GetSymbolInfo(left)
-                            //     .Symbol is IPropertySymbol)
                             var equivalentNode = _semanticModel.SyntaxTree.GetCompilationUnitRoot().DescendantNodes()
                                 .FirstOrDefault(x =>
                                     x.IsEquivalentTo(left));
@@ -395,7 +392,7 @@ namespace TracingCore.TreeRewriters
             var startLine = lineSpan.StartLinePosition;
             var endLine = lineSpan.EndLinePosition;
             var location =
-                $"{startLine.Line + 1},{startLine.Character + 1}-{endLine.Line + 1}";
+                $"{startLine.Line + 1},{startLine.Character + 1}-{endLine.Line + 1},{endLine.Character + 1}";
 
             var keywordArgument =
                 Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(keyword.Text)));

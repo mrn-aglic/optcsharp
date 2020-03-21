@@ -30,7 +30,8 @@ namespace TraceSourceExample
         static void Main(string[] args)
         {
             Console.WriteLine(args.GetType());
-            var code = Codes.GetForExample(1);
+            // var code = Codes.GetForExample(1);
+            var code = Codes.GetWhileExample(1);
             // var code = Codes.GetMethodsExample();
             // var code = Codes.GetOOPExample("3_enkapsulacija");
             // var code = Codes.GetIfElseExample();

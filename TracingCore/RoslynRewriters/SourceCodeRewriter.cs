@@ -250,6 +250,11 @@ namespace TracingCore.RoslynRewriters
                     GetSimpleTraceStatement(statement, lineNum)
                 },
                 ForStatementSyntax forStatementSyntax => HandleForLoop(forStatementSyntax, lineNum),
+                WhileStatementSyntax whileStatementSyntax => new List<StatementSyntax>
+                {
+                    VisitWhileStatement(whileStatementSyntax) as StatementSyntax,
+                    GetSimpleTraceStatement(whileStatementSyntax, lineNum)
+                },
                 ForEachStatementSyntax forEachStatementSyntax => new List<StatementSyntax>
                 {
                     VisitForEachStatement(forEachStatementSyntax) as StatementSyntax
@@ -260,17 +265,6 @@ namespace TracingCore.RoslynRewriters
 
         private List<StatementSyntax> HandleForLoop(ForStatementSyntax forStatementSyntax, LineData lineNum)
         {
-            // var list = _extractForDeclaration
-            //     ? new List<StatementSyntax>
-            //     {
-            //         ExtractForStatementDeclarations(forStatementSyntax, _extractForDeclaration)
-            //     }
-            //     : new List<StatementSyntax>();
-            // return list.Concat(new List<StatementSyntax>
-            // {
-            //     VisitForStatement(forStatementSyntax) as StatementSyntax,
-            //     GetSimpleTraceStatement(forStatementSyntax, lineNum, !_extractForDeclaration)
-            // }).ToList();
             return new List<StatementSyntax>
             {
                 VisitForStatement(forStatementSyntax) as StatementSyntax,
@@ -379,6 +373,21 @@ namespace TracingCore.RoslynRewriters
                             )
                         )
                 );
+        }
+
+        public override SyntaxNode VisitWhileStatement(WhileStatementSyntax node)
+        {
+            var hasBlock = node.Statement.IsKind(SyntaxKind.Block);
+
+            var block = hasBlock
+                ? VisitBlock(node.Statement as BlockSyntax) as BlockSyntax
+                : WrapInBlock(node.Statement);
+
+            var blockWithLoopTrace =
+                block.WithStatements(block.Statements
+                    .InsertRange(0, new[] {_expressionGenerator.GetRegisterLoopIteration(node)}));
+
+            return node.WithStatement(blockWithLoopTrace);
         }
 
         private List<StatementSyntax> InstrumentReturnStatement

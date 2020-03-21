@@ -177,6 +177,10 @@ namespace TracingCore.JsonMappers
                 case PyTutorStep pyStep:
                     jObject.Add("stdout", JToken.FromObject(pyStep.StdOut));
                     jObject.Add("line", JToken.FromObject(pyStep.Line));
+                    if (pyStep.ExceptionMsg != null)
+                    {
+                        jObject.Add("exception_msg", JToken.FromObject(pyStep.ExceptionMsg));
+                    }
                     jObject.Add("stack_to_render",
                         JToken.FromObject(pyStep.StackToRender.Select(FuncStackMapper.ToJson).Reverse()));
                     jObject.Add("globals", JToken.FromObject(pyStep.Globals));

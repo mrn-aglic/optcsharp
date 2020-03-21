@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 using TracingCore.Common;
 using TracingCore.JsonMappers;
 using TracingCore.TraceToPyDtos;
@@ -154,7 +155,6 @@ namespace TracingCore.Data
             var pyTutorStep = new PyTutorStep(
                 line,
                 @event,
-                @event == ReturnEvent,
                 _currentFunctionName,
                 stdOut,
                 lastStep.Globals,
@@ -169,7 +169,6 @@ namespace TracingCore.Data
         private bool IsReturnFromFunction()
         {
             return _pyTutorData.Trace.Last() is PyTutorStep lastStep &&
-                   !lastStep.IsFakeReturn &&
                    lastStep.Event == ReturnEvent;
         }
 
@@ -194,7 +193,6 @@ namespace TracingCore.Data
             var newLastStep = new PyTutorStep(
                 lastStep.Line,
                 lastStep.Event,
-                false,
                 lastStep.FuncName,
                 lastStep.StdOut,
                 lastStep.Globals,
@@ -285,7 +283,6 @@ namespace TracingCore.Data
             var pyTutorStep = new PyTutorStep(
                 line,
                 FunctionCallEvent,
-                false,
                 methodName,
                 stdOut,
                 globals,
@@ -317,7 +314,6 @@ namespace TracingCore.Data
             var newStep = new PyTutorStep(
                 line,
                 ReturnEvent,
-                false,
                 prevStep.FuncName,
                 prevStep.StdOut,
                 prevStep.Globals,
@@ -351,7 +347,6 @@ namespace TracingCore.Data
             var newStep = new PyTutorStep(
                 classData.LineData.StartLine,
                 StepLineEvent,
-                false,
                 lastStep.FuncName,
                 lastStep.StdOut,
                 globals,
@@ -365,7 +360,25 @@ namespace TracingCore.Data
 
         private void RegisterExceptionShared(int line, string message, string @event)
         {
-            var lastStep = _pyTutorData.Trace.Last() as PyTutorStep;
+            var lastStep = _pyTutorData.Trace.LastOrDefault() as PyTutorStep;
+
+            if (lastStep == null)
+            {
+                _pyTutorData.Trace.Add(
+                    new PyTutorStep(
+                        line,
+                        @event,
+                        string.Empty,
+                        string.Empty,
+                        message,
+                        ImmutableDictionary<string, object>.Empty,
+                        ImmutableStack<FuncStack>.Empty,
+                        ImmutableDictionary<int, HeapData>.Empty,
+                        new JObject()
+                    )
+                );
+                return;
+            }
 
             var newStep = new PyTutorStep(
                 line,
@@ -400,6 +413,11 @@ namespace TracingCore.Data
         {
             var jObject = PyTutorDataMapper.ToJson(_pyTutorData);
             FileIO.WriteToFile(jObject.ToString(), "JsonOutput", "optOutput.json");
+        }
+
+        public int GetLastStepLine()
+        {
+            return ((PyTutorStep) _pyTutorData.Trace.Last()).Line;
         }
 
         public PyTutorData GetData()

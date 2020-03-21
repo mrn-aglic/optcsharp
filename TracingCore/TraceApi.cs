@@ -54,16 +54,6 @@ namespace TracingCore
             _traceApiManager.RegisterLoopIteration(keyword, location);
         }
 
-        public static void TraceDataWithStatementHits
-        (
-            int line,
-            string statement,
-            string location,
-            params VariableData[] variables
-        )
-        {
-        }
-
         public static void TraceMethodExit(int line, bool replacePrev)
         {
             _traceApiManager.AddMethodExit(line, null, replacePrev);

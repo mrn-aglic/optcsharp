@@ -123,11 +123,13 @@ namespace TracingCore
             }
             catch (NumIterationsException numIterationsException)
             {
-                PyTutorDataManager.RegisterUncaughtException(numIterationsException.Line, numIterationsException.Message);
+                PyTutorDataManager.RegisterUncaughtException(numIterationsException.Line,
+                    numIterationsException.Message);
             }
             catch (Exception e)
             {
                 Debug.WriteLine(e);
+                PyTutorDataManager.RegisterUncaughtException(PyTutorDataManager.GetLastStepLine(), e.Message);
             }
             finally
             {
@@ -145,12 +147,11 @@ namespace TracingCore
         {
             foreach (var resultDiagnostic in compilationResult.Diagnostics)
             {
-                int line = resultDiagnostic.Location.GetLineSpan().StartLinePosition.Line;
-                string msg = resultDiagnostic.GetMessage();
+                int line = resultDiagnostic.Location.GetLineSpan().StartLinePosition.Line + 1;
+                string msg = $"Linija: {line}, {resultDiagnostic.GetMessage()}";
                 PyTutorDataManager.RegisterUncaughtException(line, msg);
             }
 
-            PyTutorDataManager.RegisterUncaughtException(0, "");
             return PyTutorDataManager.GetData();
         }
     }

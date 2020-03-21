@@ -24,6 +24,11 @@ namespace TraceSourceExample
             return GetFileContents($"For_{id}.txt");
         }
 
+        public static string GetWhileExample(int id)
+        {
+            return GetFileContents($"While_{id}.txt");
+        }
+
         public static string GetOOPExample(string name)
         {
             return GetFileContents($"OOP_{name}.txt");
