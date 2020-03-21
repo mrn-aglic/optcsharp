@@ -390,6 +390,12 @@ namespace TracingCore.RoslynRewriters
             return node.WithStatement(blockWithLoopTrace);
         }
 
+        public override SyntaxNode VisitDoStatement(DoStatementSyntax node)
+        {
+            // TODO implement
+            return base.VisitDoStatement(node);
+        }
+
         private List<StatementSyntax> InstrumentReturnStatement
         (
             TypeSyntax returnType,

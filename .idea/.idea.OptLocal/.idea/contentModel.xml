@@ -499,6 +499,7 @@
         <e p="bin" t="ExcludeRecursive" />
         <e p="CodeExamples" t="Include">
           <e p="ClassEmptyConstructor.txt" t="Include" />
+          <e p="DoWhile_1.txt" t="Include" />
           <e p="For_1.txt" t="Include" />
           <e p="HelloWorld.txt" t="Include" />
           <e p="IfElse.txt" t="Include" />
