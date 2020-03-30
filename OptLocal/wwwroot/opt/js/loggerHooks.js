@@ -14,7 +14,7 @@ const ids = {
 const getCurStep = function () {
     const text = document.getElementById('curInstr').innerHTML;
     const curStep = parseInt(text.match(/\d+/g)[0]);
-    const isDone = text.includes('Done');
+    const isDone = text.includes('terminated');
     return {curStep: curStep, isDone: isDone};
 };
 
@@ -72,10 +72,10 @@ const callbacks = {
     slider: traceSharedFunction,
     sliderSlide: function (actionId, e, callback) {
 
-        const eventType = 'slide';
         const mouseUpHandle = evt => {
             
             document.removeEventListener('mouseup', mouseUpHandle);
+            const eventType = e.target.classList.contains('ui-slider-handle') ? 'slide' : 'click';
             const data = getCurStep();
             const details = {
                 curStep: data.curStep,
@@ -131,7 +131,7 @@ class HookData {
             new HookData(document.getElementById(ids.back), eventActions.back, 'click', false, callbacks.back),
             new HookData(document.getElementById(ids.jmpFirst), eventActions.first, 'click', false, callbacks.jmpFirst),
             new HookData(document.getElementById(ids.jmpLast), eventActions.last, 'click', false, callbacks.jmpLast),
-            new HookData(document.getElementById(ids.slider), eventActions.slider, 'click', false, callbacks.slider),
+            // new HookData(document.getElementById(ids.slider), eventActions.slider, 'click', false, callbacks.slider),
             new HookData(document.getElementById(ids.slider), eventActions.slider, 'mousedown', false, callbacks.sliderSlide)
         ].concat(Array.from(document.querySelectorAll('[id^="lineNo"]'))
             .map(x =>

@@ -1671,7 +1671,7 @@ ExecutionVisualizer.prototype.updateOutputFull = function(smoothTransition) {
       vcrControls.find("#curInstr").html("Instruction limit reached");
     }
     else {
-      vcrControls.find("#curInstr").html("Program terminated");
+      vcrControls.find("#curInstr").html(`Program terminated (${String(totalInstrs-1)} steps)`);
     }
   }
   else {
