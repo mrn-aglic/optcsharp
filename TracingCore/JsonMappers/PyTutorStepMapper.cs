@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -139,6 +141,16 @@ namespace TracingCore.JsonMappers
             return PopulateJArray(jArray, heap, fields);
         }
 
+        // public static IEnumerable<object> CastObjToArray(object array)
+        // {
+        //     return array switch
+        //     {
+        //         IEnumerable<object> ienumerable => ienumerable,
+        //         int[] arr => arr.Select(),
+        //         _ => throw new NotImplementedException()
+        //     };
+        // }
+
         public static JObject HeapToJson(ImmutableDictionary<int, HeapData> heap)
         {
             JObject json = new JObject();
@@ -150,7 +162,12 @@ namespace TracingCore.JsonMappers
                 {
                     case HeapType.List:
                         var array = element.Value.Value;
-                        json.Add(element.Key.ToString(), CreateJArray(heap, (IEnumerable<object>) array));
+                        var enumerable = array switch
+                        {
+                            IEnumerable<object> ieobj => ieobj,
+                            IEnumerable ie => ie.Cast<object>()
+                        };
+                        json.Add(element.Key.ToString(), CreateJArray(heap, enumerable));
                         break;
                     case HeapType.Instance:
                         json.Add(element.Key.ToString(), CreateJInstance(heap, element.Value));
