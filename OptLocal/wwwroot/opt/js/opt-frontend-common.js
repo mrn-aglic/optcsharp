@@ -62,7 +62,7 @@ var c_backend_script = 'web_exec_c.py';
 var cpp_backend_script = 'web_exec_cpp.py';
 var csharp_backend_script = 'none';
 
-var windowLocation = window.location.href.split('#')[0];
+var windowLocation = window.location.origin;
 
 // this is customized to my own Linode server:
 // these are the REAL endpoints, accessed via jsonp. code is in ../../v4-cokapi/
@@ -75,10 +75,6 @@ if (window.location.protocol === 'https:') {
     var C_JSONP_ENDPOINT = 'https://cokapi.com:8001/exec_c_jsonp';
     var CPP_JSONP_ENDPOINT = 'https://cokapi.com:8001/exec_cpp_jsonp';
 
-    if (windowLocation[windowLocation.length - 1] === '/') {
-        windowLocation = windowLocation.substr(0, windowLocation.length - 1);
-    }
-
     var CSHARP_JSONP_ENDPOINT = `${windowLocation}/api/getcsharptrace`;
 } else {
     var JS_JSONP_ENDPOINT = 'http://104.237.139.253:3000/exec_js_jsonp'; // for deployment
@@ -87,11 +83,6 @@ if (window.location.protocol === 'https:') {
     var RUBY_JSONP_ENDPOINT = 'http://104.237.139.253:3000/exec_ruby_jsonp'; // for deployment
     var C_JSONP_ENDPOINT = 'http://104.237.139.253:3000/exec_c_jsonp'; // for deployment
     var CPP_JSONP_ENDPOINT = 'http://104.237.139.253:3000/exec_cpp_jsonp'; // for deployment
-
-    // TODO: CHANGE IF LIVE EVER
-    if (windowLocation[windowLocation.length - 1] === '/') {
-        windowLocation = windowLocation.substr(0, windowLocation.length - 1);
-    }
 
     var CSHARP_JSONP_ENDPOINT = `${windowLocation}/api/getcsharptrace`;
 }
@@ -1055,7 +1046,7 @@ function genericOptFrontendReady() {
                 setFronendError(["Server error! Your code might be too long for this tool. Shorten your code and re-try."]);
             }
         } else {
-            console.log(exception)
+            console.log(exception);
             // TODO Better error messages
             setFronendError(["Server error! Your code might be taking too much time to run or using too much memory.",
                 "",

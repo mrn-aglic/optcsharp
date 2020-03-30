@@ -303,6 +303,7 @@
 
     <ItemGroup>
       <Folder Include="wwwroot\client\src\classes" />
+      <Folder Include="wwwroot\client\src\externalRepositories" />
     </ItemGroup>
 
 

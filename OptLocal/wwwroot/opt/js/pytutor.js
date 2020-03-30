@@ -865,6 +865,8 @@ ExecutionVisualizer.prototype.render = function() {
   this.updateOutput();
 
   this.hasRendered = true;
+  
+  
 }
 
 
