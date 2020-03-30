@@ -204,7 +204,7 @@ namespace TracingCore.RoslynRewriters
                 : GetLineData(node, true);
 
             var dullDetails = GetEgDetails(statements.FirstOrDefault(), dullLineNumber,
-                TraceApiNames.TraceApiMethodFirstStep, includeThisReference);
+                TraceApiNames.TraceData, includeThisReference);
 
             var enterBlockStatement = _expressionGenerator.GetExpressionStatement(enterDetails);
             var dullStatement = _expressionGenerator.GetDullExpressionStatement(dullDetails);

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Linq;
@@ -23,10 +24,15 @@ namespace TracingCore.TreeRewriters
 
         private MemberAccessExpressionSyntax GetMemberAccessExpressionSyntax(ExpressionGeneratorDetails details)
         {
+            return GetMemberAccessExpressionSyntax(details.ClassName, details.MemberName);
+        }
+
+        private MemberAccessExpressionSyntax GetMemberAccessExpressionSyntax(string className, string memberName)
+        {
             return MemberAccessExpression(
                 SyntaxKind.SimpleMemberAccessExpression,
-                IdentifierName(details.ClassName),
-                IdentifierName(details.MemberName)
+                IdentifierName(className),
+                IdentifierName(memberName)
             );
         }
 
@@ -182,6 +188,132 @@ namespace TracingCore.TreeRewriters
                 default:
                     return "<expression generator unknown>";
             }
+        }
+
+        private string GetMethodString(SyntaxNode syntaxNode)
+        {
+            switch (syntaxNode)
+            {
+                case MethodDeclarationSyntax methodDeclarationSyntax:
+                    return $"{methodDeclarationSyntax.Identifier.Text}";
+                case ConstructorDeclarationSyntax constructorDeclarationSyntax:
+                    return $"{constructorDeclarationSyntax.Identifier.Text}";
+                case AccessorDeclarationSyntax accessorDeclarationSyntax:
+                    // Accessor declaration syntax has AccessorList as immediate parent, skip it.
+                    var property = accessorDeclarationSyntax.Parent.Parent as PropertyDeclarationSyntax;
+                    Debug.Assert(property != null, "Accessor syntax should have property syntax as parent");
+                    return $"{accessorDeclarationSyntax.Keyword.Text} {property.Identifier.Text}";
+                default:
+                    return string.Empty;
+            }
+        }
+
+        private ArgumentSyntax LineDataToArgument(LineData lineData)
+        {
+            return Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(lineData.StartLine)));
+        }
+
+        public ExpressionStatementSyntax GetSimpleTraceExpression
+        (
+            LineData lineData,
+            StatementSyntax statementSyntax,
+            bool excludeDeclaration
+        )
+        {
+            var args = GetArguments(lineData, statementSyntax, excludeDeclaration);
+
+            var invocation = InvocationExpression(
+                GetMemberAccessExpressionSyntax(TraceApiNames.ClassName, TraceApiNames.TraceData)
+            );
+
+            return ExpressionStatement(invocation.WithArgumentList(args));
+        }
+
+        private ArgumentListSyntax GetArguments
+        (
+            LineData lineData,
+            SyntaxNode syntaxNode,
+            bool excludeDeclaration
+        )
+        {
+            var lineArg = LineDataToArgument(lineData);
+            var @params = GetParameters(syntaxNode, excludeDeclaration);
+
+            return ArgumentList(new SeparatedSyntaxList<ArgumentSyntax>().Add(lineArg).AddRange(@params));
+        }
+
+        private ArgumentSyntax GetStringLiteralArg(string literal)
+        {
+            return Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(literal)));
+        }
+
+        private ExpressionStatementSyntax GetBlockExpression
+        (
+            string methodName,
+            LineData lineData,
+            BlockSyntax blockSyntax
+        )
+        {
+            var args = GetArguments(lineData, blockSyntax.Parent, false);
+            var invocation =
+                InvocationExpression(
+                    GetMemberAccessExpressionSyntax(TraceApiNames.ClassName, methodName)
+                );
+            return ExpressionStatement(invocation.WithArgumentList(args));
+        }
+
+        public ExpressionStatementSyntax GetBlockEntryExpression(LineData lineData, BlockSyntax blockSyntax)
+        {
+            return GetBlockExpression(TraceApiNames.TraceBlockEntry, lineData, blockSyntax);
+        }
+
+        public ExpressionStatementSyntax GetBlockExitExpression(LineData lineData, BlockSyntax blockSyntax)
+        {
+            return GetBlockExpression(TraceApiNames.TraceBlockExit, lineData, blockSyntax);
+        }
+
+        public ExpressionStatementSyntax GetMethodExpression
+        (
+            string methodName,
+            LineData lineData,
+            BlockSyntax blockSyntax
+        )
+        {
+            var args = GetArguments(lineData, blockSyntax.Parent, false);
+
+            var invocation =
+                InvocationExpression(
+                    GetMemberAccessExpressionSyntax(TraceApiNames.ClassName, methodName)
+                );
+
+            var funcName = GetMethodString(blockSyntax.Parent);
+            var arg = GetStringLiteralArg(funcName);
+            var fullArgs = ArgumentList(args.Arguments.Insert(1, arg));
+            return ExpressionStatement(invocation.WithArgumentList(fullArgs));
+        }
+
+        public ExpressionStatementSyntax GetMethodEntryExpression(LineData lineData, BlockSyntax blockSyntax)
+        {
+            return GetMethodExpression(TraceApiNames.TraceMethodEntry, lineData, blockSyntax);
+        }
+
+        public ExpressionStatementSyntax GetMethodExitExpression(LineData lineData, BlockSyntax blockSyntax)
+        {
+            return GetMethodExpression(TraceApiNames.TraceMethodExit, lineData, blockSyntax);
+        }
+
+        public ExpressionStatementSyntax GetDullExpressionStatement(LineData lineData)
+        {
+            return ExpressionStatement(
+                InvocationExpression(
+                    GetMemberAccessExpressionSyntax(TraceApiNames.ClassName, TraceApiNames.TraceData)
+                ).WithArgumentList(
+                    ArgumentList(
+                        new SeparatedSyntaxList<ArgumentSyntax>()
+                            .Add(LineDataToArgument(lineData))
+                    )
+                )
+            );
         }
 
         private InvocationExpressionSyntax GetMethodInvocationExpressionSyntax

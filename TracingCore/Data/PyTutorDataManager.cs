@@ -297,6 +297,11 @@ namespace TracingCore.Data
             _currentFrameId++;
         }
 
+        public void AddMethodExit(int line, List<VariableData> variables)
+        {
+            
+        }
+
 
         public void AddMethodExit(int line, VariableData variableData, bool replacePrevStep)
         {

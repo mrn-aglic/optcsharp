@@ -14,6 +14,7 @@ namespace TracingCore.TraceToPyDtos
         public object Value { get; }
         public Type Type { get; }
         public bool IsValueType { get; }
+        public virtual bool IsReturnVariable => false;
 
         public VariableData(string name, object value, Type type)
         {
@@ -28,7 +29,7 @@ namespace TracingCore.TraceToPyDtos
             return new VariableData(string.Empty, null, null);
         }
 
-        private static ArgumentListSyntax GetArgumentList
+        protected static ArgumentListSyntax GetArgumentList
         (
             SyntaxToken identifier,
             TypeSyntax type,
@@ -151,6 +152,30 @@ namespace TracingCore.TraceToPyDtos
         public HeapData ToHeapData()
         {
             throw new NotImplementedException();
+        }
+    }
+
+    public class ReturnVarData : VariableData
+    {
+        private const string ThisClassName = "ReturnVarData";
+        public override bool IsReturnVariable => true;
+
+        public ReturnVarData(string name, object value, Type type) : base(name, value, type)
+        {
+        }
+
+        public new static ObjectCreationExpressionSyntax GetObjectCreationSyntax
+        (
+            ParameterSyntax parameterSyntax
+        )
+        {
+            var a = ObjectCreationExpression(
+                IdentifierName(ThisClassName)
+            ).WithArgumentList(
+                GetArgumentList(parameterSyntax.Identifier, parameterSyntax.Type)
+            ).NormalizeWhitespace();
+
+            return a;
         }
     }
 }

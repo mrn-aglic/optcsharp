@@ -285,6 +285,29 @@ namespace Vj02
     }
 }`
     },
+    doWhile: {
+      
+        name: 'Do-while primjer (unesi dok)',
+        categories: [Categories.Debug, Categories.Professor, Categories.P2],
+        code: `using System;
+
+namespace Vj02
+{
+    class Program
+    {
+        static void Main()
+        {
+            int broj;
+            do
+            {
+                Console.WriteLine("Unesi pozitivan broj: ");
+                broj = int.Parse(Console.ReadLine());
+            } while (broj <= 0);
+            Console.WriteLine("Unesen broj: {0}", broj);
+        }
+    }
+}`
+    },
     ifElse: {
         name: 'If-else primjer',
         categories: [Categories.Debug],
