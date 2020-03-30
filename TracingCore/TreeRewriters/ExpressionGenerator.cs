@@ -48,7 +48,8 @@ namespace TracingCore.TreeRewriters
             );
         }
 
-        private IEnumerable<ArgumentSyntax> GetParameters(SyntaxNode syntaxNode, bool excludeDeclaration)
+        private IEnumerable<ArgumentSyntax> GetParameters(SyntaxNode syntaxNode, bool excludeDeclaration,
+            bool excludeOnEntry = false)
         {
             switch (syntaxNode)
             {
@@ -99,6 +100,20 @@ namespace TracingCore.TreeRewriters
                     var whileCondIdentifiers =
                         whileStatementSyntax.Condition.DescendantNodes().OfType<IdentifierNameSyntax>();
                     return whileCondIdentifiers.Select(x => Argument(VariableData.GetObjectCreationSyntax(x)));
+                case DoStatementSyntax doStatementSyntax:
+                    var doCondIdentifiers =
+                        doStatementSyntax.Condition.DescendantNodes().OfType<IdentifierNameSyntax>();
+
+                    IEnumerable<IdentifierNameSyntax> Inner()
+                    {
+                        var doDf = _semanticModel.AnalyzeDataFlow(doStatementSyntax);
+                        return doCondIdentifiers.Where(x =>
+                            doDf.DefinitelyAssignedOnEntry.Any(y => x.Identifier.Text == y.Name));
+                    }
+
+                    return excludeOnEntry
+                        ? Inner().Select(x => Argument(VariableData.GetObjectCreationSyntax(x)))
+                        : doCondIdentifiers.Select(x => Argument(VariableData.GetObjectCreationSyntax(x)));
                 case ExpressionStatementSyntax expressionStatementSyntax:
 
                     switch (expressionStatementSyntax.Expression)
@@ -326,7 +341,9 @@ namespace TracingCore.TreeRewriters
                 GetMemberAccessExpressionSyntax(details)
             );
 
-            var @params = GetParameters(details.InsTargetNode, details.ExcludeDeclaration).ToList();
+            var @params = GetParameters(details.InsTargetNode, details.ExcludeDeclaration,
+                details.InsTargetNode.IsKind(SyntaxKind.DoStatement) &&
+                TraceApiNames.TraceBlockEntry == details.MemberName).ToList(); // TODO UBER MEGA HACK TO HANDLE UNDEFINED VARIABLES IN DO_WHILE
 
             if (details.IncludeSelfReference)
             {

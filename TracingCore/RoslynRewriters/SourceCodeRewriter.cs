@@ -124,32 +124,6 @@ namespace TracingCore.RoslynRewriters
             };
         }
 
-        private LineData[] DetermineLineNumbers(List<StatementSyntax> statements, bool isParentMethodLike)
-        {
-            // skip first statement in block
-            var butFirst = statements.Skip(1);
-            var lastStatement = statements.LastOrDefault();
-            var anyStatements = lastStatement != null;
-
-            var butLastLineNumbers = butFirst.Select(x => GetLineData(x));
-
-            // if there are any statements, append the last one.
-            // if the last statement can have its own statements, use the endline
-            // else append the parent node last line. 
-            var lastStatementHasItsOwnStatements =
-                anyStatements && lastStatement.ChildNodes().OfType<StatementSyntax>().Any();
-
-            var nonMethodParentAndAnyStatements = anyStatements && !isParentMethodLike;
-
-            var lineNums = nonMethodParentAndAnyStatements || lastStatementHasItsOwnStatements
-                ? butLastLineNumbers.Append(GetLineData(lastStatement.Parent, true))
-                : anyStatements
-                    ? butLastLineNumbers
-                        .Append(GetLineData(lastStatement))
-                    : butLastLineNumbers; // last statement now may appear twice 
-            return lineNums.ToArray();
-        }
-
         private LineData[] GetLineNumbers(BlockSyntax blockSyntax, bool isParentMethodLike, bool isAugmentation)
         {
             var statements = blockSyntax.Statements;
@@ -254,6 +228,11 @@ namespace TracingCore.RoslynRewriters
                 {
                     VisitWhileStatement(whileStatementSyntax) as StatementSyntax,
                     GetSimpleTraceStatement(whileStatementSyntax, lineNum)
+                },
+                DoStatementSyntax doStatementSyntax => new List<StatementSyntax>
+                {
+                    VisitDoStatement(doStatementSyntax) as StatementSyntax,
+                    GetSimpleTraceStatement(doStatementSyntax, lineNum)
                 },
                 ForEachStatementSyntax forEachStatementSyntax => new List<StatementSyntax>
                 {
@@ -392,8 +371,17 @@ namespace TracingCore.RoslynRewriters
 
         public override SyntaxNode VisitDoStatement(DoStatementSyntax node)
         {
+            var hasBlock = node.Statement.IsKind(SyntaxKind.Block);
+
+            var block = hasBlock
+                ? VisitBlock(node.Statement as BlockSyntax) as BlockSyntax
+                : WrapInBlock(node.Statement);
+
+            var blockWithLoopTrace = block.WithStatements(block.Statements
+                .InsertRange(0, new[] {_expressionGenerator.GetRegisterLoopIteration(node)}));
+
             // TODO implement
-            return base.VisitDoStatement(node);
+            return node.WithStatement(blockWithLoopTrace);
         }
 
         private List<StatementSyntax> InstrumentReturnStatement

@@ -136,7 +136,7 @@ namespace Vj02
         categories: [Categories.Debug, Categories.Professor, Categories.OOP],
         code: `using System;
 
-namespace Vj02
+namespace Vj03
 {
     class Student
     {
@@ -177,7 +177,7 @@ namespace Vj02
         categories: [Categories.Debug, Categories.Professor, Categories.OOP],
         code: `using System;
 
-namespace Vj02
+namespace Vj03
 {
     static class Postavke
     {
@@ -193,6 +193,133 @@ namespace Vj02
             Postavke.Naziv = "Primjer static klase";
             Postavke.VelicinaSvijeta = 150;
             Postavke.SirinaSvijeta = 420;
+        }
+    }
+}`
+    },
+    Vj04_01:{
+        name: 'Pikado (svojstva)',
+        categories: [Categories.Debug, Categories.Professor, Categories.OOP],
+        code: `using System;
+
+namespace Vj04
+{
+    class Pikado
+    {
+        private int bodovi;
+
+        public int Bodovi
+        {
+            get { return bodovi; }
+            set
+            {
+                if (value >= 0)
+                {
+                    bodovi = value;
+                }
+            }
+        }
+
+        public Pikado(int bodovi)
+        {
+            Bodovi = bodovi;
+        }
+
+
+        public void UmanjiZa(int bod)
+        {
+            Bodovi = Bodovi - bod;
+        }
+
+        public void UmanjiZa(params int[] bodovi)
+        {
+            foreach (int bod in bodovi)
+            {
+                Bodovi = Bodovi - bod;
+            }
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            Pikado pikado = new Pikado(180);
+            // Cilj igre je spustiti broj bodova na pikadu od 180 do 0. S time da, ukoliko igrač
+            // pogodi više bodova od potrebnog broja da se spusti točno na 0, pikado resetira vrijednost
+            // na onu prije bacanja strelice.
+            pikado.UmanjiZa(50, 50, 60, 60);
+        }
+    }
+}`
+    },
+    Vj04_02:{
+        name: 'Sat (svojstva)',
+        categories: [Categories.Debug, Categories.Professor, Categories.OOP],
+        code: `using System;
+
+namespace Vj04
+{
+    class Sat
+    {
+        private int sati;
+
+        public int Sati
+        {
+            get { return sati; }
+            set
+            {
+                if (value > 24)
+                {
+                    int s = value - 24;
+                    Sati = s;
+                }
+                else
+                {
+                    sati = value;
+                }
+            }
+        }
+
+        private int minute;
+
+        public int Minute
+        {
+            get { return minute; }
+            set
+            {
+                if (value > 60)
+                {
+                    int s = value / 60;
+                    PomakniSate(s);
+                    Minute = value - 60 * s;
+                }
+                else
+                {
+                    minute = value;
+                }
+            }
+        }
+
+        public void PomakniSate(int sati)
+        {
+            Sati = Sati + sati;
+        }
+
+        public void PomakniMinute(int minute)
+        {
+            Minute = Minute + minute;
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            Sat s = new Sat();
+            s.PomakniSate(27);
+            s.PomakniMinute(125);
+            Console.WriteLine(s.Sati + " sata i " + s.Minute + " minuta");
         }
     }
 }`
@@ -244,7 +371,7 @@ namespace Vj02
         categories: [Categories.Debug, Categories.Professor, Categories.P2],
         code: `using System;
 
-namespace Vj02
+namespace Vj03
 {
     class Program
     {
@@ -266,7 +393,7 @@ namespace Vj02
         categories: [Categories.Debug, Categories.Professor, Categories.P2],
         code: `using System;
 
-namespace Vj02
+namespace Vj03
 {
     class Program
     {
@@ -285,13 +412,13 @@ namespace Vj02
     }
 }`
     },
-    doWhile: {
+    P2Vj_033: {
       
         name: 'Do-while primjer (unesi dok)',
         categories: [Categories.Debug, Categories.Professor, Categories.P2],
         code: `using System;
 
-namespace Vj02
+namespace Vj03
 {
     class Program
     {
