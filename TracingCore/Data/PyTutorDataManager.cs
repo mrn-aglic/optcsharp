@@ -232,46 +232,9 @@ namespace TracingCore.Data
             return (stacksToRender, newHeap);
         }
 
-        private void SimpleGC()
-        {
-            var lastStep = _pyTutorData.Trace.Last() as PyTutorStep;
-            var stacksToRender = lastStep.StackToRender.Pop(out _);
-            var currentHeap = lastStep.Heap;
-
-            var removeFromHeap = new List<int>();
-            foreach (var (key, _) in currentHeap)
-            {
-                var anyRefOnHeap = stacksToRender.Any(x => x.EncodedLocals.Any(y => y.HeapId == key));
-                if (!anyRefOnHeap)
-                {
-                    removeFromHeap.Add(key);
-                }
-            }
-
-            var newHeap = currentHeap.RemoveRange(removeFromHeap);
-
-            var newLastStep = new PyTutorStep(
-                lastStep.Line,
-                lastStep.Event,
-                lastStep.FuncName,
-                lastStep.StdOut,
-                lastStep.Globals,
-                stacksToRender,
-                newHeap,
-                PyTutorStepMapper.HeapToJson(newHeap)
-            );
-
-            _pyTutorData.Trace.Remove(lastStep);
-            _pyTutorData.Trace.Add(newLastStep);
-        }
-
         public void AddNextTraceEntry(int line, string stdOut, IList<VariableData> variables)
         {
             AddLineStep(line, stdOut, variables);
-            // if (IsReturnFromFunction())
-            // {
-            //     SimpleGC(); // this .... never gets hit...
-            // }
         }
 
         private HeapData CreateHeapDataInstance(int id, string type, object value)
