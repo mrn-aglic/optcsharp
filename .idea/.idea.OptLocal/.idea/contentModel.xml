@@ -517,6 +517,7 @@
           <e p="OOP_2_params.txt" t="Include" />
           <e p="OOP_3_enkapsulacija.txt" t="Include" />
           <e p="OOP_3_staticclass.txt" t="Include" />
+          <e p="OOP_4_pikado.txt" t="Include" />
           <e p="Polymorphism.txt" t="Include" />
           <e p="PolymorphismOverride.txt" t="Include" />
           <e p="Properties.txt" t="Include" />

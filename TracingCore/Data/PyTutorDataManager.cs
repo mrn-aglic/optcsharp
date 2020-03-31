@@ -9,6 +9,9 @@ using TracingCore.TraceToPyDtos;
 
 namespace TracingCore.Data
 {
+    using StacksToRender = IImmutableStack<FuncStack>;
+    using Heap = ImmutableDictionary<int, HeapData>;
+
     public class PyTutorDataManager
     {
         private const string FunctionCallEvent = "call";
@@ -86,18 +89,17 @@ namespace TracingCore.Data
             return null;
         }
 
-        public (List<VariableData>, List<(VariableData, HeapData)>) GroupByOnHeap(IList<VariableData> variables)
+        public (List<VariableData>, List<(VariableData, HeapData)>) GroupByOnHeap(IList<VariableData> variables,
+            Heap heap)
         {
             var notOnHeap = new List<VariableData>();
             var onHeap = new List<(VariableData, HeapData)>();
-
-            var lastStep = _pyTutorData.Trace.Last() as PyTutorStep;
 
             foreach (var variable in variables)
             {
                 bool Func(HeapData data) => variable.Value == data.Value;
 
-                var hd = GetValueOrDefaultFromHeap(lastStep?.Heap, Func);
+                var hd = GetValueOrDefaultFromHeap(heap, Func);
                 if (hd == null)
                 {
                     notOnHeap.Add(variable);
@@ -117,7 +119,9 @@ namespace TracingCore.Data
             var refVars = variables.Where(OptVariableBase.IsVarRef).ToList();
 
             var (varsNotOnHeap, varsOnHeap) =
-                lastStepExists ? (variables, new List<(VariableData, HeapData)>()) : GroupByOnHeap(refVars);
+                lastStepExists
+                    ? (variables, new List<(VariableData, HeapData)>())
+                    : GroupByOnHeap(refVars, lastStep.Heap);
             var updatedHeapValues = varsOnHeap
                 .Select(x => x.Item2 is VarHeapData varData ? varData.Copy(x.Item1.Value) : x.Item2)
                 .ToImmutableDictionary(x => x.HeapId, x => x);
@@ -131,21 +135,40 @@ namespace TracingCore.Data
                 .AddRange(newHeapData);
         }
 
+        private ImmutableDictionary<int, HeapData> UpdateHeap(IList<VariableData> variables, Heap heap)
+        {
+            var refVars = variables.Where(OptVariableBase.IsVarRef).ToList();
+
+            var (varsNotOnHeap, varsOnHeap) = GroupByOnHeap(refVars, heap);
+            var updatedHeapValues = varsOnHeap
+                .Select(x => x.Item2 is VarHeapData varData ? varData.Copy(x.Item1.Value) : x.Item2)
+                .ToImmutableDictionary(x => x.HeapId, x => x);
+
+            var newHeapData = varsNotOnHeap.Select(GetHeapData).ToImmutableDictionary(x => x.HeapId, x => x);
+
+            return heap
+                .RemoveRange(updatedHeapValues.Select(x => x.Key))
+                .AddRange(updatedHeapValues)
+                .AddRange(newHeapData);
+        }
+
         public void AddLineStep(int line, string stdOut, IList<VariableData> variables)
         {
             var lastStep = _pyTutorData.Trace.Last() as PyTutorStep;
             // var @event = lastStep.Line == line ? ReturnEvent : StepLineEvent;
             var @event = StepLineEvent;
 
-            var existingStacks = GetFuncStacks();
-            if (IsReturnFromFunction())
-            {
-                existingStacks = existingStacks.Pop();
-            }
+            var (existingStacks, lheap) = IsReturnFromFunction() ? PyTutorGc() : (GetFuncStacks(), lastStep.Heap);
+
+            // var existingStacks = GetFuncStacks();
+            // if (IsReturnFromFunction())
+            // {
+            // existingStacks = existingStacks.Pop();
+            // }
 
             var lastStack = existingStacks.First();
 
-            var heap = UpdateHeap(variables, lastStep);
+            var heap = UpdateHeap(variables, lheap);
             var encLocals = variables.Select(x => EncodedLocalFromVariableData(x, GetValueFromHeap(x.Value, heap)));
 
             var newStack = lastStack.AddAndUpdate(encLocals.ToImmutableList());
@@ -170,6 +193,43 @@ namespace TracingCore.Data
         {
             return _pyTutorData.Trace.Last() is PyTutorStep lastStep &&
                    lastStep.Event == ReturnEvent;
+        }
+        
+        private int RestoreKey(KeyValuePair<string, object> el)
+        {
+            var arr = el.Value as object[];
+            if (arr == null) throw new ArgumentException("Invalid value occured in Heap");
+            return (int) arr[1];
+        }
+
+        private (StacksToRender, Heap) PyTutorGc()
+        {
+            var lastStep = _pyTutorData.Trace.Last() as PyTutorStep;
+            if (lastStep.Event != ReturnEvent)
+            {
+                throw new ArgumentException("Last entry was not return from function");
+            }
+
+            var stacksToRender = lastStep.StackToRender.Pop(out _);
+            var currentGlobals = lastStep.Globals;
+            var currentHeap = lastStep.Heap;
+
+            var removeFromHeap = new List<int>();
+
+            foreach (var (key, _) in currentHeap)
+            {
+                var anyRefInStacks = stacksToRender.Any(x => x.EncodedLocals.Any(y => y.HeapId == key));
+                var anyRefInGlobals = currentGlobals.Any(x => key == RestoreKey(x));
+
+                if (!(anyRefInGlobals || anyRefInStacks))
+                {
+                    removeFromHeap.Add(key);
+                }
+            }
+
+            var newHeap = currentHeap.RemoveRange(removeFromHeap);
+
+            return (stacksToRender, newHeap);
         }
 
         private void SimpleGC()
@@ -208,10 +268,10 @@ namespace TracingCore.Data
         public void AddNextTraceEntry(int line, string stdOut, IList<VariableData> variables)
         {
             AddLineStep(line, stdOut, variables);
-            if (IsReturnFromFunction())
-            {
-                SimpleGC();
-            }
+            // if (IsReturnFromFunction())
+            // {
+            //     SimpleGC(); // this .... never gets hit...
+            // }
         }
 
         private HeapData CreateHeapDataInstance(int id, string type, object value)
@@ -226,7 +286,7 @@ namespace TracingCore.Data
 
         private HeapData GetHeapData(VariableData variableData)
         {
-            if (!OptVariableData.IsVarRef(variableData))
+            if (!OptVariableBase.IsVarRef(variableData))
             {
                 return null;
             }
@@ -271,11 +331,14 @@ namespace TracingCore.Data
             parameters = IgnoreArgsIfAllNull(methodName, parameters);
             var lastStep = (PyTutorStep) _pyTutorData.Trace.LastOrDefault();
 
-            var heap = UpdateHeap(parameters, lastStep);
+            var (existingStacks, lheap) = lastStep == null ? (GetFuncStacks(), Heap.Empty) :
+                IsReturnFromFunction() ? PyTutorGc() : (GetFuncStacks(), lastStep.Heap);
+
+            var heap = UpdateHeap(parameters, lheap);
             var encLocals = parameters.Select(x => EncodedLocalFromVariableData(x, GetValueFromHeap(x.Value, heap)));
 
             var funcStack = CreateFuncStack(methodName, encLocals.ToImmutableList());
-            var stacks = GetFuncStacks().Push(funcStack);
+            var stacks = existingStacks.Push(funcStack);
 
             var stdOut = lastStep != null ? lastStep.StdOut : string.Empty;
             var globals = lastStep != null ? lastStep.Globals : ImmutableDictionary<string, object>.Empty;
@@ -299,13 +362,16 @@ namespace TracingCore.Data
 
         public void AddMethodExit(int line, List<VariableData> variables)
         {
-            
         }
 
 
         public void AddMethodExit(int line, VariableData variableData, bool replacePrevStep)
         {
             var prevStep = _pyTutorData.Trace.Last() as PyTutorStep;
+
+            if (prevStep == null) throw new ArgumentException("There should be a step before method exit");
+
+            // var (gcStacks, gcHeap) = IsReturnFromFunction() ? PyTutorGc() : (prevStep.StackToRender.Pop(out ))
 
             var newStackToRender = prevStep.StackToRender.Pop(out var lastStack);
             var hd = GetHeapData(variableData);

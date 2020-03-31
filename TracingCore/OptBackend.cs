@@ -57,10 +57,6 @@ namespace TracingCore
         public CompilationUnitSyntax InstrumentSourceCode(CompilationUnitSyntax originalRoot,
             InstrumentationManager instrumentationManager)
         {
-            foreach (var descendantNode in originalRoot.DescendantNodes())
-            {
-            }
-
             return instrumentationManager.Start(originalRoot);
         }
 
