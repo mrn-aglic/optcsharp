@@ -52,14 +52,6 @@
     <script type="text/javascript" src="~/opt/js/loggerHooks.js"></script>
 
     <script type="text/javascript">
-        
-        function loadExample(idEnd) {
-            
-            const select = document.getElementById(`csharp-examples-${idEnd}`);
-            const code = select.value;
-            pyInputAceEditor.setValue(code);
-            pyInputAceEditor.clearSelection();
-        }
     
         $('document').ready(function() {
           initAceEditor(420);
@@ -68,34 +60,6 @@
           pyInputAceEditor.clearSelection();
           pyInputAceEditor.focus();
           
-          function populateCsharpExamples(idEnd, category) {
-            const select = document.getElementById(`csharp-examples-${idEnd}`);
-            const examples = Examples;
-            
-            for(let k in examples){
-                let example = examples[k];
-
-                if(example.categories.some(x => x === category)){
-                    let option = document.createElement('option');
-                    
-                    option.innerHTML = example.name;
-                    option.value = example.code;
-                    select.appendChild(option);    
-                }
-            }            
-            
-            select.options[0].selected = 'selected';
-          }
-          
-          // TODO: Remove after experiment
-          // const urlParams = new URLSearchParams(window.location.search);
-          // const category = urlParams.get('c');
-          // let useCategory = category == null ? Categories.Debug : category;
-          populateCsharpExamples('p2', 'P2');
-          populateCsharpExamples('oop', 'OOP');
-          loadExample('p2');
-          loadExample('oop');
-                    
           const urlParams = new URLSearchParams(window.location.search);
           const email = urlParams.get('email');
 
@@ -105,7 +69,7 @@
           const userPromise = userRepo.saveAndGetUser(email);
           const eventActionsPromise = activityRepo.getEventActions();
           
-          const languageId = 1;
+          const languageId = 2;
           
           axios.all([userPromise, eventActionsPromise])
           .then(axios.spread(function(userResponse, eventActionsResponse) {
@@ -128,26 +92,25 @@
         Write code in
 
         <select id="pythonVersionSelector">
-            <!--<option value="2crazy">Py 2.crazy</option>-->
-            <option value="csharp">C# (testni)</option>
+            <option value="js">JavaScript ES6</option>
         </select>
 
     </div>
 
-    <p style="margin-top: 25px; font-weight: bold;">C# Primjeri</p>
+    @* <p style="margin-top: 25px; font-weight: bold;">C# Primjeri</p> *@
 
-    <p style="margin-top: 10px;">
-        P2:
-
-        <select id="csharp-examples-p2" onchange="loadExample('p2')">
-        </select>
-    </p>
-    <p style="margin-top: 10px;">
-        OOP:
-
-        <select id="csharp-examples-oop" onchange="loadExample('oop')">
-        </select>
-    </p>
+    @* <p style="margin-top: 10px;"> *@
+    @*     P2: *@
+    @* *@
+    @*     <select id="csharp-examples-p2" onchange="loadExample('p2')"> *@
+    @*     </select> *@
+    @* </p> *@
+    @* <p style="margin-top: 10px;"> *@
+    @*     OOP: *@
+    @* *@
+    @*     <select id="csharp-examples-oop" onchange="loadExample('oop')"> *@
+    @*     </select> *@
+    @* </p> *@
 
     <div id="codeInputPane"></div> <!-- populate with a CodeMirror or Ace code editor instance -->
     <div id="frontendErrorOutput"></div>

@@ -9,11 +9,12 @@ namespace TracingCore
         public static void Init(TraceApiManager traceApiManager)
         {
             _traceApiManager = traceApiManager;
-            RegisterClasses();
+            _traceApiManager.Init();
         }
 
         public static void Clear()
         {
+            _traceApiManager.Reset();
             _traceApiManager = null;
         }
 
@@ -62,11 +63,6 @@ namespace TracingCore
         public static void TraceMethodReturnExit(int line, VariableData variableData)
         {
             _traceApiManager.AddMethodExit(line, variableData, false);
-        }
-
-        public static void RegisterClasses()
-        {
-            _traceApiManager.RegisterClasses();
         }
 
         public static void RegisterClassLoad(string fullyQualifiedName)

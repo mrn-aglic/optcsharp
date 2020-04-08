@@ -1,0 +1,20 @@
+using System;
+
+namespace Vj04
+{
+    class Program
+    {
+        struct Tocka
+        {
+            public double X, Y;
+        }
+
+        static void Main(string[] args)
+        {
+            int a;
+            Tocka t; //deklaracija
+            t.X = 2;
+            t.Y = 3;
+        }
+    }
+}

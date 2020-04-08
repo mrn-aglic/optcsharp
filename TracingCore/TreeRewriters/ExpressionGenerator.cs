@@ -1,30 +1,35 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.Design;
 using System.Diagnostics;
-using System.IO.Compression;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using TracingCore.Common;
 using TracingCore.TraceToPyDtos;
+using static TracingCore.Common.Declarations;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace TracingCore.TreeRewriters
 {
     public class ExpressionGenerator
     {
-        public readonly SemanticModel _semanticModel;
+        public readonly SemanticModel SemanticModel;
 
         public ExpressionGenerator(SemanticModel semanticModel)
         {
-            _semanticModel = semanticModel;
+            SemanticModel = semanticModel;
         }
 
         private MemberAccessExpressionSyntax GetMemberAccessExpressionSyntax(ExpressionGeneratorDetails details)
         {
             return GetMemberAccessExpressionSyntax(details.ClassName, details.MemberName);
+        }
+
+        private void Assert(Func<bool> p, string message)
+        {
+            if (!p())
+                throw new ArgumentException(message);
         }
 
         private MemberAccessExpressionSyntax GetMemberAccessExpressionSyntax(string className, string memberName)
@@ -64,6 +69,7 @@ namespace TracingCore.TreeRewriters
                             VariableData.GetObjectCreationSyntax(x)
                         ));
                 case LocalDeclarationStatementSyntax localDeclarationStatementSyntax:
+
                     return localDeclarationStatementSyntax.DescendantNodes().OfType<VariableDeclarationSyntax>()
                         .SelectMany(x => x.Variables.Select(y => Argument(
                                 VariableData.GetObjectCreationSyntax(y)
@@ -106,7 +112,7 @@ namespace TracingCore.TreeRewriters
 
                     IEnumerable<IdentifierNameSyntax> Inner()
                     {
-                        var doDf = _semanticModel.AnalyzeDataFlow(doStatementSyntax);
+                        var doDf = SemanticModel.AnalyzeDataFlow(doStatementSyntax);
                         return doCondIdentifiers.Where(x =>
                             doDf.DefinitelyAssignedOnEntry.Any(y => x.Identifier.Text == y.Name));
                     }
@@ -125,17 +131,36 @@ namespace TracingCore.TreeRewriters
                                     )
                                 ));
                         case AssignmentExpressionSyntax assignmentExpressionSyntax:
-                            if (assignmentExpressionSyntax.Left is MemberAccessExpressionSyntax)
+
+                            var left = assignmentExpressionSyntax.Left;
+
+                            // var node =
+                            //     assignmentExpressionSyntax.Left is MemberAccessExpressionSyntax
+                            //         memberAccessExpressionSyntax
+                            //         ? memberAccessExpressionSyntax.Expression
+                            //         : assignmentExpressionSyntax.Left;
+                            //
+                            // var symbol = SemanticModel.GetSymbolInfo(node).Symbol as ILocalSymbol;
+                            // var typeKind = symbol.Type.TypeKind;
+                            //
+                            // var name = symbol.Name;
+                            //
+                            // return new List<ArgumentSyntax>
+                            // {
+                            //     Argument(VariableData.GetObjectCreationSyntax(IdentifierName(name)))
+                            // };
+
+                            if (left is MemberAccessExpressionSyntax)
                             {
                                 return new List<ArgumentSyntax>();
                             }
 
-                            var left = (IdentifierNameSyntax) assignmentExpressionSyntax.Left;
+                            var l = (IdentifierNameSyntax) assignmentExpressionSyntax.Left;
 
-                            var equivalentNode = _semanticModel.SyntaxTree.GetCompilationUnitRoot().DescendantNodes()
+                            var equivalentNode = SemanticModel.SyntaxTree.GetCompilationUnitRoot().DescendantNodes()
                                 .FirstOrDefault(x =>
                                     x.IsEquivalentTo(left));
-                            if (_semanticModel.GetSymbolInfo(equivalentNode).Symbol is IPropertySymbol)
+                            if (SemanticModel.GetSymbolInfo(equivalentNode).Symbol is IPropertySymbol)
                             {
                                 return new List<ArgumentSyntax>();
                             }
@@ -143,7 +168,7 @@ namespace TracingCore.TreeRewriters
                             return new List<ArgumentSyntax>
                             {
                                 Argument(
-                                    VariableData.GetObjectCreationSyntax(left)
+                                    VariableData.GetObjectCreationSyntax(l)
                                 )
                             };
                         default:
@@ -254,7 +279,10 @@ namespace TracingCore.TreeRewriters
             var lineArg = LineDataToArgument(lineData);
             var @params = GetParameters(syntaxNode, excludeDeclaration);
 
-            return ArgumentList(new SeparatedSyntaxList<ArgumentSyntax>().Add(lineArg).AddRange(@params));
+
+            return ArgumentList(new SeparatedSyntaxList<ArgumentSyntax>()
+                .Add(lineArg)
+                .AddRange(@params));
         }
 
         private ArgumentSyntax GetStringLiteralArg(string literal)
@@ -266,10 +294,10 @@ namespace TracingCore.TreeRewriters
         (
             string methodName,
             LineData lineData,
-            BlockSyntax blockSyntax
+            SyntaxNode parent
         )
         {
-            var args = GetArguments(lineData, blockSyntax.Parent, false);
+            var args = GetArguments(lineData, parent, false);
             var invocation =
                 InvocationExpression(
                     GetMemberAccessExpressionSyntax(TraceApiNames.ClassName, methodName)
@@ -279,42 +307,96 @@ namespace TracingCore.TreeRewriters
 
         public ExpressionStatementSyntax GetBlockEntryExpression(LineData lineData, BlockSyntax blockSyntax)
         {
-            return GetBlockExpression(TraceApiNames.TraceBlockEntry, lineData, blockSyntax);
+            return GetBlockExpression(TraceApiNames.TraceBlockEntry, lineData, blockSyntax.Parent);
         }
 
         public ExpressionStatementSyntax GetBlockExitExpression(LineData lineData, BlockSyntax blockSyntax)
         {
-            return GetBlockExpression(TraceApiNames.TraceBlockExit, lineData, blockSyntax);
+            return GetBlockExpression(TraceApiNames.TraceBlockExit, lineData, blockSyntax.Parent);
+        }
+
+        public ExpressionStatementSyntax GetBlockEntryExpression(LineData lineData, SyntaxNode parent)
+        {
+            return GetBlockExpression(TraceApiNames.TraceBlockEntry, lineData, parent);
+        }
+
+        public ExpressionStatementSyntax GetBlockExitExpression(LineData lineData, SyntaxNode parent)
+        {
+            return GetBlockExpression(TraceApiNames.TraceBlockExit, lineData, parent);
         }
 
         public ExpressionStatementSyntax GetMethodExpression
         (
             string methodName,
             LineData lineData,
-            BlockSyntax blockSyntax
+            SyntaxNode parent
         )
         {
-            var args = GetArguments(lineData, blockSyntax.Parent, false);
+            var args = GetArguments(lineData, parent, false);
+            return GetMethodExpression(methodName, parent, args);
+        }
 
+        public ExpressionStatementSyntax GetMethodExpression
+        (
+            string methodName,
+            SyntaxNode parent,
+            ArgumentListSyntax statementArgs
+        )
+        {
             var invocation =
                 InvocationExpression(
                     GetMemberAccessExpressionSyntax(TraceApiNames.ClassName, methodName)
                 );
 
-            var funcName = GetMethodString(blockSyntax.Parent);
+            var funcName = GetMethodString(parent);
             var arg = GetStringLiteralArg(funcName);
-            var fullArgs = ArgumentList(args.Arguments.Insert(1, arg));
+            var fullArgs = ArgumentList(statementArgs.Arguments.Insert(1, arg));
             return ExpressionStatement(invocation.WithArgumentList(fullArgs));
         }
 
         public ExpressionStatementSyntax GetMethodEntryExpression(LineData lineData, BlockSyntax blockSyntax)
         {
-            return GetMethodExpression(TraceApiNames.TraceMethodEntry, lineData, blockSyntax);
+            Assert(() => IsMethodLike(blockSyntax.Parent),
+                $"Enter method called, but block is not child of method declaration: {blockSyntax.Parent.Kind()}.");
+            return GetMethodExpression(TraceApiNames.TraceMethodEntry, lineData, blockSyntax.Parent);
         }
 
-        public ExpressionStatementSyntax GetMethodExitExpression(LineData lineData, BlockSyntax blockSyntax)
+        public ExpressionStatementSyntax GetMethodExitExpression(LineData lineData, BlockSyntax blockSyntax,
+            bool excludeDeclaration = false)
         {
-            return GetMethodExpression(TraceApiNames.TraceMethodExit, lineData, blockSyntax);
+            Assert(() => IsMethodLike(blockSyntax.Parent),
+                $"Exit method called, but block is not child of method declaration: {blockSyntax.Parent.Kind()}");
+
+            var lastStatement = blockSyntax.Statements.LastOrDefault();
+            var args = lastStatement == null
+                ? ArgumentList(new SeparatedSyntaxList<ArgumentSyntax>().Add(LineDataToArgument(lineData)))
+                : GetArguments(lineData, lastStatement, excludeDeclaration);
+            return GetMethodExpression(TraceApiNames.TraceMethodExit, blockSyntax.Parent, args);
+        }
+
+        public ExpressionStatementSyntax GetMethodExitExpression
+        (
+            LineData lineData,
+            StatementSyntax statementSyntax,
+            BlockSyntax blockSyntax
+        )
+        {
+            Assert(
+                () => blockSyntax.Ancestors().Any(IsMethodLike),
+                $"Exit method called, but block is not descendant of method-like declaration: {blockSyntax.Parent.Kind()}");
+
+            var parent = blockSyntax.Ancestors().OfType<MemberDeclarationSyntax>().First();
+            var args = GetArguments(lineData, statementSyntax, false);
+
+            var invocation =
+                InvocationExpression(
+                    GetMemberAccessExpressionSyntax(TraceApiNames.ClassName, TraceApiNames.TraceMethodReturnExit)
+                );
+
+            var funcName = GetMethodString(parent);
+            var arg = GetStringLiteralArg(funcName);
+            var fullArgs = ArgumentList(args.Arguments.Insert(1, arg));
+            return ExpressionStatement(invocation.WithArgumentList(fullArgs));
         }
 
         public ExpressionStatementSyntax GetDullExpressionStatement(LineData lineData)
@@ -342,8 +424,9 @@ namespace TracingCore.TreeRewriters
             );
 
             var @params = GetParameters(details.InsTargetNode, details.ExcludeDeclaration,
-                details.InsTargetNode.IsKind(SyntaxKind.DoStatement) &&
-                TraceApiNames.TraceBlockEntry == details.MemberName).ToList(); // TODO UBER MEGA HACK TO HANDLE UNDEFINED VARIABLES IN DO_WHILE
+                    details.InsTargetNode.IsKind(SyntaxKind.DoStatement) &&
+                    TraceApiNames.TraceBlockEntry == details.MemberName)
+                .ToList(); // TODO UBER MEGA HACK TO HANDLE UNDEFINED VARIABLES IN DO_WHILE
 
             if (details.IncludeSelfReference)
             {

@@ -1486,7 +1486,7 @@ function executeCodeAndCreateViz(codeToExec,
                                  handleSuccessFunc, handleUncaughtExceptionFunc) {
 
     function execCallback(dataFromBackend) {
-        console.log(dataFromBackend)
+        console.log('dataFromBackend', dataFromBackend)
         var trace = dataFromBackend.trace;
 
         var killerException = null;
@@ -1676,8 +1676,7 @@ function executeCodeAndCreateViz(codeToExec,
 
     jsonp_endpoint = null;
 
-    console.log(backendScript)
-    console.log(backendScript === csharp_backend_script)
+    console.log(backendScript === js_backend_script)
 
     // hacky!
     if (backendScript === python2_backend_script) {
@@ -1728,431 +1727,8 @@ function executeCodeAndCreateViz(codeToExec,
             deltaObjStringified = "overflow_414";
         }
     }
-
+    
     if (backendScript == csharp_backend_script) {
-
-        console.log(jsonp_endpoint)
-        console.log("Raw input list for C#: ", rawInputLst);
-
-        // execCallback(
-        //     {
-        //         "code": "using System;\n            namespace TraceSourceExample\n            {\n                class Student \n                {\n                    public string FirstName {get;}\n                    public Student(string firstName)\n                    {\n                        FirstName = firstName;\n                    } \n                }\n\n                class Program\n                {\n                    static void Main(string[] args)\n                    {\n                        int c;\n                        var s = new Student(\"Ante\");\n                        Console.WriteLine(\"Hello World!\");\n                    }\n                }\n            }",
-        //         "trace": [
-        //             {
-        //                 "event": "call",
-        //                 "stdout": "",
-        //                 "line": 15,
-        //                 "stack_to_render": [
-        //                     {
-        //                         "func_name": "Main",
-        //                         "encoded_locals": {},
-        //                         "ordered_varnames": [],
-        //                         "parent_frame_id_list": [],
-        //                         "is_highlighted": true,
-        //                         "is_zombie": false,
-        //                         "is_parent": false,
-        //                         "unique_hash": "Main_f1",
-        //                         "frame_id": 1
-        //                     }
-        //                 ],
-        //                 "globals": {},
-        //                 "ordered_globals": [],
-        //                 "func_name": "Main",
-        //                 "heap": {}
-        //             },
-        //             {
-        //                 "event": "step_line",
-        //                 "stdout": "",
-        //                 "line": 17,
-        //                 "stack_to_render": [
-        //                     {
-        //                         "func_name": "Main",
-        //                         "encoded_locals": {},
-        //                         "ordered_varnames": [],
-        //                         "parent_frame_id_list": [],
-        //                         "is_highlighted": true,
-        //                         "is_zombie": false,
-        //                         "is_parent": false,
-        //                         "unique_hash": "Main_f1",
-        //                         "frame_id": 1
-        //                     }
-        //                 ],
-        //                 "globals": {},
-        //                 "ordered_globals": [],
-        //                 "func_name": "Main",
-        //                 "heap": {}
-        //             },
-        //             {
-        //                 "event": "step_line",
-        //                 "stdout": "",
-        //                 "line": 18,
-        //                 "stack_to_render": [
-        //                     {
-        //                         "func_name": "Main",
-        //                         "encoded_locals": {
-        //                             "c": "<nije inic>"
-        //                         },
-        //                         "ordered_varnames": [
-        //                             "c"
-        //                         ],
-        //                         "parent_frame_id_list": [],
-        //                         "is_highlighted": true,
-        //                         "is_zombie": false,
-        //                         "is_parent": false,
-        //                         "unique_hash": "Main_f1",
-        //                         "frame_id": 1
-        //                     }
-        //                 ],
-        //                 "globals": {},
-        //                 "ordered_globals": [],
-        //                 "func_name": "Main",
-        //                 "heap": {}
-        //             },
-        //             {
-        //                 "event": "step_line",
-        //                 "stdout": "",
-        //                 "line": 4,
-        //                 "stack_to_render": [
-        //                     {
-        //                         "func_name": "Main",
-        //                         "encoded_locals": {
-        //                             "c": "<nije inic>"
-        //                         },
-        //                         "ordered_varnames": [
-        //                             "c"
-        //                         ],
-        //                         "parent_frame_id_list": [],
-        //                         "is_highlighted": true,
-        //                         "is_zombie": false,
-        //                         "is_parent": false,
-        //                         "unique_hash": "Main_f1",
-        //                         "frame_id": 1
-        //                     }
-        //                 ],
-        //                 "globals": {
-        //                     "Student": [
-        //                         "REF",
-        //                         1
-        //                     ]
-        //                 },
-        //                 "ordered_globals": [
-        //                     "Student"
-        //                 ],
-        //                 "func_name": "Main",
-        //                 "heap": {
-        //                     "1": [
-        //                         "CLASS",
-        //                         "TraceSourceExample.Student",
-        //                         []
-        //                     ]
-        //                 }
-        //             },
-        //             {
-        //                 "event": "call",
-        //                 "stdout": "",
-        //                 "line": 7,
-        //                 "stack_to_render": [
-        //                     {
-        //                         "func_name": "Main",
-        //                         "encoded_locals": {
-        //                             "c": "<nije inic>"
-        //                         },
-        //                         "ordered_varnames": [
-        //                             "c"
-        //                         ],
-        //                         "parent_frame_id_list": [],
-        //                         "is_highlighted": true,
-        //                         "is_zombie": false,
-        //                         "is_parent": false,
-        //                         "unique_hash": "Main_f1",
-        //                         "frame_id": 1
-        //                     },
-        //                     {
-        //                         "func_name": "Student",
-        //                         "encoded_locals": {
-        //                             "firstName": "Ante",
-        //                             "this": [
-        //                                 "REF",
-        //                                 2
-        //                             ]
-        //                         },
-        //                         "ordered_varnames": [
-        //                             "firstName",
-        //                             "this"
-        //                         ],
-        //                         "parent_frame_id_list": [],
-        //                         "is_highlighted": true,
-        //                         "is_zombie": false,
-        //                         "is_parent": false,
-        //                         "unique_hash": "Student_f2",
-        //                         "frame_id": 2
-        //                     }
-        //                 ],
-        //                 "globals": {
-        //                     "Student": [
-        //                         "REF",
-        //                         1
-        //                     ]
-        //                 },
-        //                 "ordered_globals": [
-        //                     "Student"
-        //                 ],
-        //                 "func_name": "Student",
-        //                 "heap": {
-        //                     "1": [
-        //                         "CLASS",
-        //                         "TraceSourceExample.Student",
-        //                         []
-        //                     ],
-        //                     "2": [
-        //                         "INSTANCE",
-        //                         "TraceSourceExample.Student"
-        //                     ]
-        //                 }
-        //             },
-        //             {
-        //                 "event": "step_line",
-        //                 "stdout": "",
-        //                 "line": 9,
-        //                 "stack_to_render": [
-        //                     {
-        //                         "func_name": "Main",
-        //                         "encoded_locals": {
-        //                             "c": "<nije inic>"
-        //                         },
-        //                         "ordered_varnames": [
-        //                             "c"
-        //                         ],
-        //                         "parent_frame_id_list": [],
-        //                         "is_highlighted": true,
-        //                         "is_zombie": false,
-        //                         "is_parent": false,
-        //                         "unique_hash": "Main_f1",
-        //                         "frame_id": 1
-        //                     },
-        //                     {
-        //                         "func_name": "Student",
-        //                         "encoded_locals": {
-        //                             "firstName": "Ante",
-        //                             "this": [
-        //                                 "REF",
-        //                                 2
-        //                             ]
-        //                         },
-        //                         "ordered_varnames": [
-        //                             "firstName",
-        //                             "this"
-        //                         ],
-        //                         "parent_frame_id_list": [],
-        //                         "is_highlighted": true,
-        //                         "is_zombie": false,
-        //                         "is_parent": false,
-        //                         "unique_hash": "Student_f2",
-        //                         "frame_id": 2
-        //                     }
-        //                 ],
-        //                 "globals": {
-        //                     "Student": [
-        //                         "REF",
-        //                         1
-        //                     ]
-        //                 },
-        //                 "ordered_globals": [
-        //                     "Student"
-        //                 ],
-        //                 "func_name": "Student",
-        //                 "heap": {
-        //                     "1": [
-        //                         "CLASS",
-        //                         "TraceSourceExample.Student",
-        //                         []
-        //                     ],
-        //                     "2": [
-        //                         "INSTANCE",
-        //                         "TraceSourceExample.Student"
-        //                     ]
-        //                 }
-        //             },
-        //             {
-        //                 "event": "return",
-        //                 "stdout": "",
-        //                 "line": 9,
-        //                 "stack_to_render": [
-        //                     {
-        //                         "func_name": "Main",
-        //                         "encoded_locals": {
-        //                             "c": "<nije inic>"
-        //                         },
-        //                         "ordered_varnames": [
-        //                             "c"
-        //                         ],
-        //                         "parent_frame_id_list": [],
-        //                         "is_highlighted": true,
-        //                         "is_zombie": false,
-        //                         "is_parent": false,
-        //                         "unique_hash": "Main_f1",
-        //                         "frame_id": 1
-        //                     },
-        //                     {
-        //                         "func_name": "Student",
-        //                         "encoded_locals": {
-        //                             "__return__": null,
-        //                             "FirstName": "Ante",
-        //                             "firstName": "Ante",
-        //                             "this": [
-        //                                 "REF",
-        //                                 2
-        //                             ]
-        //                         },
-        //                         "ordered_varnames": [
-        //                             "firstName",
-        //                             "this",
-        //                             "FirstName",
-        //                             "__return__"
-        //                         ],
-        //                         "parent_frame_id_list": [],
-        //                         "is_highlighted": true,
-        //                         "is_zombie": false,
-        //                         "is_parent": false,
-        //                         "unique_hash": "Student_f2",
-        //                         "frame_id": 2
-        //                     }
-        //                 ],
-        //                 "globals": {
-        //                     "Student": [
-        //                         "REF",
-        //                         1
-        //                     ]
-        //                 },
-        //                 "ordered_globals": [
-        //                     "Student"
-        //                 ],
-        //                 "func_name": "Student",
-        //                 "heap": {
-        //                     "1": [
-        //                         "CLASS",
-        //                         "TraceSourceExample.Student",
-        //                         []
-        //                     ],
-        //                     "2": [
-        //                         "INSTANCE",
-        //                         "TraceSourceExample.Student",
-        //                         [
-        //                             "FirstName",
-        //                             "Ante"
-        //                         ]
-        //                     ]
-        //                 }
-        //             },
-        //             {
-        //                 "event": "step_line",
-        //                 "stdout": "",
-        //                 "line": 19,
-        //                 "stack_to_render": [
-        //                     {
-        //                         "func_name": "Main",
-        //                         "encoded_locals": {
-        //                             "s": [
-        //                                 "REF",
-        //                                 2
-        //                             ],
-        //                             "c": "<nije inic>"
-        //                         },
-        //                         "ordered_varnames": [
-        //                             "c",
-        //                             "s"
-        //                         ],
-        //                         "parent_frame_id_list": [],
-        //                         "is_highlighted": true,
-        //                         "is_zombie": false,
-        //                         "is_parent": false,
-        //                         "unique_hash": "Main_f1",
-        //                         "frame_id": 1
-        //                     }
-        //                 ],
-        //                 "globals": {
-        //                     "Student": [
-        //                         "REF",
-        //                         1
-        //                     ]
-        //                 },
-        //                 "ordered_globals": [
-        //                     "Student"
-        //                 ],
-        //                 "func_name": "Student",
-        //                 "heap": {
-        //                     "1": [
-        //                         "CLASS",
-        //                         "TraceSourceExample.Student",
-        //                         []
-        //                     ],
-        //                     "2": [
-        //                         "INSTANCE",
-        //                         "TraceSourceExample.Student",
-        //                         [
-        //                             "FirstName",
-        //                             "Ante"
-        //                         ]
-        //                     ]
-        //                 }
-        //             },
-        //             {
-        //                 "event": "return",
-        //                 "stdout": "Hello World!\n",
-        //                 "line": 19,
-        //                 "stack_to_render": [
-        //                     {
-        //                         "func_name": "Main",
-        //                         "encoded_locals": {
-        //                             "__return__": null,
-        //                             "s": [
-        //                                 "REF",
-        //                                 2
-        //                             ],
-        //                             "c": "<nije inic>"
-        //                         },
-        //                         "ordered_varnames": [
-        //                             "c",
-        //                             "s",
-        //                             "__return__"
-        //                         ],
-        //                         "parent_frame_id_list": [],
-        //                         "is_highlighted": true,
-        //                         "is_zombie": false,
-        //                         "is_parent": false,
-        //                         "unique_hash": "Main_f1",
-        //                         "frame_id": 1
-        //                     }
-        //                 ],
-        //                 "globals": {
-        //                     "Student": [
-        //                         "REF",
-        //                         1
-        //                     ]
-        //                 },
-        //                 "ordered_globals": [
-        //                     "Student"
-        //                 ],
-        //                 "func_name": "Student",
-        //                 "heap": {
-        //                     "1": [
-        //                         "CLASS",
-        //                         "TraceSourceExample.Student",
-        //                         []
-        //                     ],
-        //                     "2": [
-        //                         "INSTANCE",
-        //                         "TraceSourceExample.Student",
-        //                         [
-        //                             "FirstName",
-        //                             "Ante"
-        //                         ]
-        //                     ]
-        //                 }
-        //             }
-        //         ]
-        //     }
-        // )
 
         // TODO : TEMP DISABLE
         $.ajax({
@@ -2181,22 +1757,24 @@ function executeCodeAndCreateViz(codeToExec,
         backendScript === c_backend_script ||
         backendScript === cpp_backend_script) {
         // hack! should just be a dummy script for logging only
-        $.get(backendScript,
-            {
-                user_script: codeToExec,
-                options_json: JSON.stringify(backendOptionsObj),
-                user_uuid: supports_html5_storage() ? localStorage.getItem('opt_uuid') : undefined,
-                session_uuid: sessionUUID,
-                diffs_json: deltaObjStringified
-            },
-            function (dat) {
-            } /* don't do anything since this is a dummy call */, "text");
+        // $.get(backendScript,
+        //     {
+        //         user_script: codeToExec,
+        //         options_json: JSON.stringify(backendOptionsObj),
+        //         user_uuid: supports_html5_storage() ? localStorage.getItem('opt_uuid') : undefined,
+        //         session_uuid: sessionUUID,
+        //         diffs_json: deltaObjStringified
+        //     },
+        //     function (dat) {
+        //     } /* don't do anything since this is a dummy call */, "text");
+
+        console.log(jsonp_endpoint);
 
         // the REAL call uses JSONP
         // http://learn.jquery.com/ajax/working-with-jsonp/
         assert(jsonp_endpoint);
         $.ajax({
-            url: jsonp_endpoint,
+            url: 'http://cokapi.com/exec_js_jsonp',
             // The name of the callback parameter, as specified by the YQL service
             jsonp: "callback",
             dataType: "jsonp",
@@ -2205,6 +1783,9 @@ function executeCodeAndCreateViz(codeToExec,
                 options_json: JSON.stringify(backendOptionsObj)
             },
             success: execCallback,
+            error: function (data) {
+                console.log(data);
+            }
         });
     } else {
         // Python 2 or 3

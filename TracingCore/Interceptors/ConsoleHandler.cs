@@ -16,7 +16,6 @@ namespace TracingCore.Interceptors
         {
             _consoleWriter = new ConsoleWriter();
             _consoleReader = new ConsoleReader(Console.Out);
-            Init();
         }
 
         public void Init()

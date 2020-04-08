@@ -75,8 +75,7 @@ namespace TracingCore
             );
         }
 
-        public CompilationResult Compile(string compilationName, InstrumentationManager instrumentationManager,
-            SemanticModel semanticModel = null)
+        public CompilationResult Compile(string compilationName, InstrumentationManager instrumentationManager)
         {
             var originalRoot = UserSyntaxTree.GetCompilationUnitRoot();
 
@@ -98,11 +97,9 @@ namespace TracingCore
         public PyTutorData Trace
         (
             CompilationResult compilationResult,
-            CompilationResult userCompilationResult,
             bool flushData = false
         )
         {
-            // var semanticModel = compilationResult.GetSemanticModel();
             var classManager = new ClassManager(compilationResult, new Dictionary<string, ClassData>());
             var loopManager = new LoopManager();
 
@@ -129,7 +126,6 @@ namespace TracingCore
             }
             finally
             {
-                ConsoleHandler.RestoreDefaults();
                 // AssemblyLoadContext.GetLoadContext(compilationResult.Assembly).Unload();
                 pyTutorData = PyTutorDataManager.GetData();
                 if (flushData) PyTutorDataManager.FlushPyTutorData();

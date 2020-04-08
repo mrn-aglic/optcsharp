@@ -21,7 +21,7 @@ namespace OptLocal
         {
             services.AddControllersWithViews();
             services.AddMvc().AddNewtonsoftJson();
-            
+
             var instrumentationConfig = Configuration.GetSection("Instrumentation").Get<InstrumentationConfig>();
             services.AddSingleton(instrumentationConfig);
         }
@@ -40,7 +40,7 @@ namespace OptLocal
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -54,11 +54,16 @@ namespace OptLocal
                     "",
                     new {controller = "Shell", action = "Index", area = "Default"}
                 );
-                
+
                 endpoints.MapControllerRoute(
                     "Monaco",
                     "monaco",
                     new {controller = "Shell", action = "Monaco", area = "Default"}
+                );
+                endpoints.MapControllerRoute(
+                    "PMA",
+                    "js",
+                    new {controller = "Shell", action = "JavaScript", area = "Default"}
                 );
             });
         }

@@ -47,9 +47,9 @@ namespace OptLocal.Areas.Default.Controllers
                 new SourceCodeRewriter(new ExpressionGenerator(scriptSemanticModel), _instrumentationConfig);
             var instrumentationManager = new InstrumentationManager(sourceRewriter);
 
-            var compilationResult = optBackend.Compile(CompilationName, instrumentationManager, scriptSemanticModel);
+            var compilationResult = optBackend.Compile(CompilationName, instrumentationManager);
 
-            var pyTutorData = optBackend.Trace(compilationResult, scriptCompilation);
+            var pyTutorData = optBackend.Trace(compilationResult);
             return PyTutorDataMapper.ToJson(pyTutorData);
         }
 
@@ -76,7 +76,7 @@ namespace OptLocal.Areas.Default.Controllers
                 return PyTutorDataMapper.ToJson(optBackend.ReportCompilationError(compilationResult));
             }
 
-            var pyTutorData = optBackend.Trace(compilationResult, originalSourceCompilation);
+            var pyTutorData = optBackend.Trace(compilationResult);
             return PyTutorDataMapper.ToJson(pyTutorData);
         }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using TracingCore.Common;
 using TracingCore.SyntaxTreeEnhancers;
 using TracingCore.TreeRewriters;
 using static TracingCore.Common.RoslynHelper;
@@ -28,6 +29,8 @@ namespace TracingCore.RoslynRewriters
             SyntaxKind.ConstructorDeclaration
         };
 
+        private readonly HashSet<string> _structs;
+
         public SourceCodeRewriter(ExpressionGenerator expressionGenerator, InstrumentationConfig instrumentationConfig)
         {
             _expressionGenerator = expressionGenerator;
@@ -35,6 +38,7 @@ namespace TracingCore.RoslynRewriters
             _returnVarTemplate = instrumentationConfig.ReturnVarTemplate;
 
             _annotationsManager = new AnnotationsManager();
+            _structs = new HashSet<string>();
         }
 
         private ConstructorDeclarationSyntax PrepareStaticConstructor(ClassDeclarationSyntax classDeclarationSyntax)
@@ -51,6 +55,25 @@ namespace TracingCore.RoslynRewriters
             var registerStatement =
                 _expressionGenerator.GetRegisterClassLoadExpression(egDetails, staticCotr, fullyQualifiedName);
             return staticCotr.WithBody(_expressionGenerator.WrapInBlock(registerStatement));
+        }
+
+        public override SyntaxNode VisitStructDeclaration(StructDeclarationSyntax node)
+        {
+            var backupProperties = node.Members
+                .OfType<PropertyDeclarationSyntax>()
+                .Select(x =>
+                    x.WithIdentifier(
+                            SyntaxFactory.Identifier($"{_propertyConfig.BackupNamePrefix}{x.Identifier.Text}")
+                        )
+                        .WithAdditionalAnnotations(_annotationsManager.AugmentationAnnotation)
+                );
+
+            var visitsForEachMember = node.Members.Select(x => base.Visit(x) as MemberDeclarationSyntax);
+            var members = new SyntaxList<MemberDeclarationSyntax>().AddRange(visitsForEachMember)
+                .AddRange(backupProperties);
+            var nodeWithNewMembers = node.WithMembers(members);
+
+            return nodeWithNewMembers.WithAdditionalAnnotations(_annotationsManager.OriginalLine(node));
         }
 
         public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
@@ -142,7 +165,7 @@ namespace TracingCore.RoslynRewriters
         {
             return _methodLikeDeclarations.Contains(node.Kind());
         }
-
+        
         public override SyntaxNode VisitBlock(BlockSyntax node)
         {
             var isAugmentation = _annotationsManager.IsAugmentation(node);
@@ -450,6 +473,8 @@ namespace TracingCore.RoslynRewriters
         private List<StatementSyntax> InstrumentSimpleStatement(StatementSyntax statement, LineData lineNum)
         {
             var statementToInsert = GetSimpleTraceStatement(statement, lineNum);
+
+            var symbol = _expressionGenerator.SemanticModel.GetSymbolInfo(statement);
 
             return new List<StatementSyntax> {statement, statementToInsert};
         }

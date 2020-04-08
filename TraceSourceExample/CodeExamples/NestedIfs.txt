@@ -1,0 +1,17 @@
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        int m = 20;
+        int n = 5;
+        if (m > 10)
+        {
+            if (n > 20)
+                if(n < 5)
+                    if(m < 5)
+                        Console.WriteLine("Result1");
+        }
+    }
+}

@@ -435,6 +435,29 @@ namespace Vj03
     }
 }`
     },
+    P2_Vj041: {
+      name: 'Struct Tocka primjer',
+      categories: [Categories.Debug, Categories.Professor, Categories.P2],
+      code: `using System;
+
+namespace Vj04
+{
+    class Program
+    {
+        struct Tocka
+        {
+            public double X, Y;
+        }
+
+        static void Main(string[] args)
+        {
+            Tocka t; //deklaracija
+            t.X = 2;
+            t.Y = 3;
+        }
+    }
+}`  
+    },
     ifElse: {
         name: 'If-else primjer',
         categories: [Categories.Debug],

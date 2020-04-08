@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using TracingCore.TreeRewriters;
+using TracingCore.Common;
 
 namespace TracingCore.SyntaxTreeEnhancers
 {
@@ -14,6 +14,7 @@ namespace TracingCore.SyntaxTreeEnhancers
         private const string OriginalLineAnnotationKind = "originalLine";
         private const string LocationAnnotationKind = "location";
         private const string AugmentationAnnotationKind = "augmentation";
+        private const string TraceStatementKind = "traceStatement";
 
         public AnnotationsManager()
         {
@@ -38,10 +39,24 @@ namespace TracingCore.SyntaxTreeEnhancers
             return (startLine: new LineData(range.First()), endLine: new LineData(range.Last()));
         }
 
-        public string ConstructLineData(SyntaxNode node)
+        public LineData GetFirstLineData(SyntaxNode node)
+        {
+            if (!node.HasAnnotation(OriginalLineAnnotation))
+                throw new ArgumentException("Node does not have required annotation!");
+
+            return GetLineDataFromAnnotation(node.GetAnnotations(OriginalLineAnnotationKind).First()).startLine;
+        }
+
+        private string ConstructLineData(SyntaxNode node)
         {
             var lineSpan = node.GetLocation().GetLineSpan();
             return $"[{lineSpan.StartLinePosition.Line + 1}-{lineSpan.EndLinePosition.Line + 1}]";
+        }
+
+        public SyntaxNode SourceLineAnnotateFrom(SyntaxNode targetNode, SyntaxNode sourceNode)
+        {
+            return targetNode.WithAdditionalAnnotations(new SyntaxAnnotation(OriginalLineAnnotationKind,
+                ConstructLineData(sourceNode)));
         }
 
         public SyntaxAnnotation OriginalLine(SyntaxNode node)

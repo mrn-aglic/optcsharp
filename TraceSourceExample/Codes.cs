@@ -14,6 +14,10 @@ namespace TraceSourceExample
             return File.ReadAllText(filePath);
         }
 
+        public static string GetStructExample()
+        {
+            return GetFileContents("structTocka.txt");
+        }
         public static string GetIfElseExample()
         {
             return GetFileContents("IfElse.txt");
@@ -177,6 +181,11 @@ namespace TraceSourceExample
         public static string VoidMethodExample()
         {
             return GetFileContents("VoidMethodExample.txt");
+        }
+
+        public static string GetNestedIfsExample()
+        {
+            return GetFileContents("NestedIfs.txt");
         }
     }
 }

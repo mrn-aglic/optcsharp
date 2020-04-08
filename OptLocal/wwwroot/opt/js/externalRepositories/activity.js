@@ -1,7 +1,7 @@
 'use strict';
 
 class ActionData {
-    constructor(id, actionId, userId, eventType, details, index, loadTime, compileTime) {
+    constructor(id, actionId, userId, eventType, details, index, loadTime, compileTime, languageId) {
         this.actionId = actionId;
         this.userId = userId;
         this.eventType = eventType;
@@ -9,6 +9,7 @@ class ActionData {
         this.index = index;
         this.loadTime = loadTime;
         this.compileTime = compileTime;
+        this.languageId = languageId;
     }
 
     static createFromPartialJson(userId, index, loadTime, compileTime, {actionId, eventType, details}) {

@@ -334,7 +334,9 @@ namespace TracingCore.Data
 
             if (prevStep == null) throw new ArgumentException("There should be a step before method exit");
 
-            // var (gcStacks, gcHeap) = IsReturnFromFunction() ? PyTutorGc() : (prevStep.StackToRender.Pop(out ))
+            // var (gcStacks, _) = IsReturnFromFunction()
+            //     ? PyTutorGc()
+            //     : (prevStep.StackToRender.Pop(out var lastStack), null);
 
             var newStackToRender = prevStep.StackToRender.Pop(out var lastStack);
             var hd = GetHeapData(variableData);

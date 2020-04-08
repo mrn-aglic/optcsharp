@@ -12,11 +12,6 @@ namespace TracingCore.TracingManagers
         DoWhile
     }
 
-    public class LoopData
-    {
-        
-    }
-
     public class LoopManager
     {
         private readonly Dictionary<string, int> _loopIterations;

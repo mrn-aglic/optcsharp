@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,13 +31,19 @@ namespace TraceSourceExample
         static void Main(string[] args)
         {
             Console.WriteLine(args.GetType());
+            // var code = Codes.GetStructExample();
             // var code = Codes.GetForExample(1);
             // var code = Codes.GetWhileExample(1);
             // var code = Codes.GetDoWhileExample(1);
             // var code = Codes.GetMethodsExample();
-            var code = Codes.GetOOPExample("4_pikado");
+            var code = Codes.GetOOPExample("3_enkapsulacija");
+            // var code = Codes.GetIfElseExample();
+            // var code = Codes.GetNestedIfsExample();
+            // var code = Codes.GetOOPExample("4_pikado");
             // var code = Codes.GetIfElseExample();
             // var code = Codes.GetPropertiesExample();
+            // var code = Codes.GetSimpleClassInstanceExample();
+            // var code = Codes.GetClassEmptyConstructorInstanceExample();
 
             var config = LoadConfiguration();
             var appConfig = config.GetSection("Instrumentation").Get<InstrumentationConfig>();
@@ -50,22 +57,29 @@ namespace TraceSourceExample
             PyTutorStepMapper.RegisterConfig(service);
             
             
-            
-
             var optBackend = new OptBackend(code, new List<string>());
             var originalSourceCompilation = optBackend.Compile("user-code");
             var userSemanticModel =
                 originalSourceCompilation.GetSemanticModel();
+            
+            
+            var test = new SourceRewriter(new ExpressionGenerator(userSemanticModel), service);
+            var result =test.Visit(CSharpSyntaxTree.ParseText(code).GetCompilationUnitRoot()).NormalizeWhitespace();
+
+           
             var sourceRewriter = new SourceCodeRewriter(new ExpressionGenerator(userSemanticModel), service);
             var newTree = sourceRewriter.Start(optBackend.UserSyntaxTree.GetCompilationUnitRoot());
 
+            
+            
             // return;
             FileIO.WriteToFile(newTree.ToFullString(), "Instrumentation", "code.txt");
+            FileIO.WriteToFile(result.ToFullString(), "Instrumentation", "code2.txt");
 
 
             var instrumentationManager = new InstrumentationManager(sourceRewriter);
             var compilationResult = optBackend.Compile("opt-compilation", instrumentationManager);
-            var pyTutorData = optBackend.Trace(compilationResult, originalSourceCompilation, true);
+            var pyTutorData = optBackend.Trace(compilationResult, true);
             // TraceApi.FlushPyTutorData();
         }
     }

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TracingCore.Common;
 using TracingCore.Data;
-using TracingCore.TreeRewriters;
 
 namespace TracingCore.TraceToPyDtos
 {

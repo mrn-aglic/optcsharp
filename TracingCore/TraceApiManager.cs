@@ -40,11 +40,6 @@ namespace TracingCore
             _pyTutorDataManager.AddMethodExit(line, varData, replacePrev);
         }
 
-        public void RegisterClasses()
-        {
-            _classManager.RegisterClasses();
-        }
-
         public void RegisterClassLoad(string fullyQualifiedName)
         {
             var classData = _classManager.GetClassData(fullyQualifiedName);
@@ -71,6 +66,17 @@ namespace TracingCore
             var vars = expressionResult ? variables : new VariableData[0];
             TraceData(line, vars);
             // _pyTutorDataManager.AddNextTraceEntry(line, stdOut, new List<VariableData>());
+        }
+
+        public void Init()
+        {
+            _consoleHandler.Init();
+            _classManager.RegisterClasses();
+        }
+
+        public void Reset()
+        {
+            _consoleHandler.RestoreDefaults();
         }
     }
 }

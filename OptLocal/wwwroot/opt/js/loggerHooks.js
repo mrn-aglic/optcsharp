@@ -73,7 +73,7 @@ const callbacks = {
     sliderSlide: function (actionId, e, callback) {
 
         const mouseUpHandle = evt => {
-            
+
             document.removeEventListener('mouseup', mouseUpHandle);
             const eventType = e.target.classList.contains('ui-slider-handle') ? 'slide' : 'click';
             const data = getCurStep();
@@ -141,9 +141,10 @@ class HookData {
 }
 
 class HooksManager {
-    constructor(user, eventActions) {
+    constructor(user, languageId, eventActions) {
         this.user = user;
         this.eventActions = eventActions;
+        this.languageId = languageId;
         this.attachedHooks = [];
 
         this.execButtonHook =
@@ -165,7 +166,8 @@ class HooksManager {
                 self.compileTime = new Date().toISOString();
             }
 
-            const actionData = new ActionData(null, actionId, self.user.id, eventType, details, self.index, self.loadTime, self.compileTime);
+            const actionData =
+                new ActionData(null, actionId, self.user.id, eventType, details, self.index, self.loadTime, self.compileTime, self.languageId);
             self.index = self.index + 1;
 
             self.activityRepo.saveEventAction(actionData).then(() => {

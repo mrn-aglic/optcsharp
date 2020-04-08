@@ -17,6 +17,7 @@
               <e p="_ViewStart.cshtml" t="Include" />
               <e p="Shell" t="Include">
                 <e p="Index.cshtml" t="Include" />
+                <e p="JavaScript.cshtml" t="Include" />
                 <e p="Monaco.cshtml" t="Include" />
               </e>
             </e>
@@ -510,9 +511,9 @@
           <e p="HelloWorld.txt" t="Include" />
           <e p="IfElse.txt" t="Include" />
           <e p="InstanceExample1.txt" t="Include" />
-          <e p="Methods.txt" t="Include" />
           <e p="MethodsExample.txt" t="Include" />
           <e p="MultipleNamespacesExample.txt" t="Include" />
+          <e p="NestedIfs.txt" t="Include" />
           <e p="OOP_2_overload.txt" t="Include" />
           <e p="OOP_2_params.txt" t="Include" />
           <e p="OOP_3_enkapsulacija.txt" t="Include" />
@@ -522,12 +523,14 @@
           <e p="PolymorphismOverride.txt" t="Include" />
           <e p="Properties.txt" t="Include" />
           <e p="SimpleWithMethod.txt" t="Include" />
+          <e p="structTocka.txt" t="Include" />
           <e p="VoidMethodExample.txt" t="Include" />
           <e p="While_1.txt" t="Include" />
         </e>
         <e p="Codes.cs" t="Include" />
         <e p="Instrumentation" t="Include">
           <e p="code.txt" t="Include" />
+          <e p="code2.txt" t="Include" />
         </e>
         <e p="JsonOutput" t="Include">
           <e p="optOutput.json" t="Include" />
@@ -546,7 +549,9 @@
         <e p="appsettings.json" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
         <e p="Common" t="Include">
+          <e p="Declarations.cs" t="Include" />
           <e p="FileIO.cs" t="Include" />
+          <e p="LineData.cs" t="Include" />
           <e p="RoslynHelper.cs" t="Include" />
         </e>
         <e p="CompilationResult.cs" t="Include" />
@@ -591,7 +596,9 @@
         <e p="RoslynRewriters" t="Include">
           <e p="IInstrumentationEngine.cs" t="Include" />
           <e p="InstrumentationManager.cs" t="Include" />
+          <e p="RewriteHelper.cs" t="Include" />
           <e p="SourceCodeRewriter.cs" t="Include" />
+          <e p="SourceRewriter.cs" t="Include" />
         </e>
         <e p="SyntaxTreeEnhancers" t="Include">
           <e p="AnnotationsManager.cs" t="Include" />
@@ -614,8 +621,6 @@
         <e p="TreeRewriters" t="Include">
           <e p="ExpressionGenerator.cs" t="Include" />
           <e p="ExpressionGeneratorDetails.cs" t="Include" />
-          <e p="InstrumentationDetails.cs" t="Include" />
-          <e p="LineData.cs" t="Include" />
         </e>
       </e>
     </e>
