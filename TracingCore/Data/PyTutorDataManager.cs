@@ -221,7 +221,7 @@ namespace TracingCore.Data
                 var anyRefInStacks = stacksToRender.Any(x => x.EncodedLocals.Any(y => y.HeapId == key));
                 var anyRefInGlobals = currentGlobals.Any(x => key == RestoreKey(x));
 
-                if (!(anyRefInGlobals || anyRefInStacks))
+                if (!(anyRefInGlobals || anyRefInStacks) && !ReferencedByClass(key, currentHeap))
                 {
                     removeFromHeap.Add(key);
                 }
@@ -230,6 +230,12 @@ namespace TracingCore.Data
             var newHeap = currentHeap.RemoveRange(removeFromHeap);
 
             return (stacksToRender, newHeap);
+        }
+
+        private bool ReferencedByClass(int key, Heap heap)
+        {
+            var methods = heap.Values.OfType<ClassHeapData>().SelectMany(x => x.FindMyMembersInHeap(heap));
+            return methods.Any(x => x.HeapId == key);
         }
 
         public void AddNextTraceEntry(int line, string stdOut, IList<VariableData> variables)
@@ -326,7 +332,6 @@ namespace TracingCore.Data
         public void AddMethodExit(int line, List<VariableData> variables)
         {
         }
-
 
         public void AddMethodExit(int line, VariableData variableData, bool replacePrevStep)
         {

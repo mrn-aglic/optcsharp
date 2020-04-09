@@ -18,8 +18,6 @@ namespace TracingCore.TraceToPyDtos
         public bool HasMain { get; }
         public Type Type { get; }
 
-        public bool ClassLoaded { get; set; }
-
         public ClassData(string name, bool isStatic, string[] extendedTypes, string fullyQualifiedPath,
             IList<MethodData> methods, LineData lineData,
             Type type)
@@ -31,7 +29,6 @@ namespace TracingCore.TraceToPyDtos
             Methods = methods;
             LineData = lineData;
             HasMain = Methods.Any(x => x.IsMain);
-            ClassLoaded = false;
             Type = type;
         }
 

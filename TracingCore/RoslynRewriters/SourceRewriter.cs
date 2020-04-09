@@ -218,7 +218,7 @@ namespace TracingCore.RoslynRewriters
 
             return ReplaceSingleLineStatementWithBlock(elseClause, node.Statement, elseClause.Statement as BlockSyntax);
         }
-
+        
         private List<StatementSyntax> InstrumentReturnStatement
         (
             TypeSyntax returnType,

@@ -324,6 +324,79 @@ namespace Vj04
     }
 }`
     },
+    Vj06_01:{
+      name: 'Primjer new i override',
+      categories: [Categories.Debug, Categories.Professor, Categories.OOP],
+      code: `using System;
+
+namespace Vj06
+{
+    public class Osoba
+    {
+        public string Ime;
+        public string Prezime;
+
+        public Osoba(string ime, string prezime)
+        {
+            Ime = ime;
+            Prezime = prezime;
+        }
+
+        public void IspisDetalja()
+        {
+            Console.WriteLine($"{Ime} {Prezime}");
+        }
+
+        public virtual void PuniIspis()
+        {
+            Console.WriteLine($"{Ime} {Prezime}");
+        }
+    }
+
+    public class Student : Osoba
+    {
+        public string Jmbag;
+        public Student(string ime, string prezime, string jmbag) : base(ime, prezime)
+        {
+            Jmbag = jmbag;
+        }
+
+        public new void IspisDetalja()
+        {
+            Console.WriteLine($"{Ime} {Prezime} {Jmbag}");
+        }
+
+        public override void PuniIspis()
+        {
+            Console.WriteLine($"{Ime} {Prezime} {Jmbag}");
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            // Ako želimo promijeniti ponašanje elementa (npr. metode), to možemo postići
+            // korištenjem ključnih riječi new ili override. 
+            // Koja metoda će se pozvati zahtjeva da znamo razliku između tipa varijable
+            // i tipa instance objekta.
+            // U slučaju override, uvijek se poziva metoda koja pripada instanci,
+            // a u slučaju new, ona koja je definirana u tipu varijable.
+            // Isprobajte sve kombinacije. 
+            // Na primjer, probajte napraviti dvije nova varijable, tipa Osoba i tipa Student, gdje će 
+            // obe imati instancu studenta pa probajte pozvati metodu "PuniIspis" na osoba1
+            // i dvima novim varijablama. 
+            Osoba osoba1 = new Osoba("Ante", "Antic");
+            Osoba osoba2 = new Student("Marko", "Maric", "123");
+            Student osoba3 = new Student("Ivan", "Ivic", "456");
+            
+            osoba1.IspisDetalja();
+            osoba2.IspisDetalja();
+            osoba3.IspisDetalja();
+        }
+    }
+}`  
+    },
     P2Vj_021: {
         name: 'Primjer slijed',
         categories: [Categories.Debug, Categories.Professor, Categories.P2],

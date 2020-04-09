@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 
 namespace TracingCore.Data
 {
@@ -17,6 +20,11 @@ namespace TracingCore.Data
             IsStatic = isStatic;
             Extends = extends;
             Type = type;
+        }
+
+        public IEnumerable<MethodHeapData> FindMyMembersInHeap(ImmutableDictionary<int, HeapData> heap)
+        {
+            return heap.Values.OfType<MethodHeapData>().Where(x => x.EnclosingParentFullName == FullyQualifiedName);
         }
     }
 }

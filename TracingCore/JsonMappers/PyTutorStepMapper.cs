@@ -19,11 +19,11 @@ namespace TracingCore.JsonMappers
             BindingFlags.NonPublic |
             BindingFlags.Public |
             BindingFlags.Instance |
-            BindingFlags.Static |
-            BindingFlags.DeclaredOnly;
+            BindingFlags.Static;
+        // BindingFlags.DeclaredOnly;
 
         private static BindingFlags _propertyBindingFlags =
-            BindingFlags.DeclaredOnly |
+            // BindingFlags.DeclaredOnly |
             BindingFlags.NonPublic | // Should we include non-public properties?
             BindingFlags.Public |
             BindingFlags.Static |
@@ -125,8 +125,7 @@ namespace TracingCore.JsonMappers
             var jArray = new JArray
                 {heapTypeString, $"{value.FullyQualifiedName + (value.IsStatic ? " static" : "")}", extends};
 
-            var methods = heap.Values.OfType<MethodHeapData>()
-                .Where(x => x.EnclosingParentFullName == value.FullyQualifiedName);
+            var methods = value.FindMyMembersInHeap(heap);
 
             foreach (var method in methods)
             {
@@ -140,16 +139,6 @@ namespace TracingCore.JsonMappers
                 .ToList();
             return PopulateJArray(jArray, heap, fields);
         }
-
-        // public static IEnumerable<object> CastObjToArray(object array)
-        // {
-        //     return array switch
-        //     {
-        //         IEnumerable<object> ienumerable => ienumerable,
-        //         int[] arr => arr.Select(),
-        //         _ => throw new NotImplementedException()
-        //     };
-        // }
 
         public static JObject HeapToJson(ImmutableDictionary<int, HeapData> heap)
         {
@@ -198,6 +187,7 @@ namespace TracingCore.JsonMappers
                     {
                         jObject.Add("exception_msg", JToken.FromObject(pyStep.ExceptionMsg));
                     }
+
                     jObject.Add("stack_to_render",
                         JToken.FromObject(pyStep.StackToRender.Select(FuncStackMapper.ToJson).Reverse()));
                     jObject.Add("globals", JToken.FromObject(pyStep.Globals));

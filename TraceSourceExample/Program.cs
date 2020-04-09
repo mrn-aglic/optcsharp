@@ -36,11 +36,11 @@ namespace TraceSourceExample
             // var code = Codes.GetWhileExample(1);
             // var code = Codes.GetDoWhileExample(1);
             // var code = Codes.GetMethodsExample();
-            var code = Codes.GetOOPExample("3_enkapsulacija");
+            // var code = Codes.GetOOPExample("3_enkapsulacija");
             // var code = Codes.GetIfElseExample();
             // var code = Codes.GetNestedIfsExample();
             // var code = Codes.GetOOPExample("4_pikado");
-            // var code = Codes.GetIfElseExample();
+            var code = Codes.GetIfElseExample();
             // var code = Codes.GetPropertiesExample();
             // var code = Codes.GetSimpleClassInstanceExample();
             // var code = Codes.GetClassEmptyConstructorInstanceExample();
