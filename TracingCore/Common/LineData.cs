@@ -1,9 +1,12 @@
+using Microsoft.CodeAnalysis;
+
 namespace TracingCore.Common
 {
     public interface ILineData
     {
         public int StartLine { get; }
     }
+
     public class LineData : ILineData
     {
         public int StartLine { get; }
@@ -14,15 +17,27 @@ namespace TracingCore.Common
         }
     }
 
-    public class FullLineData : ILineData
+    public class TraceLineSpan : ILineData
     {
-        public int StartLine { get; }
-        public int Column { get; }
+        public int StartLine { private set; get; }
+        public int StartCharacter { private set; get; }
+        public int EndLine { private set; get; }
+        public int EndCharacter { private set; get; }
+        public bool UseEndLine { get; }
+        public int TraceLine => UseEndLine ? EndLine : StartLine;
 
-        public FullLineData(int startLine, int startLineColumn)
+        public TraceLineSpan(FileLinePositionSpan lineSpan, bool useEndLine)
         {
-            StartLine = startLine;
-            Column = startLineColumn;
+            Assign(lineSpan);
+            UseEndLine = useEndLine;
+        }
+
+        private void Assign(FileLinePositionSpan lineSpan)
+        {
+            StartLine = lineSpan.StartLinePosition.Line + 1;
+            StartCharacter = lineSpan.StartLinePosition.Character + 1;
+            EndLine = lineSpan.EndLinePosition.Line + 1;
+            EndCharacter = lineSpan.EndLinePosition.Character + 1;
         }
     }
 }

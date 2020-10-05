@@ -6,6 +6,16 @@ namespace TracingCore.RoslynRewriters
 {
     public class InstrumentationManager
     {
+        private static readonly IdentifierNameSyntax TracingCoreIdentifierName =
+            SyntaxFactory.IdentifierName("TracingCore");
+
+        private static readonly IdentifierNameSyntax TraceApiNamespace = TracingCoreIdentifierName
+            .WithLeadingTrivia(SyntaxFactory.Space);
+
+        private static readonly QualifiedNameSyntax TraceDtosNamespace = SyntaxFactory.QualifiedName(
+            TracingCoreIdentifierName,
+            SyntaxFactory.IdentifierName("TraceToPyDtos"));
+
         private readonly IInstrumentationEngine _instrumentationEngine;
 
         public InstrumentationManager(IInstrumentationEngine instrumentationEngine)
@@ -15,22 +25,15 @@ namespace TracingCore.RoslynRewriters
 
         private CompilationUnitSyntax AddUsings(CompilationUnitSyntax root)
         {
-            var tracingCoreIdentifier =
-                SyntaxFactory.IdentifierName("TracingCore").WithLeadingTrivia(SyntaxFactory.Space);
-
-            var variableDataDirective =
-                SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName("TracingCore"),
-                    SyntaxFactory.IdentifierName("TraceToPyDtos"));
-
             return root.WithUsings(root.Usings
                 .Add(
                     SyntaxFactory.UsingDirective(
-                        tracingCoreIdentifier
+                        TraceApiNamespace
                     )
                 )
                 .Add(
                     SyntaxFactory.UsingDirective(
-                        variableDataDirective
+                        TraceDtosNamespace
                     )
                 )
             );

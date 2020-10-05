@@ -2,6 +2,7 @@ namespace TracingCore
 {
     public static class TraceApiNames
     {
+        public const string TraceApiVarName = "__TRACEAPI";
         public const string ClassName = "TraceApi";
         public const string TraceMethodEntry = "TraceMethodEntry";
         public const string TraceBlockEntry = "TraceBlockEntry";

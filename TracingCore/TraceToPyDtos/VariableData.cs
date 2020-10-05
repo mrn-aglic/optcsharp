@@ -10,6 +10,8 @@ namespace TracingCore.TraceToPyDtos
     public class VariableData : ITracePyDto
     {
         private const string ThisClassName = "VariableData";
+        private const string GetTypeName = "GetType";
+        private const string ThisString = "this";
         public string Name { get; }
         public object Value { get; }
         public Type Type { get; }
@@ -49,7 +51,7 @@ namespace TracingCore.TraceToPyDtos
                         MemberAccessExpression(
                             SyntaxKind.SimpleMemberAccessExpression,
                             IdentifierName(identifier),
-                            IdentifierName("GetType")
+                            IdentifierName(GetTypeName)
                         )
                     )
                 )
@@ -72,7 +74,7 @@ namespace TracingCore.TraceToPyDtos
         public static ObjectCreationExpressionSyntax GetObjectCreationSyntax(
             VariableDeclaratorSyntax variableDeclaratorSyntax)
         {
-            var variableDeclaration = variableDeclaratorSyntax.Parent as VariableDeclarationSyntax;
+            var variableDeclaration = (VariableDeclarationSyntax) variableDeclaratorSyntax.Parent;
             var a = ObjectCreationExpression(
                 IdentifierName(ThisClassName)
             ).WithArgumentList(
@@ -126,7 +128,7 @@ namespace TracingCore.TraceToPyDtos
                             // Argument(GetThisWithMemberWiseClone())
                             Argument(LiteralExpression(
                                     SyntaxKind.StringLiteralExpression,
-                                    Literal("this")
+                                    Literal(ThisString)
                                 )
                             )
                         )
@@ -140,7 +142,7 @@ namespace TracingCore.TraceToPyDtos
                                 MemberAccessExpression(
                                     SyntaxKind.SimpleMemberAccessExpression,
                                     ThisExpression(),
-                                    IdentifierName("GetType")
+                                    IdentifierName(GetTypeName)
                                 )
                             ))
                         ))

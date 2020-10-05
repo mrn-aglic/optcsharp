@@ -14,8 +14,6 @@ namespace TracingCore.RoslynRewriters
 {
     public class SourceRewriter : CSharpSyntaxRewriter, IInstrumentationEngine
     {
-        private readonly bool _extractForDeclaration = false;
-
         private readonly RewriteHelper _rewriteHelper;
 
         private readonly ExpressionGenerator _expressionGenerator;
@@ -67,15 +65,110 @@ namespace TracingCore.RoslynRewriters
                 ElseClauseSyntax elseClause => elseClause.WithStatement(
                     GetBlockForStatement(elseClause, block, () => GetLineData(source), () => GetLineData(source))
                 ),
+                ForEachStatementSyntax @foreach => @foreach.WithStatement(
+                    GetBlockForStatement(@foreach, block, () => GetLineData(source), () => GetLineData(source))
+                ),
                 _ => throw new NotImplementedException()
             };
+        }
+
+        private BlockSyntax WrapNonBlockStatement<T>(T node, StatementSyntax statement, StatementSyntax lineDataSource)
+            where T : StatementSyntax
+        {
+            var block = statement is BlockSyntax blockSyntax
+                ? blockSyntax
+                : _rewriteHelper.WrapInBlock(statement);
+            return GetBlockForStatement(node, block,
+                () => GetLineData(lineDataSource),
+                () => GetLineData(lineDataSource)
+            );
+        }
+
+        private SyntaxNode ReplaceSingleLineStatementWithBlock(SyntaxNode node, SyntaxNode source)
+        {
+            if (node.GetType() != source.GetType()) throw new ArgumentException("Nodes of different type");
+
+            switch (source)
+            {
+                case IfStatementSyntax @if:
+                {
+                    var statement = @if.Statement;
+                    var hasBlock = statement is BlockSyntax;
+
+                    if (hasBlock) return node;
+
+                    var newNode = (IfStatementSyntax) node;
+                    var block = WrapNonBlockStatement(newNode, newNode.Statement, @if.Statement);
+
+                    return newNode.WithStatement(block);
+                }
+                case ElseClauseSyntax @else:
+                {
+                    var statement = @else.Statement;
+                    var hasBlock = statement is BlockSyntax;
+
+                    if (hasBlock) return node;
+
+                    var newNode = (ElseClauseSyntax) node;
+                    var block = newNode.Statement is BlockSyntax blockSyntax
+                        ? blockSyntax
+                        : _rewriteHelper.WrapInBlock(newNode.Statement);
+
+                    return newNode.WithStatement(GetBlockForStatement(newNode, block,
+                        () => GetLineData(@else.Statement),
+                        () => GetLineData(@else.Statement)));
+                }
+                case ForEachStatementSyntax @foreach:
+                {
+                    var statement = @foreach.Statement;
+                    var hasBlock = statement is BlockSyntax;
+
+                    if (hasBlock) return node;
+
+                    var newNode = (ForEachStatementSyntax) node;
+                    var block = WrapNonBlockStatement(newNode, newNode.Statement, @foreach.Statement);
+                    return newNode.WithStatement(block);
+                }
+                case ForStatementSyntax @for:
+                {
+                    var statement = @for.Statement;
+                    var hasBlock = statement is BlockSyntax;
+
+                    if (hasBlock) return node;
+
+                    var newNode = (ForStatementSyntax) node;
+                    var block = WrapNonBlockStatement(newNode, newNode.Statement, @for.Statement);
+                    return newNode.WithStatement(block);
+                }
+                case WhileStatementSyntax @while:
+                {
+                    var statement = @while.Statement;
+                    var hasBlock = statement is BlockSyntax;
+                    if (hasBlock) return node;
+
+                    var newNode = (WhileStatementSyntax) node;
+                    var block = WrapNonBlockStatement(newNode, newNode.Statement, @while.Statement);
+                    return newNode.WithStatement(block);
+                }
+                case DoStatementSyntax @do:
+                {
+                    var statement = @do.Statement;
+                    var hasBlock = statement is BlockSyntax;
+                    if (hasBlock) return node;
+
+                    var newNode = (DoStatementSyntax) node;
+                    var block = WrapNonBlockStatement(newNode, newNode.Statement, @do.Statement);
+                    return newNode.WithStatement(block);
+                }
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         private SyntaxNode InstrumentBlock
         (
             BlockSyntax blockSyntax,
             SyntaxNode parent,
-            ClassDeclarationSyntax @class,
             IReadOnlyCollection<StatementSyntax> newStatements
         )
         {
@@ -93,13 +186,9 @@ namespace TracingCore.RoslynRewriters
                 ? GetLineData(statements.Last(), true)
                 : GetLineData(blockSyntax, true);
 
-            var includeThisReference = isParentMethodLike &&
-                                       @class.Modifiers.All(x => !x.IsKind(SyntaxKind.StaticKeyword)) &&
-                                       !NodeHasStaticModifier(parent);
-            
             var entryStatement = isParentMethodLike
                 ? _expressionGenerator.GetMethodEntryExpression(entryLine, blockSyntax)
-                : _expressionGenerator.GetBlockEntryExpression(entryLine, blockSyntax);
+                : _expressionGenerator.GetBlockEntryExpression(entryLine, blockSyntax.Parent);
 
             var dullStatement = _expressionGenerator.GetDullExpressionStatement(dullLine);
 
@@ -110,7 +199,7 @@ namespace TracingCore.RoslynRewriters
                     isParentMethodLike
                         ? _expressionGenerator.GetMethodExitExpression(exitLine,
                             blockSyntax)
-                        : _expressionGenerator.GetBlockExitExpression(exitLine, blockSyntax)
+                        : _expressionGenerator.GetBlockExitExpression(exitLine, blockSyntax.Parent)
                 );
 
             return blockSyntax.WithStatements(new SyntaxList<StatementSyntax>().AddRange(stmtsList));
@@ -119,8 +208,7 @@ namespace TracingCore.RoslynRewriters
         private SyntaxNode InstrumentBlock(BlockSyntax blockSyntax, SyntaxNode parent,
             List<StatementSyntax> newStatements)
         {
-            var @class = blockSyntax.Ancestors().OfType<ClassDeclarationSyntax>().First();
-            return InstrumentBlock(blockSyntax, parent, @class, newStatements);
+            return InstrumentBlock(blockSyntax, parent, (IReadOnlyCollection<StatementSyntax>) newStatements);
         }
 
         public override SyntaxNode VisitBlock(BlockSyntax node)
@@ -144,28 +232,27 @@ namespace TracingCore.RoslynRewriters
             return _rewriteHelper.UnwrapAugmentedBlock(base.Visit(statement));
         }
 
-        private SyntaxNode GetSimpleStatementWithTrace(StatementSyntax statementSyntax, LineData lineData,
-            bool excludeDeclaration)
+        private SyntaxNode GetSimpleStatementWithTrace(StatementSyntax statementSyntax, LineData lineData)
         {
             var newStatement =
-                _expressionGenerator.GetSimpleTraceExpression(lineData, statementSyntax, excludeDeclaration);
+                _expressionGenerator.GetSimpleTraceExpression(lineData, statementSyntax);
             return _rewriteHelper.WrapInBlock(statementSyntax, newStatement);
         }
 
-        private SyntaxNode GetSimpleStatementWithTrace(StatementSyntax statementSyntax, bool excludeDeclaration)
+        private SyntaxNode GetSimpleStatementWithTrace(StatementSyntax statementSyntax)
         {
             var lineData = GetLineNumber(statementSyntax, statementSyntax.Parent as BlockSyntax);
-            return GetSimpleStatementWithTrace(statementSyntax, lineData, excludeDeclaration);
+            return GetSimpleStatementWithTrace(statementSyntax, lineData);
         }
 
         public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
         {
-            return GetSimpleStatementWithTrace(node, false);
+            return GetSimpleStatementWithTrace(node);
         }
 
         public override SyntaxNode VisitLocalDeclarationStatement(LocalDeclarationStatementSyntax node)
         {
-            return GetSimpleStatementWithTrace(node, false);
+            return GetSimpleStatementWithTrace(node);
         }
 
         private BlockSyntax GetBlockForStatement
@@ -202,10 +289,10 @@ namespace TracingCore.RoslynRewriters
                     )
                     as IfStatementSyntax;
 
-            if (!node.Parent.IsKind(SyntaxKind.Block)) return @if;
+            if (!node.Parent.IsBlock()) return @if;
 
-            var lineData = GetLineData(node, true);
-            var traceStatement = _expressionGenerator.GetSimpleTraceExpression(lineData, @if, false);
+            var lineData = GetLineNumber(node, node.Parent as BlockSyntax);
+            var traceStatement = _expressionGenerator.GetSimpleTraceExpression(lineData, node);
             return _rewriteHelper.WrapInBlock(@if, traceStatement);
         }
 
@@ -218,7 +305,96 @@ namespace TracingCore.RoslynRewriters
 
             return ReplaceSingleLineStatementWithBlock(elseClause, node.Statement, elseClause.Statement as BlockSyntax);
         }
-        
+
+        public override SyntaxNode VisitForEachStatement(ForEachStatementSyntax node)
+        {
+            var hasBlock = node.Statement.IsKind(SyntaxKind.Block);
+
+            var foreachNode = (ForEachStatementSyntax) base.VisitForEachStatement(node);
+
+            var @foreach = hasBlock
+                ? foreachNode
+                : ReplaceSingleLineStatementWithBlock(foreachNode, node.Statement, foreachNode.Statement as BlockSyntax)
+                    as ForEachStatementSyntax;
+
+            if (!node.Parent.IsBlock()) return @foreach;
+
+            var lineData = GetLineNumber(node, node.Parent as BlockSyntax);
+            var traceStatement = _expressionGenerator.GetSimpleTraceExpression(lineData, node);
+            return _rewriteHelper.WrapInBlock(@foreach, traceStatement);
+        }
+
+        public override SyntaxNode VisitForStatement(ForStatementSyntax node)
+        {
+            var lineSpan = node.GetLineSpan();
+            var forNode = (ForStatementSyntax) base.VisitForStatement(node);
+
+            var @for = (ForStatementSyntax) ReplaceSingleLineStatementWithBlock(forNode, node);
+
+            var block = _expressionGenerator.WrapInBlock
+            (
+                ((BlockSyntax) @for.Statement)
+                .Statements
+                .Insert(0, _expressionGenerator.GetRegisterLoopIteration(@for.ForKeyword, lineSpan))
+            );
+
+            var conditionalTrace = _expressionGenerator.StatementToExpressionSyntax(
+                _expressionGenerator.GetConditionalExpressionStatement(GetLineData(node), node.Condition)
+            );
+
+            if (!node.Parent.IsBlock())
+                return @for.WithStatement(block)
+                    .WithIncrementors(node.Incrementors.Add(conditionalTrace));
+
+
+            var lineData = GetLineNumber(node, node.Parent as BlockSyntax);
+            var traceStatement = _expressionGenerator.GetSimpleTraceExpression(lineData, node);
+            return _rewriteHelper.WrapInBlock(
+                @for.WithStatement(block).WithIncrementors(@for.Incrementors.Add(conditionalTrace)), traceStatement);
+        }
+
+        public override SyntaxNode VisitWhileStatement(WhileStatementSyntax node)
+        {
+            var lineSpan = node.GetLineSpan();
+            var whileNode = (WhileStatementSyntax) base.VisitWhileStatement(node);
+            var @while = (WhileStatementSyntax) ReplaceSingleLineStatementWithBlock(whileNode, node);
+
+            var block = _expressionGenerator.WrapInBlock(
+                ((BlockSyntax) @while.Statement)
+                .Statements
+                .Insert(0, _expressionGenerator.GetRegisterLoopIteration(@while.WhileKeyword, lineSpan))
+            );
+
+            if (!node.Parent.IsBlock())
+                return @while.WithStatement(block);
+
+            var lineData = GetLineNumber(node, node.Parent as BlockSyntax);
+            var traceStatement = _expressionGenerator.GetSimpleTraceExpression(lineData, node);
+
+            return _rewriteHelper.WrapInBlock(@while.WithStatement(block), traceStatement);
+        }
+
+        public override SyntaxNode VisitDoStatement(DoStatementSyntax node)
+        {
+            var lineSpan = node.GetLineSpan();
+            var doNode = (DoStatementSyntax) base.VisitDoStatement(node);
+            var @do = (DoStatementSyntax) ReplaceSingleLineStatementWithBlock(doNode, node);
+
+            var block = _expressionGenerator.WrapInBlock(
+                ((BlockSyntax) @do.Statement)
+                .Statements
+                .Insert(0, _expressionGenerator.GetRegisterLoopIteration(@do.DoKeyword, lineSpan))
+            );
+
+            if (!node.Parent.IsBlock())
+                return @do.WithStatement(block);
+
+            var lineData = GetLineNumber(node, node.Parent as BlockSyntax);
+            var traceStatement = _expressionGenerator.GetSimpleTraceExpression(lineData, node);
+
+            return _rewriteHelper.WrapInBlock(@do.WithStatement(block), traceStatement);
+        }
+
         private List<StatementSyntax> InstrumentReturnStatement
         (
             TypeSyntax returnType,
@@ -264,6 +440,14 @@ namespace TracingCore.RoslynRewriters
             return _rewriteHelper
                 .WrapInBlock(InstrumentReturnStatement(returnType, returnLineData, node, block)
                     .ToArray());
+        }
+
+        public override SyntaxNode VisitThrowStatement(ThrowStatementSyntax node)
+        {
+            var @throw = (ThrowStatementSyntax) base.VisitThrowStatement(node);
+            var lineData = GetLineData(node);
+            var traceStatement = _expressionGenerator.GetSimpleTraceExpression(lineData, @throw);
+            return _rewriteHelper.WrapInBlock(traceStatement, @throw);
         }
 
         public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)

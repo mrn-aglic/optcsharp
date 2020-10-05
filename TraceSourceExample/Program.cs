@@ -31,6 +31,8 @@ namespace TraceSourceExample
         static void Main(string[] args)
         {
             Console.WriteLine(args.GetType());
+            var code = Codes.GetStructExample();
+            // var code = Codes.GetOOPExample("2_params");
             // var code = Codes.GetStructExample();
             // var code = Codes.GetForExample(1);
             // var code = Codes.GetWhileExample(1);
@@ -40,7 +42,6 @@ namespace TraceSourceExample
             // var code = Codes.GetIfElseExample();
             // var code = Codes.GetNestedIfsExample();
             // var code = Codes.GetOOPExample("4_pikado");
-            var code = Codes.GetIfElseExample();
             // var code = Codes.GetPropertiesExample();
             // var code = Codes.GetSimpleClassInstanceExample();
             // var code = Codes.GetClassEmptyConstructorInstanceExample();
@@ -55,26 +56,27 @@ namespace TraceSourceExample
             var service = provider.GetService<InstrumentationConfig>();
 
             PyTutorStepMapper.RegisterConfig(service);
-            
-            
+
+
             var optBackend = new OptBackend(code, new List<string>());
             var originalSourceCompilation = optBackend.Compile("user-code");
             var userSemanticModel =
                 originalSourceCompilation.GetSemanticModel();
-            
-            
-            var test = new SourceRewriter(new ExpressionGenerator(userSemanticModel), service);
-            var result =test.Visit(CSharpSyntaxTree.ParseText(code).GetCompilationUnitRoot()).NormalizeWhitespace();
 
-           
+
+            var test = new SourceRewriter(new ExpressionGenerator(userSemanticModel), service);
+            var insManager = new InstrumentationManager(test);
+            var result = insManager.Start(userSemanticModel.SyntaxTree.GetCompilationUnitRoot()).NormalizeWhitespace();
+            
+            FileIO.WriteToFile(result.ToFullString(), "Instrumentation", "code2.txt");
+
+
             var sourceRewriter = new SourceCodeRewriter(new ExpressionGenerator(userSemanticModel), service);
             var newTree = sourceRewriter.Start(optBackend.UserSyntaxTree.GetCompilationUnitRoot());
 
-            
-            
+
             // return;
             FileIO.WriteToFile(newTree.ToFullString(), "Instrumentation", "code.txt");
-            FileIO.WriteToFile(result.ToFullString(), "Instrumentation", "code2.txt");
 
 
             var instrumentationManager = new InstrumentationManager(sourceRewriter);

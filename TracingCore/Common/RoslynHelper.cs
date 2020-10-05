@@ -9,7 +9,7 @@ namespace TracingCore.Common
 {
     public static class RoslynHelper
     {
-        public static string GetClassParentPath(ClassDeclarationSyntax classDeclarationSyntax)
+        public static string GetClassParentPath(TypeDeclarationSyntax classDeclarationSyntax)
         {
             bool ClassOrNamespaceKind(SyntaxNode node)
             {
@@ -46,32 +46,6 @@ namespace TracingCore.Common
             (
                 useEndLine ? lineSpan.EndLinePosition.Line + 1 : lineSpan.StartLinePosition.Line + 1
             );
-        }
-
-        public static ClassDeclarationSyntax FindFirstClassParent(SyntaxNode node)
-        {
-            return node.Ancestors().OfType<ClassDeclarationSyntax>().FirstOrDefault();
-        }
-
-        public static bool NodeHasStaticModifier(SyntaxNode node)
-        {
-            return node switch
-            {
-                ClassDeclarationSyntax classDeclarationSyntax =>
-                classDeclarationSyntax.Modifiers.Any(x => x.IsKind(SyntaxKind.StaticKeyword)),
-                AccessorDeclarationSyntax accessorDeclarationSyntax => accessorDeclarationSyntax.Modifiers.Any(x =>
-                    x.IsKind(SyntaxKind.StaticKeyword)),
-                BaseMethodDeclarationSyntax baseMethodDeclarationSyntax => baseMethodDeclarationSyntax.Modifiers.Any(
-                    x => x.IsKind(SyntaxKind.StaticKeyword)),
-                _ => throw new NotImplementedException(
-                    "The use case probably is not implemented yet or a bug occurred.")
-            };
-        }
-
-        public static bool IsParentClassStatic(SyntaxNode node)
-        {
-            var parent = FindFirstClassParent(node);
-            return parent != null && NodeHasStaticModifier(parent);
         }
     }
 }

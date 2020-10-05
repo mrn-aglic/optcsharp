@@ -594,6 +594,7 @@
         </e>
         <e p="OptBackend.cs" t="Include" />
         <e p="RoslynRewriters" t="Include">
+          <e p="Extensions.cs" t="Include" />
           <e p="IInstrumentationEngine.cs" t="Include" />
           <e p="InstrumentationManager.cs" t="Include" />
           <e p="RewriteHelper.cs" t="Include" />
@@ -610,6 +611,8 @@
           <e p="ClassData.cs" t="Include" />
           <e p="ITracePyDto.cs" t="Include" />
           <e p="MethodData.cs" t="Include" />
+          <e p="StructData.cs" t="Include" />
+          <e p="TypeDeclarationData.cs" t="Include" />
           <e p="VariableData.cs" t="Include" />
         </e>
         <e p="TracingConfig.cs" t="Include" />
@@ -617,6 +620,8 @@
         <e p="TracingManagers" t="Include">
           <e p="ClassManager.cs" t="Include" />
           <e p="LoopManager.cs" t="Include" />
+          <e p="ManagerCore.cs" t="Include" />
+          <e p="StructManager.cs" t="Include" />
         </e>
         <e p="TreeRewriters" t="Include">
           <e p="ExpressionGenerator.cs" t="Include" />

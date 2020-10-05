@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using TracingCore.RoslynRewriters;
 
 namespace TracingCore.Common
 {
@@ -30,6 +31,17 @@ namespace TracingCore.Common
         public static bool IsMethodLike(SyntaxNode node)
         {
             return IsMethodLike(node.Kind());
+        }
+
+        public static bool IsInStaticContext(SyntaxNode node)
+        {
+            return node.GetParentOfType<MemberDeclarationSyntax>().IsStatic() ||
+                   node.GetParentOfType<ClassDeclarationSyntax>().IsStatic();
+        }
+
+        public static bool NonStaticContext(SyntaxNode node)
+        {
+            return !IsInStaticContext(node);
         }
     }
 }

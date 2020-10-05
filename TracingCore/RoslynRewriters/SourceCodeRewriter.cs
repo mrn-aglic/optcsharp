@@ -165,7 +165,7 @@ namespace TracingCore.RoslynRewriters
         {
             return _methodLikeDeclarations.Contains(node.Kind());
         }
-        
+
         public override SyntaxNode VisitBlock(BlockSyntax node)
         {
             var isAugmentation = _annotationsManager.IsAugmentation(node);
@@ -345,6 +345,7 @@ namespace TracingCore.RoslynRewriters
         public override SyntaxNode VisitForStatement(ForStatementSyntax node)
         {
             var hasBlock = node.Statement.IsKind(SyntaxKind.Block);
+            var lineSpan = node.GetLocation().GetLineSpan();
 
             var block = hasBlock
                 ? VisitBlock(node.Statement as BlockSyntax) as BlockSyntax
@@ -353,7 +354,7 @@ namespace TracingCore.RoslynRewriters
             // var forKeywordTrace = GetSimpleTraceStatement(node, GetLineData(node));
             var blockWithLoopTrace =
                 block.WithStatements(block.Statements
-                    .InsertRange(0, new[] {_expressionGenerator.GetRegisterLoopIteration(node)}));
+                    .InsertRange(0, new[] {_expressionGenerator.GetRegisterLoopIteration(node.ForKeyword, lineSpan)}));
 
             var egDetails = new ExpressionGeneratorDetails.Long
             (
@@ -380,6 +381,7 @@ namespace TracingCore.RoslynRewriters
         public override SyntaxNode VisitWhileStatement(WhileStatementSyntax node)
         {
             var hasBlock = node.Statement.IsKind(SyntaxKind.Block);
+            var lineSpan = node.GetLocation().GetLineSpan();
 
             var block = hasBlock
                 ? VisitBlock(node.Statement as BlockSyntax) as BlockSyntax
@@ -387,7 +389,8 @@ namespace TracingCore.RoslynRewriters
 
             var blockWithLoopTrace =
                 block.WithStatements(block.Statements
-                    .InsertRange(0, new[] {_expressionGenerator.GetRegisterLoopIteration(node)}));
+                    .InsertRange(0,
+                        new[] {_expressionGenerator.GetRegisterLoopIteration(node.WhileKeyword, lineSpan)}));
 
             return node.WithStatement(blockWithLoopTrace);
         }
@@ -395,13 +398,14 @@ namespace TracingCore.RoslynRewriters
         public override SyntaxNode VisitDoStatement(DoStatementSyntax node)
         {
             var hasBlock = node.Statement.IsKind(SyntaxKind.Block);
+            var lineSpan = node.GetLocation().GetLineSpan();
 
             var block = hasBlock
                 ? VisitBlock(node.Statement as BlockSyntax) as BlockSyntax
                 : WrapInBlock(node.Statement);
 
             var blockWithLoopTrace = block.WithStatements(block.Statements
-                .InsertRange(0, new[] {_expressionGenerator.GetRegisterLoopIteration(node)}));
+                .InsertRange(0, new[] {_expressionGenerator.GetRegisterLoopIteration(node.DoKeyword, lineSpan)}));
 
             // TODO implement
             return node.WithStatement(blockWithLoopTrace);

@@ -12,14 +12,16 @@ namespace TracingCore
         private readonly PyTutorDataManager _pyTutorDataManager;
         private readonly ConsoleHandler _consoleHandler;
         private readonly ClassManager _classManager;
+        private readonly StructManager _structManager;
         private readonly LoopManager _loopManager;
 
         public TraceApiManager(PyTutorDataManager pyTutorDataManager, ConsoleHandler consoleHandler,
-            ClassManager classManager, LoopManager loopManager)
+            ClassManager classManager, StructManager structManager, LoopManager loopManager)
         {
             _pyTutorDataManager = pyTutorDataManager;
             _consoleHandler = consoleHandler;
             _classManager = classManager;
+            _structManager = structManager;
             _loopManager = loopManager;
         }
 
@@ -72,6 +74,10 @@ namespace TracingCore
         {
             _consoleHandler.Init();
             _classManager.RegisterClasses();
+            _structManager.RegisterStructs();
+
+            var structs = _structManager.GetStructData();
+            _pyTutorDataManager.PreloadHeap(structs.Select(x => x as TypeDeclarationData).ToList());
         }
 
         public void Reset()

@@ -101,9 +101,12 @@ namespace TracingCore
         )
         {
             var classManager = new ClassManager(compilationResult, new Dictionary<string, ClassData>());
+            var structManager = new StructManager(compilationResult, new Dictionary<string, StructData>());
             var loopManager = new LoopManager();
+            var traceApiManager = new TraceApiManager(PyTutorDataManager, ConsoleHandler, classManager, structManager,
+                loopManager);
 
-            TraceApi.Init(new TraceApiManager(PyTutorDataManager, ConsoleHandler, classManager, loopManager));
+            TraceApi.Init(traceApiManager);
 
             PyTutorData pyTutorData;
             try
