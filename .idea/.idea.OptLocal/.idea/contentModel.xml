@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ContentModelStore">
-    <e p="$USER_HOME$/Library/Caches/Rider2019.3/extResources" t="IncludeRecursive" />
-    <e p="$USER_HOME$/Library/Caches/Rider2019.3/resharper-host/local/Transient/ReSharperHost/v193/SolutionCaches/_OptLocal.-363407406.00" t="ExcludeRecursive" />
+    <e p="$USER_HOME$/Library/Caches/JetBrains/Rider2020.2/extResources" t="IncludeRecursive" />
+    <e p="$USER_HOME$/Library/Caches/JetBrains/Rider2020.2/javascript/typings/lodash/4.14.161/node_modules/@types/lodash" t="IncludeRecursive" />
+    <e p="$USER_HOME$/Library/Caches/JetBrains/Rider2020.2/resharper-host/local/Transient/Rider/v202/SolutionCaches/_OptLocal.1564007562.00" t="ExcludeRecursive" />
     <e p="$PROJECT_DIR$" t="IncludeFlat">
       <e p="OptLocal" t="IncludeRecursive">
         <e p="appsettings.Development.json" t="Include" />
@@ -41,6 +42,7 @@
           <e p="node" t="IncludeRecursive" />
         </e>
         <e p="node_modules/@vue/component-compiler-utils" t="IncludeRecursive" />
+        <e p="node_modules/acorn" t="IncludeRecursive" />
         <e p="node_modules/axios" t="IncludeRecursive" />
         <e p="node_modules/babel-loader" t="IncludeRecursive" />
         <e p="node_modules/bootstrap-vue" t="IncludeRecursive" />
@@ -60,7 +62,6 @@
         <e p="node_modules/postcss" t="IncludeRecursive" />
         <e p="node_modules/postcss-selector-parser" t="IncludeRecursive" />
         <e p="node_modules/rimraf" t="IncludeRecursive" />
-        <e p="node_modules/source-map" t="IncludeRecursive" />
         <e p="node_modules/style-loader" t="IncludeRecursive" />
         <e p="node_modules/terser" t="IncludeRecursive" />
         <e p="node_modules/tslib" t="IncludeRecursive" />
