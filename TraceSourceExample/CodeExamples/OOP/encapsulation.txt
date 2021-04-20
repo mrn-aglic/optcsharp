@@ -1,0 +1,29 @@
+using System;
+
+namespace encapsulation
+{
+    class Osoba
+    {
+        string BrojRacuna;
+        public Osoba(string brojRacuna)
+        {
+            BrojRacuna = brojRacuna;
+        }    
+
+        public string DobaviBrojRacuna()
+        {
+            return "####" + BrojRacuna.Substring(4);
+        }
+    }
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Osoba o = new Osoba("12345678");
+            Console.WriteLine(o.DobaviBrojRacuna());
+
+            // o.BrojRacuna = "12341234";
+            Console.WriteLine(o.DobaviBrojRacuna());
+        }
+    }
+}

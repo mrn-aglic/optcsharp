@@ -1,0 +1,37 @@
+using System;
+
+namespace nasljedivanje
+{
+    class Osoba
+    {
+        public string Ime;
+        int Godiste;
+        public Osoba(string ime, int godiste)
+        {
+            Ime = ime;
+            Godiste = godiste;
+        }
+
+        public int DobaviGodine()
+        {
+            return 2020 - Godiste;
+        }
+    }
+
+    class Student : Osoba
+    {
+        public string Jmbag;
+        public Student(string name, int godiste, string jmbag) : base(name, godiste)
+        {
+            Jmbag = jmbag;
+        }
+    }
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Student s = new Student("Ivan", 1994, "0123456789");
+            Console.WriteLine($"{s.Ime} {s.Jmbag} Ima godina: {s.DobaviGodine()}");
+        }
+    }
+}

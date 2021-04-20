@@ -1,0 +1,28 @@
+using System;
+
+namespace objectmessagepassing
+{
+    class Osoba
+    {
+        int Godiste;
+        public Osoba(int godiste)
+        {
+            Godiste = godiste;
+        }
+
+        public int Godine()
+        {
+            return 2020 - Godiste;
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Osoba o = new Osoba(1994);
+            int god = o.Godine();
+            Console.WriteLine("Osoba ima " + god + " godina");
+        }
+    }
+}

@@ -1,0 +1,46 @@
+using System;
+
+namespace polimorfizam
+{
+    class Osoba
+    {
+        public string Ime;
+        public Osoba(string ime)
+        {
+            Ime = ime;
+        }
+
+        public virtual void Ucenje()
+        {
+            Console.WriteLine("Samostalno učenje");
+        }
+    }
+
+    class Student : Osoba
+    {
+        public string Jmbag;
+        public Student(string name, string jmbag) : base(name)
+        {
+            Jmbag = jmbag;
+        }
+
+        public override void Ucenje()
+        {
+            Console.WriteLine("Učenje ma fakultetu");
+        }
+    }
+    class Program
+    {
+        static void ispisiUcenje(Osoba o)
+        {
+            o.Ucenje();
+        }
+        static void Main(string[] args)
+        {
+            Osoba o = new Osoba("Ante");
+            Student s = new Student("Ivan", "0123456789");
+            ispisiUcenje(o);
+            ispisiUcenje(s);
+        }
+    }
+}

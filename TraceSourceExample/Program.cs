@@ -31,7 +31,8 @@ namespace TraceSourceExample
         static void Main(string[] args)
         {
             Console.WriteLine(args.GetType());
-            var code = Codes.GetStructExample();
+            var code = Codes.GetFileContents("OOP", "Program2.txt");
+            // var code = Codes.GetStructExample();
             // var code = Codes.GetOOPExample("2_params");
             // var code = Codes.GetStructExample();
             // var code = Codes.GetForExample(1);

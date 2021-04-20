@@ -1,0 +1,30 @@
+using System;
+
+namespace nasljedivanje
+{
+    class Osoba
+    {
+        public string Ime;
+        public Osoba(string ime)
+        {
+            Ime = ime;
+        }
+    }
+
+    class Student : Osoba
+    {
+        public string Jmbag;
+        public Student(string name, string jmbag) : base(name)
+        {
+            Jmbag = jmbag;
+        }
+    }
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Student s = new Student("Ivan", "0123456789");
+            Console.WriteLine($"{s.Ime} {s.Jmbag}");
+        }
+    }
+}

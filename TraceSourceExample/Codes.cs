@@ -13,6 +13,15 @@ namespace TraceSourceExample
             var filePath = $"{directory}CodeExamples/{filename}";
             return File.ReadAllText(filePath);
         }
+        
+        public static string GetFileContents(string dir, string filename)
+        {
+            var directory =
+                AppContext.BaseDirectory.Substring(0,
+                    AppContext.BaseDirectory.IndexOf("bin", StringComparison.Ordinal));
+            var filePath = $"{directory}CodeExamples/{dir}/{filename}";
+            return File.ReadAllText(filePath);
+        }
 
         public static string GetStructExample()
         {

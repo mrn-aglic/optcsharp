@@ -1,0 +1,23 @@
+using System;
+
+namespace Example
+{
+    class Student
+    {
+        string Ime;
+        public Student(string ime)
+        {
+            Ime = ime;
+        }
+    }
+
+    class Program
+    {
+        public static void Main()
+        {
+            Student s1 = new Student("Ana");
+            Student s2 = new Student("Ana");
+            Console.WriteLine(s1 == s2);
+        }
+    }
+}
