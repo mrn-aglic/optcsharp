@@ -15,3 +15,4 @@ node_modules/
 /OptLocal/Instrumentation/
 /TraceSourceExample/Instrumentation/
 /TraceSourceExample/JsonOutput/
+.idea

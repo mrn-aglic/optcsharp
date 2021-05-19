@@ -1,16 +1,12 @@
 using System.Linq;
 using CSharpOptBackend.TreeDetails.Interfaces;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
-namespace CSharpOptBackend.TreeDetails
+namespace CSharpOptBackend.TreeDetails.HighlightManagers
 {
     public class DefaultHighlightManager : IHighlightManager
     {
-        public DefaultHighlightManager()
-        {
-        }
-        
-        
         public Span GetHighlightSpan(SyntaxNode syntaxNode)
         {
             var childNodesAndTokens = syntaxNode.ChildNodesAndTokens();
@@ -31,6 +27,11 @@ namespace CSharpOptBackend.TreeDetails
                 startLocation.Character + 1,
                 endLocation.Character + 1
             );
+        }
+
+        public SyntaxKind GetSyntaxKind()
+        {
+            return SyntaxKind.None;
         }
     }
 }

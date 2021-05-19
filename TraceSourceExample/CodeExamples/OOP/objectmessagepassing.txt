@@ -22,6 +22,9 @@ namespace objectmessagepassing
         {
             Osoba o = new Osoba(1994);
             int god = o.Godine();
+            
+            list.Test().Test2().Test3().Test4();
+            
             Console.WriteLine("Osoba ima " + god + " godina");
         }
     }

@@ -9,7 +9,7 @@ using RoslynExtensions.Models;
 
 namespace CSharpOptBackend.DebuggerCommands
 {
-    public class DebuggerCommand : ICommand
+    public class DebugStatement : ICommand
     {
         public const string DebuggerName = "SharpTutor";
         public const string Step = "Step";
@@ -17,7 +17,7 @@ namespace CSharpOptBackend.DebuggerCommands
         private readonly SyntaxNode _syntaxNode;
         private readonly IEnumerable<string> _variables;
 
-        public DebuggerCommand(SyntaxNode syntaxNode, IEnumerable<string> variables)
+        public DebugStatement(SyntaxNode syntaxNode, IEnumerable<string> variables)
         {
             _syntaxNode = syntaxNode;
             // _span = span;
@@ -29,7 +29,10 @@ namespace CSharpOptBackend.DebuggerCommands
             var span = _syntaxNode.GetSpan();
             var spanDetails = $"{span.GetSingleLineHighlight()}";
             var paramsText = ToParamsText(_variables);
-            return $"{DebuggerName}.{Step}({spanDetails}, {paramsText})";
+
+            var @params = _variables.Any() ? $",{paramsText}" : paramsText;
+
+            return $"{DebuggerName}.{Step}({spanDetails}{@params})";
         }
 
         private string ToParamsText(IEnumerable<string> variables)

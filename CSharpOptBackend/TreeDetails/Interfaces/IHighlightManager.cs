@@ -1,4 +1,11 @@
-$HEADER$namespace $NAMESPACE$
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+
+namespace CSharpOptBackend.TreeDetails.Interfaces
 {
-  public class $CLASS$ {$END$}
+    public interface IHighlightManager
+    {
+        public Span GetHighlightSpan(SyntaxNode node);
+        public SyntaxKind GetSyntaxKind();
+    }
 }

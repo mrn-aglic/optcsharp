@@ -1,4 +1,8 @@
-$HEADER$namespace $NAMESPACE$
+using System.Collections.Generic;
+
+namespace CSharpOptBackend.DebuggerCommands
 {
-  public class $CLASS$ {$END$}
+    public class DebugDataManager
+    {
+    }
 }

@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using CSharpOptBackend.DebuggerCommands;
-using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CSharpOptBackend.Interfaces
 {
-    public interface IDebuggerCommandManager : ICommandManager
+    public interface IDebugStatementManager : ICommandManager
     {
-        public IList<DebuggerCommand> GetCommands();
-        public DebuggerCommand CreateCommand(SyntaxNode node);
+        public IList<DebugStatement> CreateDebugStatements(CompilationUnitSyntax compilationUnit);
     }
 }

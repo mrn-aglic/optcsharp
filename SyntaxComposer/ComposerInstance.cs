@@ -2,17 +2,13 @@ using SyntaxComposer.MessagePassing.interfaces;
 
 namespace SyntaxComposer
 {
-    public class SyntaxComposer : ISyntaxComposer
+    public class ComposerInstance : ISyntaxComposer
     {
         public IMethodWrappers MethodWrappers { get; }
 
-        public SyntaxComposer(IMethodWrappers methodWrappers)
+        public ComposerInstance(IMethodWrappers methodWrappers)
         {
             MethodWrappers = methodWrappers;
         }
-    }
-
-    public interface ISyntaxComposer
-    {
     }
 }

@@ -7,10 +7,12 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpOptBackend.SyntaxComposers
 {
-    public class ArgumentsList
+    public class ArgumentList
     {
-        public ArgumentListSyntax CreateArgumentList(params ExpressionSyntax[] arguments)
+        public static ArgumentListSyntax CreateArgumentList(params ExpressionSyntax[] arguments)
         {
+            if (!arguments.Any()) return ArgumentList();
+
             var args = arguments.Skip(1);
             var syntaxList = new SyntaxNodeOrTokenList().Add(Argument(arguments[0]));
 
@@ -23,8 +25,10 @@ namespace CSharpOptBackend.SyntaxComposers
             );
         }
 
-        public ArgumentListSyntax CreateNamedArgumentList(params (ExpressionSyntax expr, string name)[] namedArguments)
+        public static ArgumentListSyntax CreateNamedArgumentList(
+            params (ExpressionSyntax expr, string name)[] namedArguments)
         {
+            if (!namedArguments.Any()) return ArgumentList();
             var args = namedArguments.Skip(1);
 
             var (firstExpr, name) = namedArguments[0];
@@ -33,7 +37,7 @@ namespace CSharpOptBackend.SyntaxComposers
             var syntaxList = new SyntaxNodeOrTokenList().Add(firstArg);
 
             var list = args.Aggregate(syntaxList,
-                (acc, cur) => 
+                (acc, cur) =>
                     acc.Add(Token(SyntaxKind.CommaToken)).Add(cur.expr.ToNamedArgument(cur.name))
             );
 

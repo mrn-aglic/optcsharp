@@ -3,49 +3,104 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpOptBackend.Interfaces;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using RoslynExtensions.Extensions;
 
 namespace CSharpOptBackend.DebuggerCommands
 {
     public class DebugStatementManager : IDebugStatementManager
     {
-        public IList<DebugStatement> DebuggerCommands { get; }
+        private bool _includeMainArgs = false;
+        public ScopeManager ScopeManager { get; }
+        public IList<DebugStatement> DebugStatements { get; }
 
-        public DebugStatementManager()
+        public DebugStatementManager(ScopeManager scopeManager)
         {
-            DebuggerCommands = new List<DebugStatement>();
+            ScopeManager = scopeManager;
+            DebugStatements = new List<DebugStatement>();
         }
 
-        public void AddCommand(ICommand command)
+        public IList<DebugStatement> CreateDebugStatements(CompilationUnitSyntax compilationUnit)
         {
-            switch (command)
+            var descendants = compilationUnit.DescendantNodes();
+            var members = descendants.Where(desc => desc.IsMember());
+
+            var debugStatements = new List<DebugStatement>();
+
+            foreach (var member in members)
             {
-                case DebugStatement cmd:
-                    DebuggerCommands.Add(cmd);
-                    break;
-                default: throw new ArgumentException("Unsupported command for DebuggerCommands.CommandManager");
+                var newDebugStatements = CreateDebugStatementsForMember(member);
+                debugStatements.AddRange(newDebugStatements);
+            }
+
+            return debugStatements;
+        }
+
+        private IList<DebugStatement> CreateDebugStatementsForMember(SyntaxNode node)
+        {
+            switch (node)
+            {
+                case MethodDeclarationSyntax methodDeclaration:
+                    return CreateForMethod(methodDeclaration);
+                default:
+                    throw new NotImplementedException($"Can't get statement for {node.Kind()}");
             }
         }
 
-        public IList<DebugStatement> GetCommands()
+        private IList<DebugStatement> CreateForMethod(MethodDeclarationSyntax methodDeclaration)
         {
-            return DebuggerCommands.ToList();
+            var isMain = methodDeclaration.IsStatic() && methodDeclaration.Identifier.Text == "Main";
+            var scopedVars = ScopeManager.GetScopedVars(methodDeclaration).Where(x => !isMain).ToList();
+            var bodyStatements = Create(methodDeclaration.Body, scopedVars);
+            return bodyStatements;
         }
 
-        public DebugStatement CreateCommand(SyntaxNode node)
+        private bool ShouldAccept(SyntaxNode node)
         {
-            throw new NotImplementedException();
+            return node is StatementSyntax;
         }
 
-
-        private DebugStatement CollectCommands(MethodDeclarationSyntax methodDeclarationSyntax)
+        private bool CreatesScope(SyntaxNode node)
         {
-            var parameters = methodDeclarationSyntax.ParameterList.Parameters;
+            return node.IsKind(SyntaxKind.Block) ||
+                   node.IsKind(SyntaxKind.ForStatement);
+        }
 
-            var debuggerCommands =
-                new DebugStatement(methodDeclarationSyntax, parameters.Select(p => p.Identifier.Text));
+        private IList<DebugStatement> Create(SyntaxNode node, IList<ScopedVar> existingScopedVars)
+        {
+            (IList<DebugStatement> debugStatements, IList<ScopedVar> scopedVars) CreateInner(
+                SyntaxNode _node,
+                List<ScopedVar> currentScope)
+            {
+                var debugStatements = new List<DebugStatement>();
 
-            return debuggerCommands;
+                var myScope = new List<ScopedVar>(currentScope);
+
+                if (!(_node is BlockSyntax))
+                {
+                    var vars = ScopeManager.CreateScopedVars(_node);
+                    myScope.AddRange(vars);
+
+                    var debugStatement = new DebugStatement(_node, myScope.Select(v => v.Name));
+                    debugStatements.Add(debugStatement);
+                }
+
+                foreach (var childNode in _node.ChildNodes().Where(ShouldAccept))
+                {
+                    var (statements, vars) = CreateInner(childNode, myScope);
+                    debugStatements.AddRange(statements);
+
+                    if (!CreatesScope(childNode))
+                        myScope.AddRange(vars);
+                }
+
+                var newVars = myScope.Where(s => !currentScope.Contains(s)).ToList();
+
+                return (debugStatements, newVars);
+            }
+
+            return CreateInner(node, existingScopedVars.ToList()).debugStatements;
         }
     }
 }

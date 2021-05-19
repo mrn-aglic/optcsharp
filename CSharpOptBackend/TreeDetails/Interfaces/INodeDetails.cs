@@ -1,8 +1,12 @@
-namespace CSharpOptBackend.TreeDetails
+using System.Collections.Generic;
+using Microsoft.CodeAnalysis;
+
+namespace CSharpOptBackend.TreeDetails.Interfaces
 {
-    public class INodeDetails
+    public interface INodeDetails
     {
-        public int Start { get; }
-        public int End { get; }
+        public SyntaxNode Node { get; }
+        public Span NodeSpan { get; }
+        public IList<Span> HighlightSpans { get; }
     }
 }

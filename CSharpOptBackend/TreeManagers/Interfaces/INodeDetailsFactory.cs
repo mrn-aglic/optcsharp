@@ -1,7 +1,8 @@
+using System.Collections.Generic;
 using CSharpOptBackend.TreeDetails.Interfaces;
 using Microsoft.CodeAnalysis;
 
-namespace CSharpOptBackend.TreeManagers.Factories
+namespace CSharpOptBackend.TreeManagers.Interfaces
 {
     public interface INodeDetailsFactory
     {

@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace SyntaxComposer.Extensions
+namespace RoslynExtensions.Extensions
 {
     public static class ExpressionSyntaxExtensions
     {

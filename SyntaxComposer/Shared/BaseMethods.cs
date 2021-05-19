@@ -1,4 +1,8 @@
-$HEADER$namespace $NAMESPACE$
+using SyntaxComposer.Shared.interfaces;
+
+namespace SyntaxComposer.Shared
 {
-  public class $CLASS$ {$END$}
+    public class BaseMethods : IBaseMethods
+    {
+    }
 }

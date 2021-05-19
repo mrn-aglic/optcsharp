@@ -1,7 +1,6 @@
 namespace CSharpOptBackend.Interfaces
 {
-    public class ICommand
+    public interface ICommand
     {
-        
     }
 }

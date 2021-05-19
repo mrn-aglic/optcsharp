@@ -1,9 +1,9 @@
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Linq;
 
-namespace SyntaxComposer.Extensions
+namespace RoslynExtensions.Extensions
 {
     public static class MemberExtensions
     {
