@@ -1,22 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using CSharpAnalyzer;
 using CSharpOptBackend.DebuggerCommands;
-using CSharpOptBackend.Rewriters;
-using CSharpOptBackend.TreeDetails.HighlightManagers;
-using CSharpOptBackend.TreeDetails.Interfaces;
-using CSharpOptBackend.TreeManagers;
-using CSharpOptBackend.TreeManagers.Factories;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SyntaxComposer;
-using SyntaxComposer.MessagePassing;
-using SyntaxComposer.Shared;
 using TracingCore;
 using TracingCore.Common;
 using TracingCore.JsonMappers;
@@ -93,10 +81,6 @@ namespace TraceSourceExample
             var code = Codes.GetFileContents("", "For_2.txt");
 
 
-            var options = new Dictionary<SyntaxKind, IHighlightManager>
-            {
-                {SyntaxKind.MethodDeclaration, new MethodHighlightManager()}
-            };
             var backend = new CSharpOptBackend.OptBackend(code);
 
             var syntaxTree = backend.UserSyntaxTree;

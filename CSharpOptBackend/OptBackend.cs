@@ -1,11 +1,7 @@
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using CSharpOptBackend.DebuggerCommands;
 using CSharpOptBackend.Interfaces;
 using CSharpOptBackend.Rewriters;
-using CSharpOptBackend.TreeDetails.Interfaces;
-using CSharpOptBackend.TreeManagers.Interfaces;
 using CSharpOptBackend.Visitors;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
